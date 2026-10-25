@@ -1,0 +1,2 @@
+# Preserve pasted source material verbatim, including its original whitespace.
+docs/sources/*.txt -whitespace

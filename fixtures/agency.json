@@ -1,0 +1,725 @@
+{
+  "id": "fixture",
+  "generation": 1,
+  "createdAt": 1792800000000,
+  "expiresAt": 1792886400000,
+  "mode": "LOCAL_REHEARSAL",
+  "business": {
+    "id": "agency",
+    "displayName": "Cedar & Co. Creative",
+    "currency": "USD",
+    "timezone": "America/Los_Angeles",
+    "openingCashCents": 2000000,
+    "startDate": "2026-10-26"
+  },
+  "inputVersion": 1,
+  "ledgerVersion": 1,
+  "revision": 1,
+  "invoices": [
+    {
+      "id": "invoice-0",
+      "number": "INV-A",
+      "counterparty": "Aster Advisory",
+      "amountCents": 2000000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2026-11-01",
+      "expectedDate": "2026-10-28",
+      "evidenceId": "doc-inv-0"
+    },
+    {
+      "id": "invoice-1",
+      "number": "INV-002",
+      "counterparty": "Juniper Studio",
+      "amountCents": 200000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2027-02-01",
+      "expectedDate": "2027-02-01",
+      "evidenceId": "doc-inv-1"
+    },
+    {
+      "id": "invoice-2",
+      "number": "INV-003",
+      "counterparty": "Northline Partners",
+      "amountCents": 300000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2027-02-01",
+      "expectedDate": "2027-02-01",
+      "evidenceId": "doc-inv-2"
+    },
+    {
+      "id": "invoice-3",
+      "number": "INV-004",
+      "counterparty": "Morrow Design",
+      "amountCents": 400000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2027-02-01",
+      "expectedDate": "2027-02-01",
+      "evidenceId": "doc-inv-3"
+    },
+    {
+      "id": "invoice-4",
+      "number": "INV-005",
+      "counterparty": "Fieldwork Co.",
+      "amountCents": 500000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2027-02-01",
+      "expectedDate": "2027-02-01",
+      "evidenceId": "doc-inv-4"
+    },
+    {
+      "id": "invoice-5",
+      "number": "INV-006",
+      "counterparty": "Oriel Consulting",
+      "amountCents": 600000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2027-02-01",
+      "expectedDate": "2027-02-01",
+      "evidenceId": "doc-inv-5"
+    },
+    {
+      "id": "invoice-6",
+      "number": "INV-007",
+      "counterparty": "Tandem Works",
+      "amountCents": 700000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2027-02-01",
+      "expectedDate": "2027-02-01",
+      "evidenceId": "doc-inv-6"
+    },
+    {
+      "id": "invoice-7",
+      "number": "INV-008",
+      "counterparty": "Coast & Pine",
+      "amountCents": 800000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2027-02-01",
+      "expectedDate": "2027-02-01",
+      "evidenceId": "doc-inv-7"
+    },
+    {
+      "id": "invoice-8",
+      "number": "INV-009",
+      "counterparty": "Civic Studio",
+      "amountCents": 900000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2027-02-01",
+      "expectedDate": "2027-02-01",
+      "evidenceId": "doc-inv-8"
+    },
+    {
+      "id": "invoice-9",
+      "number": "INV-010",
+      "counterparty": "Sable Agency",
+      "amountCents": 1000000,
+      "issueDate": "2026-10-01",
+      "dueDate": "2027-02-01",
+      "expectedDate": "2027-02-01",
+      "evidenceId": "doc-inv-9"
+    }
+  ],
+  "receipts": [
+    {
+      "id": "receipt-1",
+      "invoiceId": "invoice-1",
+      "amountCents": 200000,
+      "date": "2026-10-20",
+      "posted": true,
+      "evidenceId": "doc-bank"
+    },
+    {
+      "id": "receipt-2",
+      "invoiceId": "invoice-2",
+      "amountCents": 100000,
+      "date": "2026-10-20",
+      "posted": true,
+      "evidenceId": "doc-bank"
+    },
+    {
+      "id": "receipt-3",
+      "invoiceId": "invoice-3",
+      "amountCents": 400000,
+      "date": "2026-10-20",
+      "posted": true,
+      "evidenceId": "doc-bank"
+    },
+    {
+      "id": "receipt-4",
+      "invoiceId": "invoice-4",
+      "amountCents": 500000,
+      "date": "2026-10-20",
+      "posted": true,
+      "evidenceId": "doc-bank"
+    },
+    {
+      "id": "receipt-5",
+      "invoiceId": "invoice-5",
+      "amountCents": 600000,
+      "date": "2026-10-20",
+      "posted": true,
+      "evidenceId": "doc-bank"
+    },
+    {
+      "id": "receipt-6",
+      "invoiceId": "invoice-6",
+      "amountCents": 700000,
+      "date": "2026-10-20",
+      "posted": true,
+      "evidenceId": "doc-bank"
+    },
+    {
+      "id": "receipt-7",
+      "invoiceId": "invoice-7",
+      "amountCents": 800000,
+      "date": "2026-10-20",
+      "posted": true,
+      "evidenceId": "doc-bank"
+    },
+    {
+      "id": "receipt-8",
+      "invoiceId": "invoice-8",
+      "amountCents": 900000,
+      "date": "2026-10-20",
+      "posted": true,
+      "evidenceId": "doc-bank"
+    },
+    {
+      "id": "receipt-9",
+      "invoiceId": "invoice-9",
+      "amountCents": 1000000,
+      "date": "2026-10-20",
+      "posted": true,
+      "evidenceId": "doc-bank"
+    },
+    {
+      "id": "receipt-unmatched",
+      "invoiceId": "invoice-2",
+      "amountCents": 50000,
+      "date": "2026-10-21",
+      "posted": false,
+      "evidenceId": "doc-bank"
+    }
+  ],
+  "credits": [],
+  "documents": [
+    {
+      "id": "doc-inv-0",
+      "filename": "INV-A.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-A\nCounterparty: Aster Advisory\nCurrency: USD\nAmountCents: 2000000\nIssueDate: 2026-10-01\nDueDate: 2026-11-01"
+    },
+    {
+      "id": "doc-inv-1",
+      "filename": "INV-002.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-002\nCounterparty: Juniper Studio\nCurrency: USD\nAmountCents: 200000\nIssueDate: 2026-10-01\nDueDate: 2027-02-01"
+    },
+    {
+      "id": "doc-inv-2",
+      "filename": "INV-003.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-003\nCounterparty: Northline Partners\nCurrency: USD\nAmountCents: 300000\nIssueDate: 2026-10-01\nDueDate: 2027-02-01"
+    },
+    {
+      "id": "doc-inv-3",
+      "filename": "INV-004.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-004\nCounterparty: Morrow Design\nCurrency: USD\nAmountCents: 400000\nIssueDate: 2026-10-01\nDueDate: 2027-02-01"
+    },
+    {
+      "id": "doc-inv-4",
+      "filename": "INV-005.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-005\nCounterparty: Fieldwork Co.\nCurrency: USD\nAmountCents: 500000\nIssueDate: 2026-10-01\nDueDate: 2027-02-01"
+    },
+    {
+      "id": "doc-inv-5",
+      "filename": "INV-006.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-006\nCounterparty: Oriel Consulting\nCurrency: USD\nAmountCents: 600000\nIssueDate: 2026-10-01\nDueDate: 2027-02-01"
+    },
+    {
+      "id": "doc-inv-6",
+      "filename": "INV-007.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-007\nCounterparty: Tandem Works\nCurrency: USD\nAmountCents: 700000\nIssueDate: 2026-10-01\nDueDate: 2027-02-01"
+    },
+    {
+      "id": "doc-inv-7",
+      "filename": "INV-008.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-008\nCounterparty: Coast & Pine\nCurrency: USD\nAmountCents: 800000\nIssueDate: 2026-10-01\nDueDate: 2027-02-01"
+    },
+    {
+      "id": "doc-inv-8",
+      "filename": "INV-009.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-009\nCounterparty: Civic Studio\nCurrency: USD\nAmountCents: 900000\nIssueDate: 2026-10-01\nDueDate: 2027-02-01"
+    },
+    {
+      "id": "doc-inv-9",
+      "filename": "INV-010.pdf",
+      "mime": "application/pdf",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "invoice",
+      "text": "LedgerProof synthetic invoice\nInvoice: INV-010\nCounterparty: Sable Agency\nCurrency: USD\nAmountCents: 1000000\nIssueDate: 2026-10-01\nDueDate: 2027-02-01"
+    },
+    {
+      "id": "doc-bank",
+      "filename": "bank.csv",
+      "mime": "text/csv",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "bank",
+      "text": "externalId,invoiceNumber,postedDate,amountCents\nreceipt-1,INV-002,2026-10-20,200000\nreceipt-2,INV-003,2026-10-20,100000\nreceipt-3,INV-004,2026-10-20,400000\nreceipt-4,INV-005,2026-10-20,500000\nreceipt-5,INV-006,2026-10-20,600000\nreceipt-6,INV-007,2026-10-20,700000\nreceipt-7,INV-008,2026-10-20,800000\nreceipt-8,INV-009,2026-10-20,900000\nreceipt-9,INV-010,2026-10-20,1000000\nreceipt-unmatched,INV-003,2026-10-21,50000"
+    },
+    {
+      "id": "doc-ledger",
+      "filename": "ledger.csv",
+      "mime": "text/csv",
+      "sha256": "fixture-generated",
+      "uploadedAt": 1792800000000,
+      "kind": "ledger",
+      "text": "entryId,sourceReference,date,account,debitCents,creditCents\nopening,doc-ledger,2026-10-01,cash,2000000,0\nopening,doc-ledger,2026-10-01,opening_equity,0,2000000\nentry-invoice-0,doc-inv-0,2026-10-01,accounts_receivable,2000000,0\nentry-invoice-0,doc-inv-0,2026-10-01,service_revenue,0,2000000\nentry-invoice-1,doc-inv-1,2026-10-01,accounts_receivable,200000,0\nentry-invoice-1,doc-inv-1,2026-10-01,service_revenue,0,200000\nentry-invoice-2,doc-inv-2,2026-10-01,accounts_receivable,300000,0\nentry-invoice-2,doc-inv-2,2026-10-01,service_revenue,0,300000\nentry-invoice-3,doc-inv-3,2026-10-01,accounts_receivable,400000,0\nentry-invoice-3,doc-inv-3,2026-10-01,service_revenue,0,400000\nentry-invoice-4,doc-inv-4,2026-10-01,accounts_receivable,500000,0\nentry-invoice-4,doc-inv-4,2026-10-01,service_revenue,0,500000\nentry-invoice-5,doc-inv-5,2026-10-01,accounts_receivable,600000,0\nentry-invoice-5,doc-inv-5,2026-10-01,service_revenue,0,600000\nentry-invoice-6,doc-inv-6,2026-10-01,accounts_receivable,700000,0\nentry-invoice-6,doc-inv-6,2026-10-01,service_revenue,0,700000\nentry-invoice-7,doc-inv-7,2026-10-01,accounts_receivable,800000,0\nentry-invoice-7,doc-inv-7,2026-10-01,service_revenue,0,800000\nentry-invoice-8,doc-inv-8,2026-10-01,accounts_receivable,900000,0\nentry-invoice-8,doc-inv-8,2026-10-01,service_revenue,0,900000\nentry-invoice-9,doc-inv-9,2026-10-01,accounts_receivable,1000000,0\nentry-invoice-9,doc-inv-9,2026-10-01,service_revenue,0,1000000\nentry-duplicate,doc-inv-4,2026-10-01,accounts_receivable,500000,0\nentry-duplicate,doc-inv-4,2026-10-01,service_revenue,0,500000\nentry-receipt-1,doc-bank,2026-10-20,cash,200000,0\nentry-receipt-1,doc-bank,2026-10-20,accounts_receivable,0,200000\nentry-receipt-2,doc-bank,2026-10-20,cash,100000,0\nentry-receipt-2,doc-bank,2026-10-20,accounts_receivable,0,100000\nentry-receipt-3,doc-bank,2026-10-20,cash,400000,0\nentry-receipt-3,doc-bank,2026-10-20,accounts_receivable,0,400000\nentry-receipt-4,doc-bank,2026-10-20,cash,500000,0\nentry-receipt-4,doc-bank,2026-10-20,accounts_receivable,0,500000\nentry-receipt-5,doc-bank,2026-10-20,cash,600000,0\nentry-receipt-5,doc-bank,2026-10-20,accounts_receivable,0,600000\nentry-receipt-6,doc-bank,2026-10-20,cash,700000,0\nentry-receipt-6,doc-bank,2026-10-20,accounts_receivable,0,700000\nentry-receipt-7,doc-bank,2026-10-20,cash,800000,0\nentry-receipt-7,doc-bank,2026-10-20,accounts_receivable,0,800000\nentry-receipt-8,doc-bank,2026-10-20,cash,900000,0\nentry-receipt-8,doc-bank,2026-10-20,accounts_receivable,0,900000\nentry-receipt-9,doc-bank,2026-10-20,cash,1000000,0\nentry-receipt-9,doc-bank,2026-10-20,accounts_receivable,0,1000000\nhistorical-distribution,doc-ledger,2026-10-23,opening_equity,5200000,0\nhistorical-distribution,doc-ledger,2026-10-23,cash,0,5200000"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "payroll-1",
+      "date": "2026-10-30",
+      "amountCents": 1200000,
+      "category": "payroll",
+      "description": "Week 1 payroll"
+    },
+    {
+      "id": "payroll-2",
+      "date": "2026-11-06",
+      "amountCents": 1200000,
+      "category": "payroll",
+      "description": "Week 2 payroll"
+    },
+    {
+      "id": "expense-1",
+      "date": "2026-11-18",
+      "amountCents": 150000,
+      "category": "expense",
+      "description": "Studio lease"
+    },
+    {
+      "id": "expense-2",
+      "date": "2026-11-20",
+      "amountCents": 50000,
+      "category": "expense",
+      "description": "Software subscriptions"
+    }
+  ],
+  "entries": [
+    {
+      "id": "opening",
+      "sourceReference": "doc-ledger",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 2000000,
+          "creditCents": 0
+        },
+        {
+          "account": "opening_equity",
+          "debitCents": 0,
+          "creditCents": 2000000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-0",
+      "sourceReference": "doc-inv-0",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 2000000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 2000000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-1",
+      "sourceReference": "doc-inv-1",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 200000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 200000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-2",
+      "sourceReference": "doc-inv-2",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 300000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 300000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-3",
+      "sourceReference": "doc-inv-3",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 400000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 400000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-4",
+      "sourceReference": "doc-inv-4",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 500000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 500000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-5",
+      "sourceReference": "doc-inv-5",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 600000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 600000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-6",
+      "sourceReference": "doc-inv-6",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 700000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 700000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-7",
+      "sourceReference": "doc-inv-7",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 800000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 800000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-8",
+      "sourceReference": "doc-inv-8",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 900000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 900000
+        }
+      ]
+    },
+    {
+      "id": "entry-invoice-9",
+      "sourceReference": "doc-inv-9",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 1000000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 1000000
+        }
+      ]
+    },
+    {
+      "id": "entry-duplicate",
+      "sourceReference": "doc-inv-4",
+      "effectiveDate": "2026-10-01",
+      "lines": [
+        {
+          "account": "accounts_receivable",
+          "debitCents": 500000,
+          "creditCents": 0
+        },
+        {
+          "account": "service_revenue",
+          "debitCents": 0,
+          "creditCents": 500000
+        }
+      ]
+    },
+    {
+      "id": "entry-receipt-1",
+      "sourceReference": "doc-bank",
+      "effectiveDate": "2026-10-20",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 200000,
+          "creditCents": 0
+        },
+        {
+          "account": "accounts_receivable",
+          "debitCents": 0,
+          "creditCents": 200000
+        }
+      ]
+    },
+    {
+      "id": "entry-receipt-2",
+      "sourceReference": "doc-bank",
+      "effectiveDate": "2026-10-20",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 100000,
+          "creditCents": 0
+        },
+        {
+          "account": "accounts_receivable",
+          "debitCents": 0,
+          "creditCents": 100000
+        }
+      ]
+    },
+    {
+      "id": "entry-receipt-3",
+      "sourceReference": "doc-bank",
+      "effectiveDate": "2026-10-20",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 400000,
+          "creditCents": 0
+        },
+        {
+          "account": "accounts_receivable",
+          "debitCents": 0,
+          "creditCents": 400000
+        }
+      ]
+    },
+    {
+      "id": "entry-receipt-4",
+      "sourceReference": "doc-bank",
+      "effectiveDate": "2026-10-20",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 500000,
+          "creditCents": 0
+        },
+        {
+          "account": "accounts_receivable",
+          "debitCents": 0,
+          "creditCents": 500000
+        }
+      ]
+    },
+    {
+      "id": "entry-receipt-5",
+      "sourceReference": "doc-bank",
+      "effectiveDate": "2026-10-20",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 600000,
+          "creditCents": 0
+        },
+        {
+          "account": "accounts_receivable",
+          "debitCents": 0,
+          "creditCents": 600000
+        }
+      ]
+    },
+    {
+      "id": "entry-receipt-6",
+      "sourceReference": "doc-bank",
+      "effectiveDate": "2026-10-20",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 700000,
+          "creditCents": 0
+        },
+        {
+          "account": "accounts_receivable",
+          "debitCents": 0,
+          "creditCents": 700000
+        }
+      ]
+    },
+    {
+      "id": "entry-receipt-7",
+      "sourceReference": "doc-bank",
+      "effectiveDate": "2026-10-20",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 800000,
+          "creditCents": 0
+        },
+        {
+          "account": "accounts_receivable",
+          "debitCents": 0,
+          "creditCents": 800000
+        }
+      ]
+    },
+    {
+      "id": "entry-receipt-8",
+      "sourceReference": "doc-bank",
+      "effectiveDate": "2026-10-20",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 900000,
+          "creditCents": 0
+        },
+        {
+          "account": "accounts_receivable",
+          "debitCents": 0,
+          "creditCents": 900000
+        }
+      ]
+    },
+    {
+      "id": "entry-receipt-9",
+      "sourceReference": "doc-bank",
+      "effectiveDate": "2026-10-20",
+      "lines": [
+        {
+          "account": "cash",
+          "debitCents": 1000000,
+          "creditCents": 0
+        },
+        {
+          "account": "accounts_receivable",
+          "debitCents": 0,
+          "creditCents": 1000000
+        }
+      ]
+    },
+    {
+      "id": "historical-distribution",
+      "sourceReference": "doc-ledger",
+      "effectiveDate": "2026-10-23",
+      "lines": [
+        {
+          "account": "opening_equity",
+          "debitCents": 5200000,
+          "creditCents": 0
+        },
+        {
+          "account": "cash",
+          "debitCents": 0,
+          "creditCents": 5200000
+        }
+      ]
+    }
+  ],
+  "scenarios": [],
+  "findings": [],
+  "proposals": [],
+  "runs": [],
+  "events": [],
+  "decisions": {}
+}

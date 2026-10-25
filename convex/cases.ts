@@ -1,0 +1,13 @@
+import { mutationGeneric as mutation,queryGeneric as query } from 'convex/server';
+import { v } from 'convex/values';
+import { createFixture } from '../fixtures/agency';
+import { caseSchema,commandSchema } from '../lib/contracts';
+import { transition } from '../lib/workflow';
+
+function authorize(secret:string){if(!process.env.LEDGERPROOF_BACKEND_SECRET||secret!==process.env.LEDGERPROOF_BACKEND_SECRET)throw Error('Unauthorized backend');}
+const auth={secret:v.string(),caseId:v.string(),tokenHash:v.string()};
+export const create=mutation({args:{...auth,now:v.number()},handler:async(ctx,args)=>{authorize(args.secret);if(await ctx.db.query('cases').withIndex('by_case',q=>q.eq('caseId',args.caseId)).first())throw Error('Case already exists');const state=createFixture(args.caseId,args.now,1,'CONVEX');await ctx.db.insert('cases',{caseId:args.caseId,tokenHash:args.tokenHash,expiresAt:state.expiresAt,revision:state.revision,state});return state;}});
+export const read=query({args:auth,handler:async(ctx,args)=>{authorize(args.secret);const row=await ctx.db.query('cases').withIndex('by_case',q=>q.eq('caseId',args.caseId)).first();if(!row||row.tokenHash!==args.tokenHash||row.expiresAt<Date.now())throw Error('Session unavailable');return caseSchema.parse(row.state);}});
+export const apply=mutation({args:{...auth,command:v.any()},handler:async(ctx,args)=>{authorize(args.secret);const row=await ctx.db.query('cases').withIndex('by_case',q=>q.eq('caseId',args.caseId)).first();if(!row||row.tokenHash!==args.tokenHash||row.expiresAt<Date.now())throw Error('Session unavailable');const state=transition(caseSchema.parse(row.state),commandSchema.parse(args.command));await ctx.db.patch(row._id,{state,expiresAt:state.expiresAt,revision:state.revision});return state;}});
+export const uploadUrl=mutation({args:auth,handler:async(ctx,args)=>{authorize(args.secret);const row=await ctx.db.query('cases').withIndex('by_case',q=>q.eq('caseId',args.caseId)).first();if(!row||row.tokenHash!==args.tokenHash||row.expiresAt<Date.now())throw Error('Session unavailable');return await ctx.storage.generateUploadUrl();}});
+export const fileUrl=query({args:{...auth,storageId:v.id('_storage'),documentId:v.string()},handler:async(ctx,args)=>{authorize(args.secret);const row=await ctx.db.query('cases').withIndex('by_case',q=>q.eq('caseId',args.caseId)).first();if(!row||row.tokenHash!==args.tokenHash||row.expiresAt<Date.now())throw Error('Session unavailable');const c=caseSchema.parse(row.state);if(!c.documents.some(d=>d.id===args.documentId&&d.storageRef===args.storageId))throw Error('Document unavailable');return await ctx.storage.getUrl(args.storageId);}});

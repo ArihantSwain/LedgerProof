@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="960" viewBox="0 0 1400 960" role="img" aria-labelledby="title desc">
+<title id="title">Ownership and the current data model</title><desc id="desc">Today: one bounded typed aggregate per judge case. The normalized production schema is a future migration.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d9185"/></marker></defs>
+<rect width="1400" height="960" fill="#f8faf6"/>
+<text x="50" y="46" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="2">LEDGERPROOF / ARCHITECTURE ATLAS</text>
+<text x="50" y="90" fill="#223b35" font-family="Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="0">Ownership and the current data model</text>
+<text x="50" y="121" fill="#6c7c76" font-family="Arial, sans-serif" font-size="14" font-weight="400" letter-spacing="0">Today: one bounded typed aggregate per judge case. The normalized production schema is a future migration.</text>
+<rect x="50" y="175" width="300" height="115" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="68" y="205" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Session capability</text>
+<text x="68" y="232" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Random token → stored hash</text>
+<text x="68" y="254" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">24-hour access / reset scope</text>
+<text x="68" y="274" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CASE-SCOPED ACCESS</text>
+<rect x="500" y="175" width="370" height="115" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="518" y="205" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Case / business aggregate</text>
+<text x="518" y="232" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Generation + input / ledger versions</text>
+<text x="518" y="254" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Revision + owner-scoped state</text>
+<text x="518" y="274" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">ONE TRANSACTIONAL UNIT</text>
+<polyline points="350,230 500,230" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#arrow)"/>
+<rect x="1010" y="175" width="330" height="115" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="1028" y="205" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Other judge case</text>
+<text x="1028" y="232" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Different capability + state</text>
+<text x="1028" y="254" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">No cross-case record API</text>
+<text x="1028" y="274" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">ISOLATED</text>
+<rect x="50" y="430" width="390" height="160" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="68" y="460" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Evidence</text>
+<text x="68" y="487" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Documents / original storage refs</text>
+<text x="68" y="509" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Normalized invoices / receipts</text>
+<text x="68" y="531" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Issued credits / source IDs</text>
+<text x="68" y="574" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CONTAINED IN CASE</text>
+<rect x="500" y="430" width="390" height="160" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="518" y="460" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Investigation</text>
+<text x="518" y="487" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Runs / provider IDs / states</text>
+<text x="518" y="509" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Findings / proposals</text>
+<text x="518" y="531" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Input-version links</text>
+<text x="518" y="574" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CONTAINED IN CASE</text>
+<rect x="950" y="430" width="390" height="160" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="968" y="460" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Accounting + decisions</text>
+<text x="968" y="487" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Ledger entries / permitted lines</text>
+<text x="968" y="509" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Obligations / scenarios</text>
+<text x="968" y="531" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Decisions / application events</text>
+<text x="968" y="574" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CONTAINED IN CASE</text>
+<polyline points="580,290 580,355 245,355 245,430" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#arrow)"/>
+<polyline points="685,290 685,430" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#arrow)"/>
+<polyline points="790,290 790,355 1145,355 1145,430" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#arrow)"/>
+<rect x="50" y="730" width="620" height="130" rx="12" fill="#ffffff" stroke="#cbd7d0" stroke-width="1.5"/>
+<text x="68" y="760" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Physical storage choices</text>
+<text x="68" y="787" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Local: ignored files, atomic rename, one-process queue</text>
+<text x="68" y="809" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Convex: prepared case row + indexes, schema-validated transition</text>
+<text x="68" y="844" fill="#cbd7d0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">ONLY ONE SELECTED BACKEND</text>
+<rect x="720" y="730" width="620" height="130" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="738" y="760" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Future normalized persistence</text>
+<text x="738" y="787" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Organization → business → case ownership and indexed tables</text>
+<text x="738" y="809" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Field provenance / forecast snapshots / retention / migrations</text>
+<text x="738" y="844" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">PLANNED · NOT IMPLEMENTED</text>
+<polyline points="695,590 695,670 1030,670 1030,730" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#arrow)"/>
+<line x1="50" y1="893" x2="1350" y2="893" stroke="#dbe3dc"/>
+<text x="50" y="915" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Ownership is inherited from the aggregate today. Production roles, normalized tables, durable forecast snapshots, and cleanup jobs are not yet present.</text>
+</svg>

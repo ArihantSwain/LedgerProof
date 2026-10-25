@@ -1,0 +1,72 @@
+import { NextRequest,NextResponse } from 'next/server';
+import { randomUUID } from 'node:crypto';
+import { z } from 'zod';
+import { createSession,readCase,applyCommand,saveOriginal,readOriginal,Access } from '@/lib/store';
+import { forecast } from '@/lib/finance';
+import { documentPdf,parseUpload,MAX_BYTES } from '@/lib/documents';
+import { localRehearsal,evidenceBundle } from '@/lib/investigation';
+import { creaoConfigured,startInvestigation,getInvestigation,ProviderResultError } from '@/lib/providers/creao';
+import { Case,Run } from '@/lib/contracts';
+export const runtime='nodejs';
+export const dynamic='force-dynamic';
+const globalRate=globalThis as typeof globalThis & {lpRate?:Map<string,{n:number;until:number}>};
+function limit(key:string,max=60){const map=globalRate.lpRate??=new Map();const now=Date.now();for(const [k,v] of map)if(v.until<now)map.delete(k);const v=map.get(key)??{n:0,until:now+60_000};v.n++;map.set(key,v);if(v.n>max)throw Error('Request limit reached; try again in a minute');}
+function access(req:NextRequest):Access{const raw=req.cookies.get('lp_session')?.value;if(!raw)throw Error('Session unavailable');const [caseId,token]=raw.split('.');return {caseId,token};}
+function response(data:unknown,status=200){return NextResponse.json(data,{status,headers:{'Cache-Control':'no-store','Referrer-Policy':'no-referrer'}});}
+function sessionResponse(a:Access){const r=response({caseId:a.caseId});r.cookies.set('lp_session',a.caseId+'.'+a.token,{httpOnly:true,sameSite:'strict',secure:process.env.APP_ORIGIN?.startsWith('https:')??false,path:'/',maxAge:86400});return r;}
+async function body(req:NextRequest){const text=await req.text();if(text.length>8192)throw Error('Request body too large');return JSON.parse(text);}
+function view(c:Case){return {case:c,baseline:forecast(c,'baseline'),revised:forecast(c,'revised'),preview:forecast(c,'preview'),providers:{creao:creaoConfigured()?'CONFIGURED_UNVERIFIED':'BLOCKED',convex:c.mode==='CONVEX'?'CONFIGURED_UNVERIFIED':'LOCAL_REHEARSAL',anthropic:'BLOCKED',crs:'UNTESTED',coinbase:'UNTESTED',brightdata:'NOT_TARGETED'}};}
+async function poll(a:Access,c:Case){
+ for(const run of c.runs.filter(r=>r.mode==='CREAO'&&r.providerRunId&&['submitted','running','retry_scheduled'].includes(r.state))){
+   if(run.inputVersion!==c.inputVersion)continue;
+   try{const state=await getInvestigation(run.providerRunId!,c);if(state.status==='completed'&&state.result)c=await applyCommand(a,{type:'apply_result',runId:run.id,generation:run.generation,result:state.result});else c=await applyCommand(a,{type:'update_run',runId:run.id,generation:run.generation,patch:{state:state.status==='failed'||state.status==='cancelled'?'failed':'running'}});}
+   catch(error){c=await applyCommand(a,{type:'update_run',runId:run.id,generation:run.generation,patch:{state:error instanceof ProviderResultError?'needs_review':'retry_scheduled',error:error instanceof ProviderResultError?error.message:'Provider retrieval failed. Resume retrieves the same run; no resubmission or fabricated result.'}});}
+ }return c;
+}
+export async function GET(req:NextRequest){try{
+ const p=req.nextUrl.pathname.slice(5).split('/').map(decodeURIComponent);const a=access(req);let c=await readCase(a);limit(a.caseId+':read',180);
+ if(p[0]==='state')return response(view(c));
+ if(p[0]==='investigations') {c=await poll(a,c);return response(view(c));}
+ if(p[0]==='cases'&&p[1]===c.id&&p[2]==='bundle')return response(evidenceBundle(c));
+ if(p[0]==='share')return response({fragment:`session=${a.caseId}.${a.token}`});
+ if(p[0]==='documents'&&p[1]){const d=c.documents.find(d=>d.id===p[1]);if(!d)throw Error('Document unavailable');const bytes=await readOriginal(a,d.id)??(d.mime==='application/pdf'?await documentPdf(d.text):new TextEncoder().encode(d.text));return new NextResponse(Buffer.from(bytes),{headers:{'Content-Type':d.mime,'Content-Disposition':`inline; filename="${d.filename}"`,'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'}});}
+ if(p[0]==='reports')return new NextResponse(JSON.stringify({label:'Synthetic accounting investigation and decision support',mode:c.mode,business:c.business,forecast:forecast(c),findings:c.findings,reviewEvents:c.events,providerRuns:c.runs.map(r=>({id:r.id,mode:r.mode,providerRunId:r.providerRunId,state:r.state})),limitations:'CREAO execution and sponsor eligibility are unverified. This is not a certified audit.'},null,2),{headers:{'Content-Type':'application/json','Content-Disposition':'attachment; filename="ledgerproof-report.json"','Cache-Control':'no-store'}});
+ return response({error:'Route not found'},404);
+ }catch(error){return response({error:error instanceof Error?error.message:'Request failed'},400);}}
+export async function POST(req:NextRequest){try{
+ const origin=req.headers.get('origin');if(origin&&origin!==(process.env.APP_ORIGIN??req.nextUrl.origin))return response({error:'Origin rejected'},403);
+ const length=Number(req.headers.get('content-length')??0);if(length>MAX_BYTES+10_000)throw Error('Request body too large');
+ const p=req.nextUrl.pathname.slice(5).split('/').map(decodeURIComponent);
+ if(p[0]==='demo'&&p[1]==='session'){limit('create',20);return sessionResponse(await createSession());}
+ if(p[0]==='demo'&&p[1]==='join'){limit('join',30);const b=z.object({session:z.string().max(110)}).parse(await body(req));const [caseId,token]=b.session.split('.');const a={caseId,token};await readCase(a);return sessionResponse(a);}
+ const a=access(req);limit(a.caseId+':write',40);let c=await readCase(a);
+ if(p[0]==='demo'&&p[1]==='reset')return response(view(await applyCommand(a,{type:'reset'})));
+ if(p[0]==='scenarios'){const b=z.object({invoiceId:z.string(),expectedDate:z.iso.date(),expectedAmountCents:z.number().int().nonnegative().optional(),reason:z.string().min(1).max(500)}).parse(await body(req));return response(view(await applyCommand(a,{type:'scenario',...b})));}
+ if(p[0]==='invoices'&&p[1]){const b=z.object({amountCents:z.number().int().positive()}).parse(await body(req));return response(view(await applyCommand(a,{type:'edit_invoice',invoiceId:p[1],...b})));}
+ if(p[0]==='documents'){
+  const form=await req.formData();const f=form.get('file');if(!(f instanceof File)||f.size>MAX_BYTES)throw Error('Choose a supported file up to 1 MB');const bytes=new Uint8Array(await f.arrayBuffer());const parsed=await parseUpload(bytes,f.name,f.type,c);
+  const storageRef=await saveOriginal(a,bytes,parsed.document.mime);const document={...parsed.document,storageRef};
+  if(parsed.credit)c=await applyCommand(a,{type:'upload_credit',document,credit:parsed.credit});else c=await applyCommand(a,{type:'upload_receipt',document,receipt:parsed.receipt!});return response(view(c));
+ }
+ if(p[0]==='proposals'&&p[1]&&['approve','reject'].includes(p[2])){const b=z.object({reason:z.string().min(1).max(500),requestKey:z.string().min(8).max(120),expectedLedgerVersion:z.number().int()}).parse(await body(req));return response(view(await applyCommand(a,{type:'decision',proposalId:p[1],status:p[2]==='approve'?'approved':'rejected',...b})));}
+ if(p[0]==='investigations'||p[0]==='findings'){
+  const b=z.object({mode:z.enum(['CREAO','LOCAL_REHEARSAL']).default('CREAO'),question:z.string().max(1000).optional(),injectTimeout:z.boolean().optional(),resumeRunId:z.string().optional()}).parse(await body(req));
+  if(b.resumeRunId){const r=c.runs.find(r=>r.id===b.resumeRunId);if(!r)throw Error('Run unavailable');if(r.mode==='LOCAL_REHEARSAL'&&r.state==='retry_scheduled')c=await applyCommand(a,{type:'apply_result',runId:r.id,generation:r.generation,result:localRehearsal(c)});else c=await poll(a,c);return response(view(c));}
+  const run:Run={id:randomUUID(),inputVersion:c.inputVersion,generation:c.generation,mode:b.mode,state:b.mode==='CREAO'&&!creaoConfigured()?'blocked':'queued',startedAt:Date.now(),challenge:b.question};
+  if(run.state==='blocked')run.error='CREAO hosted execution unavailable. Configure agent ID, API key, and verify the v2 contract. Local rehearsal is separate and does not satisfy the mandatory integration.';
+  c=await applyCommand(a,{type:'start_run',run});
+  if(run.state==='blocked')return response(view(c));
+  if(b.mode==='LOCAL_REHEARSAL'){
+   if(b.question){c=await applyCommand(a,{type:'update_run',runId:run.id,generation:run.generation,patch:{state:'needs_review',error:'Free-form challenges require CREAO; local rehearsal cannot answer your question.'}});}
+   else if(b.injectTimeout)c=await applyCommand(a,{type:'update_run',runId:run.id,generation:run.generation,patch:{state:'retry_scheduled',error:'SIMULATED retrieval timeout. Resume the same local run.'}});
+   else c=await applyCommand(a,{type:'apply_result',runId:run.id,generation:run.generation,result:localRehearsal(c)});
+  }else{
+   // Persist submission intent first. An interrupted/ambiguous submission is never blindly repeated.
+   c=await applyCommand(a,{type:'update_run',runId:run.id,generation:run.generation,patch:{state:'unknown',error:'Submission outcome unknown until a provider run ID is saved; reconcile in CREAO before another run.'}});
+   try{const providerRunId=await startInvestigation(c,b.question);c=await applyCommand(a,{type:'update_run',runId:run.id,generation:run.generation,patch:{providerRunId,state:'submitted',error:undefined}});}catch{c=await applyCommand(a,{type:'update_run',runId:run.id,generation:run.generation,patch:{state:'unknown',error:'Submission outcome unknown. Do not retry blindly; reconcile against CREAO account history.'}});}
+  }
+  return response(view(c));
+ }
+ if(p[0]==='commerce')return response({error:'Coinbase buyer-agent/x402 flow is UNTESTED and not implemented. No receipt or settlement has been fabricated.'},501);
+ return response({error:'Route not found'},404);
+ }catch(error){return response({error:error instanceof Error?error.message:'Request failed'},400);}}

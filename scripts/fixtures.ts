@@ -1,0 +1,11 @@
+import {mkdir,writeFile} from 'node:fs/promises';
+import {createFixture} from '../fixtures/agency';
+import {documentPdf} from '../lib/documents';
+const c=createFixture('fixture',Date.UTC(2026,9,24));
+await mkdir('public/fixtures',{recursive:true});
+for(const d of c.documents)await writeFile('public/fixtures/'+d.filename,d.mime==='application/pdf'?await documentPdf(d.text):d.text);
+await writeFile('public/fixtures/credit-note-INV-A.pdf',await documentPdf('LEDGERPROOF / SYNTHETIC ISSUED CREDIT NOTE\nType: credit_note\nInvoice: INV-A\nCurrency: USD\nAmountCents: 800000\nDate: 2026-10-26'));
+await writeFile('public/fixtures/bank-upload.csv','externalId,invoiceNumber,postedDate,amountCents\nnew-receipt-001,INV-003,2026-10-26,50000\n');
+await writeFile('public/fixtures/obligations.csv','id,date,amountCents,category,description\n'+c.obligations.map(o=>[o.id,o.date,o.amountCents,o.category,o.description].join(',')).join('\n'));
+await writeFile('fixtures/agency.json',JSON.stringify(c,null,2));
+console.log(`Generated ${c.invoices.length} invoice PDFs, credit PDF, ledger/bank/obligations CSVs from one definition.`);

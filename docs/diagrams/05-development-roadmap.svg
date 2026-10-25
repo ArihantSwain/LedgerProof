@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000" role="img" aria-labelledby="title desc">
+<title id="title">A sequenced path to a useful finance product</title><desc id="desc">Roadmap hypotheses, not shipped features or delivery promises. Access and evidence gates come before broader scope.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d9185"/></marker></defs>
+<rect width="1400" height="1000" fill="#f8faf6"/>
+<text x="50" y="46" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="2">LEDGERPROOF / ARCHITECTURE ATLAS</text>
+<text x="50" y="90" fill="#223b35" font-family="Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="0">A sequenced path to a useful finance product</text>
+<text x="50" y="121" fill="#6c7c76" font-family="Arial, sans-serif" font-size="14" font-weight="400" letter-spacing="0">Roadmap hypotheses, not shipped features or delivery promises. Access and evidence gates come before broader scope.</text>
+<rect x="50" y="190" width="610" height="150" rx="12" fill="#fff2e8" stroke="#b07845" stroke-width="1.5"/>
+<text x="68" y="220" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">A / Verify the event core</text>
+<text x="68" y="247" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Actual hosted CREAO run + share link; deployed Convex</text>
+<text x="68" y="269" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Exact judge case; source review; recovery; honest claims</text>
+<text x="68" y="324" fill="#b07845" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">ACCOUNT ACCESS GATE</text>
+<rect x="740" y="190" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="758" y="220" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">B / Complete supported imports</text>
+<text x="758" y="247" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Trial balance / invoice / bank / ledger / obligations</text>
+<text x="758" y="269" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Staged mapping, validation, atomic import and new cases</text>
+<text x="758" y="324" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">REUSABLE DATA GATE</text>
+<rect x="50" y="440" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="68" y="470" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">C / Pilot reliability</text>
+<text x="68" y="497" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Roles / native sync / workflow / parsing isolation</text>
+<text x="68" y="519" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Retention, observability, quotas and restoration proof</text>
+<text x="68" y="574" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">OPERATIONAL TRUST GATE</text>
+<rect x="740" y="440" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="758" y="470" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">D / Accountant workflow</text>
+<text x="758" y="497" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Read-only close assistant and review portal</text>
+<text x="758" y="519" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Consented real cases, mappings, measured review effort</text>
+<text x="758" y="574" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CUSTOMER VALUE GATE</text>
+<rect x="50" y="690" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="68" y="720" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">E / Repeatable product</text>
+<text x="68" y="747" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Multi-client firms, onboarding, cost controls</text>
+<text x="68" y="769" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Pricing tests, support, retention and narrow distribution</text>
+<text x="68" y="824" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">COMMERCIAL VALIDATION GATE</text>
+<rect x="740" y="690" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="758" y="720" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Conditional expansion</text>
+<text x="758" y="747" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">CRS identity / x402 report / research / accessibility</text>
+<text x="758" y="769" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Factory evaluation worker / Fetch.ai discovery</text>
+<text x="758" y="824" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">UTILITY + CAPABILITY GATE</text>
+<polyline points="660,265 740,265" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#arrow)"/>
+<polyline points="1045,340 1045,385 355,385 355,440" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#arrow)"/>
+<polyline points="660,515 740,515" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#arrow)"/>
+<polyline points="1045,590 1045,635 355,635 355,690" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#arrow)"/>
+<polyline points="660,765 740,765" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#arrow)"/>
+<line x1="50" y1="923" x2="1350" y2="923" stroke="#dbe3dc"/>
+<text x="50" y="945" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Do not add sponsor services before the core works. Stop a path when the data, user need, permissions, or supported capabilities do not fit.</text>
+</svg>

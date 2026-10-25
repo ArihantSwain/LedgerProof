@@ -1,0 +1,1362 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="LedgerProof architecture, service responsibilities, event strategy and future development"><title>LedgerProof — architecture & development briefing</title><style>
+:root{--ink:#233b33;--green:#2f6953;--bg:#f6f8f2;--line:#dce5d8;--muted:#70816f}*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--bg);font:15px/1.75 system-ui,-apple-system,sans-serif}a{color:var(--green)}button,input{font:inherit}button{cursor:pointer}aside{position:fixed;inset:0 auto 0 0;width:265px;background:#eaf0e3;border-right:1px solid var(--line);padding:28px 20px;overflow:auto}.brand{font-size:23px;font-weight:750;letter-spacing:-1px}.brand small{display:block;font-size:10px;letter-spacing:2px;font-weight:500;margin-top:4px;color:var(--muted)}nav{display:grid;gap:4px;margin-top:28px}nav button{border:0;border-radius:5px;background:none;padding:10px 12px;text-align:left;color:#59705b;font-size:13px}nav button[aria-current=page]{background:#d5e3c9;color:#294d38;font-weight:650}nav button:hover{background:#dce8d2}aside p{font-size:11px;line-height:1.8;color:var(--muted);margin-top:35px}main{margin-left:265px;max-width:1550px;padding:35px 50px 70px}.topbar{display:flex;justify-content:space-between;gap:20px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:25px;margin-bottom:35px}.topbar span{font-size:10px;letter-spacing:1px;color:var(--muted)}.tools{display:flex;gap:10px;align-items:center}.tools input{width:210px;border:1px solid var(--line);background:white;border-radius:6px;padding:9px 12px;font-size:12px}.tools button{border:1px solid var(--line);background:white;border-radius:6px;padding:9px 12px;color:var(--ink);font-size:12px}.banner{border:1px solid #e2d4b9;background:#fff8e9;border-radius:8px;padding:15px 20px;font-size:12px;color:#8c6d37;margin-bottom:30px}article{max-width:1120px}article[hidden]{display:none}h1{font-size:39px;line-height:1.2;letter-spacing:-1.5px;font-weight:650;margin:0 0 25px}h2{font-size:23px;letter-spacing:-.5px;margin:42px 0 14px;line-height:1.35}h3{font-size:18px;margin-top:30px}p{margin:14px 0;color:#526652}strong{color:#284e39}li{margin:7px 0;color:#526652}code{background:#e9eee3;border-radius:3px;padding:2px 4px;font-size:.85em;overflow-wrap:anywhere}pre{background:#20392f;color:#eef4e8;border-radius:8px;padding:22px;overflow:auto;font-size:12px;line-height:1.7}pre code{background:none;color:inherit;padding:0}table{border-collapse:collapse;width:100%;font-size:12px;background:#fff}th,td{border:1px solid var(--line);padding:12px 13px;vertical-align:top;text-align:left;line-height:1.6}th{background:#edf3e6;font-weight:650;color:#345338}td{color:#5c6e57}.table-wrap{overflow:auto;border-radius:7px;margin:23px 0}.diagram{background:#f8faf6;border:1px solid var(--line);border-radius:9px;padding:10px;margin:25px 0;overflow:auto}.diagram svg{display:block;width:100%;height:auto;min-width:650px}.source-link{display:inline-block;margin-top:30px;font-size:12px}#search-status{font-size:11px;color:var(--muted);padding:5px 0}.print-title{display:none}.empty{padding:50px;border:1px solid var(--line);border-radius:8px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #9dbb8a;outline-offset:3px}footer{font-size:10px;color:var(--muted);margin-top:55px;border-top:1px solid var(--line);padding-top:20px}
+@media(max-width:900px){aside{position:relative;width:100%;padding:20px}nav{display:flex;overflow:auto;margin-top:17px;gap:5px}nav button{white-space:nowrap}aside p{display:none}main{margin:0;padding:25px 20px}.topbar{align-items:flex-start;flex-direction:column}.tools{width:100%}.tools input{flex:1;width:auto}h1{font-size:31px}.diagram svg{min-width:650px}th,td{min-width:120px}}
+@media print{@page{size:A4;margin:17mm 13mm 18mm}body{font-size:10px;background:white;line-height:1.6}aside,.topbar,.banner,footer,.source-link,#search-status{display:none!important}main{margin:0;padding:0;max-width:none}article[hidden],article{display:block!important;max-width:none;break-before:page}article:first-of-type{break-before:auto}h1{font-size:26px;letter-spacing:-.7px;break-after:avoid}h2{font-size:17px;margin-top:23px;break-after:avoid}h3{font-size:13px;break-after:avoid}table{font-size:8px}th,td{padding:6px;min-width:0}tr{break-inside:avoid}thead{display:table-header-group}.table-wrap{overflow:visible}.diagram{break-inside:avoid;padding:0;border:0}.diagram svg{min-width:0;width:100%}pre{white-space:pre-wrap;font-size:9px}a{color:inherit;text-decoration:none}.print-title{display:block;font-size:10px;color:#60705a;margin-bottom:15px}p,li{orphans:3;widows:3}}
+</style></head><body><aside><div class="brand">LedgerProof<small>ARCHITECTURE & DEVELOPMENT</small></div><nav aria-label="Briefing sections"><button data-target="overview" aria-current="page">Start here</button><button data-target="architecture" >Architecture atlas</button><button data-target="explanation" >How it works</button><button data-target="services" >Service register</button><button data-target="future" >Future development</button><button data-target="event" >Event strategy</button><button data-target="actions" >Your action items</button><button data-target="evaluation" >Evaluation</button><button data-target="workflow" >Workflow stage log</button><button data-target="sources" >Sources and decisions</button></nav><p>October 24, 2026 · Pacific time<br>Self-contained offline briefing.<br>Prepared code is not live-provider proof.<br><br><a href="LedgerProof-Briefing.pdf">Download printable PDF ↓</a></p></aside><main><div class="topbar"><span>RECEIVABLES → EVIDENCE → REVIEW → CASH</span><div class="tools"><input id="search" type="search" aria-label="Search briefing" placeholder="Search services, plans, controls…"><button id="print">Print / save PDF</button></div></div><div class="banner"><strong>Tested local rehearsal.</strong> Mandatory CREAO execution and Convex deployment need account verification. No sponsor integration is LIVE_VERIFIED.</div><div id="search-status" role="status" aria-live="polite"></div><div class="print-title">LedgerProof · Architecture, service responsibilities and development briefing · October 24, 2026</div><article id="overview" data-label="Start here" ><h1>LedgerProof — return briefing</h1>
+<p>Prepared October 24, 2026, America/Los_Angeles. This is the index for the autonomous work package.</p>
+<p>LedgerProof checks whether the invoices behind a cash forecast are trustworthy. The demo agency looks comfortable at $16,000 after two payrolls; an approved credit reduces that to $8,000, and a collection delay reveals a $4,000 shortfall. The useful product is the chain from source evidence to a reviewed correction to an understandable cash decision.</p>
+<p><strong>Current state:</strong> working local rehearsal; mandatory hosted CREAO execution and Convex deployment are still blocked by account setup. Code and diagrams do not establish live integration or sponsor eligibility.</p>
+<h2>Read or open these first</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>What you get</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="briefing.html">Interactive briefing</a></td>
+<td>Self-contained offline guide, diagrams, service search, and roadmap tabs; no account or server required</td>
+</tr>
+<tr>
+<td><a href="LedgerProof-Briefing.pdf">Printable briefing</a></td>
+<td>Portable report for reviewing or sharing after checking its contents</td>
+</tr>
+<tr>
+<td><a href="ARCHITECTURE-DIAGRAMS.md">Architecture atlas</a></td>
+<td>Editable Mermaid plus standalone SVG/PNG architecture, lifecycle, ownership, and roadmap diagrams</td>
+</tr>
+<tr>
+<td><a href="HOW-IT-WORKS.md">How it works</a></td>
+<td>Full user flow, cash calculations, code paths, design choices, failure behavior, and service responsibilities</td>
+</tr>
+<tr>
+<td><a href="SERVICE-REGISTER.md">Service register</a></td>
+<td>Exactly what is built, configured, tested, blocked, and deliberately excluded for each service</td>
+</tr>
+<tr>
+<td><a href="FUTURE-DEVELOPMENT.md">Future development</a></td>
+<td>Sequenced technical/product roadmap, new expansion paths, metrics, commercial hypotheses, and stop conditions</td>
+</tr>
+<tr>
+<td><a href="EVENT-STRATEGY.md">Event strategy</a></td>
+<td>Updated guide interpretation, newly discovered tracks, fit ranking, evidence gaps, and schedule</td>
+</tr>
+<tr>
+<td><a href="ACTION-ITEMS.md">Your action list</a></td>
+<td>Prioritized actions that need your accounts, eligibility information, or publishing/submission decisions</td>
+</tr>
+<tr>
+<td><a href="EVALUATION.md">Evaluation</a></td>
+<td>Actual executed checks; offline evaluation separated from live provider verification</td>
+</tr>
+</tbody></table></div>
+<h2>Local use</h2>
+<pre><code class="language-sh">npm ci
+npm run fixtures
+npm run dev
+</code></pre>
+<p>Open <a href="http://localhost:3000">http://localhost:3000</a> in LedgerProof. Start demo → upload the generated credit → open Investigation activity → explicitly select local rehearsal → run → inspect evidence → approve credit → move collection to November 9. Select weeks 2 and 3 to trace exact cash movements. Reset only your own workspace. See DEMO.md.</p>
+<p>For the briefing alone, open docs/briefing.html directly. Diagrams are under docs/diagrams. Rebuild documentation assets with <code>npm run docs:build</code>; export PDF/PNG with <code>npm run docs:export</code> after installing Playwright Chromium.</p>
+<h2>Autonomous changes made in this pass</h2>
+<p>Added the architecture atlas, service inventory, operating explanation, development strategy, event/source register, stage log, submission checklist, and an offline navigable/printable briefing. Reviewed the user-supplied event guide and retrieved the linked Coinbase and Figma challenge content through Google Drive.</p>
+<p>Hardened CREAO configuration: one explicitly selected API family, no automatic cross-family fallback, family-specific request/response validation, structured text handling, bounded payloads, wrong-run rejection, and malformed outputs escalated to review. Both adapters are contract-tested with mock HTTP responses, <strong>not live verified</strong>.</p>
+<p>Corrected a finance edge case found during architecture review: newly posted receipts now enter the forecast in their actual date bucket, rather than all being added to opening cash. Source amounts with fractional dollars now retain cents in the display. The exact judge cash story remains unchanged.</p>
+<p>No sponsor was added merely to claim another track. No paid service was purchased, real money moved, customer contacted, public deployment made, or Devpost submission sent. Missing account access is summarized in ACTION-ITEMS.md, so you do not need to reconstruct the conversation.</p>
+<p>Final verification: 20 unit/backend/provider-contract tests, 3 browser tests, typecheck and production build pass. Five diagrams, offline navigation/search/mobile behavior, and the 26-page PDF were checked. A local-only configuration doctor, changed-input test bundles, and an offline GitHub Actions workflow are prepared. Remote CI has not run; no source push occurred.</p>
+<a class="source-link" href="START-HERE.md">Open editable Markdown ↗</a></article>
+<article id="architecture" data-label="Architecture atlas" hidden><h1>Architecture atlas</h1>
+<p>Each diagram has an editable Mermaid source, portable SVG and exported PNG under diagrams/. Regenerate SVG with <code>python3 scripts/render-diagrams.py</code>; regenerate briefing/PDF/PNG using the npm docs scripts. Green denotes a working local component, orange a prepared but blocked hosted path, and blue a future/conditional path. A box is not evidence of a live integration.</p>
+<h2>1. System context and trust boundaries</h2>
+<p><div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="1400" height="950" viewBox="0 0 1400 950" role="img" aria-labelledby="01-system-context-title 01-system-context-desc">
+<title id="01-system-context-title">The system and its trust boundaries</title><desc id="01-system-context-desc">Solid arrows: implemented local path. Dashed arrows: prepared hosted calls, blocked until account verification.</desc>
+<defs><marker id="01-system-context-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d9185"/></marker></defs>
+<rect width="1400" height="950" fill="#f8faf6"/>
+<text x="50" y="46" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="2">LEDGERPROOF / ARCHITECTURE ATLAS</text>
+<text x="50" y="90" fill="#223b35" font-family="Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="0">The system and its trust boundaries</text>
+<text x="50" y="121" fill="#6c7c76" font-family="Arial, sans-serif" font-size="14" font-weight="400" letter-spacing="0">Solid arrows: implemented local path. Dashed arrows: prepared hosted calls, blocked until account verification.</text>
+<rect x="50" y="180" width="220" height="130" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="68" y="210" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Reviewer</text>
+<text x="68" y="237" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Synthetic workspace</text>
+<text x="68" y="259" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Inspect / approve / plan</text>
+<text x="68" y="294" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">HUMAN AUTHORITY</text>
+<rect x="330" y="180" width="230" height="130" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="348" y="210" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">React interface</text>
+<text x="348" y="237" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Cash / sources / activity</text>
+<text x="348" y="259" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Review queue / scenario</text>
+<text x="348" y="294" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">WORKING LOCAL</text>
+<rect x="620" y="180" width="270" height="130" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="638" y="210" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Next.js scoped API</text>
+<text x="638" y="237" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Session / origin / schema</text>
+<text x="638" y="259" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">No secrets in browser</text>
+<text x="638" y="294" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">WORKING LOCAL</text>
+<rect x="1000" y="180" width="330" height="130" rx="12" fill="#fff2e8" stroke="#b07845" stroke-width="1.5"/>
+<text x="1018" y="210" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">CREAO investigator</text>
+<text x="1018" y="237" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Versioned evidence → findings</text>
+<text x="1018" y="259" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">No posting or approval tools</text>
+<text x="1018" y="294" fill="#b07845" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">PREPARED · LIVE BLOCKED</text>
+<polyline points="270,245 330,245" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#01-system-context-arrow)"/>
+<polyline points="560,245 620,245" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#01-system-context-arrow)"/>
+<polyline points="890,245 1000,245" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#01-system-context-arrow)"/>
+<rect x="50" y="410" width="220" height="130" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="68" y="440" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Source evidence</text>
+<text x="68" y="467" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Credit PDF / receipt CSV</text>
+<text x="68" y="489" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Untrusted document text</text>
+<text x="68" y="524" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">BOUNDED INPUTS</text>
+<rect x="330" y="410" width="230" height="130" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="348" y="440" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Parse + normalize</text>
+<text x="348" y="467" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Size / pages / USD cents</text>
+<text x="348" y="489" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Original + extracted text</text>
+<text x="348" y="524" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">WORKING LOCAL</text>
+<rect x="620" y="410" width="270" height="130" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="638" y="440" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Transition engine</text>
+<text x="638" y="467" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Versions / proposals / review</text>
+<text x="638" y="489" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Atomic posting + event</text>
+<text x="638" y="524" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">DETERMINISTIC CONTROL</text>
+<rect x="1000" y="410" width="330" height="130" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="1018" y="440" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Finance engine</text>
+<text x="1018" y="467" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Allowed balanced entries</text>
+<text x="1018" y="489" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Dated 13-week cash outlook</text>
+<text x="1018" y="524" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">NO LLM MONEY CALCULATION</text>
+<polyline points="270,475 330,475" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#01-system-context-arrow)"/>
+<polyline points="560,475 620,475" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#01-system-context-arrow)"/>
+<polyline points="755,310 755,410" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#01-system-context-arrow)"/>
+<text x="770" y="365" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="400" letter-spacing="0">validated commands</text>
+<polyline points="890,475 1000,475" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#01-system-context-arrow)"/>
+<polyline points="1165,310 1165,350 860,350 860,410" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#01-system-context-arrow)"/>
+<text x="925" y="340" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="400" letter-spacing="0">validated findings only</text>
+<rect x="330" y="690" width="230" height="140" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="348" y="720" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Local file store</text>
+<text x="348" y="747" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Token hash + JSON + files</text>
+<text x="348" y="769" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Single-process serial queue</text>
+<text x="348" y="814" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">REHEARSAL ONLY</text>
+<rect x="620" y="690" width="270" height="140" rx="12" fill="#fff2e8" stroke="#b07845" stroke-width="1.5"/>
+<text x="638" y="720" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Convex store</text>
+<text x="638" y="747" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Case transaction + indexes</text>
+<text x="638" y="769" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Original document storage</text>
+<text x="638" y="814" fill="#b07845" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">PREPARED · LIVE BLOCKED</text>
+<rect x="1000" y="690" width="330" height="140" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="1018" y="720" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Optional evidence / commerce</text>
+<text x="1018" y="747" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">CRS / Claude / Coinbase</text>
+<text x="1018" y="769" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Capability and utility gates</text>
+<text x="1018" y="814" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">NOT EXECUTED</text>
+<polyline points="700,540 700,600 445,600 445,690" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#01-system-context-arrow)"/>
+<polyline points="800,540 800,690" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#01-system-context-arrow)"/>
+<text x="815" y="625" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="400" letter-spacing="0">selected backend</text>
+<line x1="50" y1="878" x2="1350" y2="878" stroke="#dbe3dc"/>
+<text x="50" y="900" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">No hosted provider is LIVE_VERIFIED. Agent interpretation, deterministic accounting, and human approval are separate responsibilities.</text>
+</svg></div></p>
+<p>The browser handles presentation and review; the server handles scoped access and secrets. Documents are untrusted inputs. CREAO is intended to interpret evidence, while the deterministic transition and finance modules enforce posting and amounts. Local storage is tested; Convex/CREAO hosted paths are prepared but not verified. <a href="diagrams/01-system-context.mmd">Editable source</a>.</p>
+<h2>2. Investigation, review and recovery</h2>
+<p><div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1010" viewBox="0 0 1400 1010" role="img" aria-labelledby="02-workflow-recovery-title 02-workflow-recovery-desc">
+<title id="02-workflow-recovery-title">Investigation, review, and recovery</title><desc id="02-workflow-recovery-desc">Implemented transitions are shown; provider execution is still blocked. Unknown submission is never blindly repeated.</desc>
+<defs><marker id="02-workflow-recovery-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d9185"/></marker></defs>
+<rect width="1400" height="1010" fill="#f8faf6"/>
+<text x="50" y="46" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="2">LEDGERPROOF / ARCHITECTURE ATLAS</text>
+<text x="50" y="90" fill="#223b35" font-family="Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="0">Investigation, review, and recovery</text>
+<text x="50" y="121" fill="#6c7c76" font-family="Arial, sans-serif" font-size="14" font-weight="400" letter-spacing="0">Implemented transitions are shown; provider execution is still blocked. Unknown submission is never blindly repeated.</text>
+<rect x="50" y="180" width="290" height="110" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="68" y="210" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Evidence changes</text>
+<text x="68" y="237" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Increment inputVersion</text>
+<text x="68" y="259" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Discard pending stale findings</text>
+<text x="68" y="274" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">SOURCE BOUNDARY</text>
+<rect x="410" y="180" width="290" height="110" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="428" y="210" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Start investigation</text>
+<text x="428" y="237" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Save local run + generation</text>
+<text x="428" y="259" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">CREAO or labeled rehearsal</text>
+<text x="428" y="274" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">QUEUED</text>
+<rect x="770" y="180" width="290" height="110" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="788" y="210" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Persist submission intent</text>
+<text x="788" y="237" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Before outbound network call</text>
+<text x="788" y="259" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">No assumed idempotency</text>
+<text x="788" y="274" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">UNKNOWN UNTIL ID SAVED</text>
+<polyline points="340,235 410,235" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#02-workflow-recovery-arrow)"/>
+<polyline points="700,235 770,235" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#02-workflow-recovery-arrow)"/>
+<rect x="770" y="390" width="290" height="120" rx="12" fill="#fff2e8" stroke="#b07845" stroke-width="1.5"/>
+<text x="788" y="420" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Provider ID retained</text>
+<text x="788" y="447" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Retrieve same run after retry</text>
+<text x="788" y="469" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">pending / running / terminal</text>
+<text x="788" y="494" fill="#b07845" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">SUBMITTED → RUNNING</text>
+<polyline points="915,290 915,390" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#02-workflow-recovery-arrow)"/>
+<text x="930" y="345" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="400" letter-spacing="0">ID received</text>
+<rect x="50" y="390" width="290" height="120" rx="12" fill="#fff2e8" stroke="#b07845" stroke-width="1.5"/>
+<text x="68" y="420" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Unknown outcome</text>
+<text x="68" y="447" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Reconcile account history</text>
+<text x="68" y="469" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Do not create another run</text>
+<text x="68" y="494" fill="#b07845" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">MANUAL RECONCILIATION</text>
+<polyline points="770,260 735,260 735,350 195,350 195,390" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#02-workflow-recovery-arrow)"/>
+<text x="360" y="339" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="400" letter-spacing="0">timeout before saved ID</text>
+<rect x="410" y="390" width="290" height="120" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="428" y="420" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Validation gate</text>
+<text x="428" y="447" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Version / schema / evidence</text>
+<text x="428" y="469" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Reject wrong provider run ID</text>
+<text x="428" y="494" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">NO FACTS INVENTED</text>
+<polyline points="770,450 700,450" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#02-workflow-recovery-arrow)"/>
+<text x="710" y="435" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="400" letter-spacing="0">result</text>
+<rect x="410" y="620" width="290" height="120" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="428" y="650" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Reviewer decision</text>
+<text x="428" y="677" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Inspect source + enter reason</text>
+<text x="428" y="699" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">CAS version + request key</text>
+<text x="428" y="724" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">HUMAN APPROVAL REQUIRED</text>
+<polyline points="555,510 555,620" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#02-workflow-recovery-arrow)"/>
+<text x="570" y="570" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="400" letter-spacing="0">supported proposal</text>
+<rect x="770" y="620" width="290" height="120" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="788" y="650" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Atomic commit</text>
+<text x="788" y="677" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Entry + decision + event</text>
+<text x="788" y="699" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Recompute revised cash</text>
+<text x="788" y="724" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">POST ONCE</text>
+<polyline points="700,680 770,680" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#02-workflow-recovery-arrow)"/>
+<rect x="50" y="620" width="290" height="120" rx="12" fill="#fff2e8" stroke="#b07845" stroke-width="1.5"/>
+<text x="68" y="650" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Needs review / retry</text>
+<text x="68" y="677" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Malformed result → review</text>
+<text x="68" y="699" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Retrieval outage → same ID</text>
+<text x="68" y="724" fill="#b07845" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">NO FABRICATED FALLBACK</text>
+<polyline points="410,465 365,465 365,580 195,580 195,620" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#02-workflow-recovery-arrow)"/>
+<rect x="410" y="820" width="650" height="95" rx="12" fill="#ffffff" stroke="#cbd7d0" stroke-width="1.5"/>
+<text x="428" y="850" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Stale input or reset generation</text>
+<text x="428" y="877" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Late old output cannot replace the current workspace; completed decisions retain their source trail.</text>
+<line x1="50" y1="953" x2="1350" y2="953" stroke="#dbe3dc"/>
+<text x="50" y="975" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Local concurrent/idempotent decisions are tested. Native Convex Workflow, scheduled retrieval, and automatic model-output repair remain future work.</text>
+</svg></div></p>
+<p>A saved provider ID is the recovery anchor. An ambiguous submission is not blindly repeated. Output must pass source/version checks before a supported proposal reaches the reviewer. Human approval is distinct from agent findings. Stale input and reset generations protect current state. <a href="diagrams/02-workflow-recovery.mmd">Editable source</a>.</p>
+<h2>3. Ownership and physical model</h2>
+<p><div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="1400" height="960" viewBox="0 0 1400 960" role="img" aria-labelledby="03-data-ownership-title 03-data-ownership-desc">
+<title id="03-data-ownership-title">Ownership and the current data model</title><desc id="03-data-ownership-desc">Today: one bounded typed aggregate per judge case. The normalized production schema is a future migration.</desc>
+<defs><marker id="03-data-ownership-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d9185"/></marker></defs>
+<rect width="1400" height="960" fill="#f8faf6"/>
+<text x="50" y="46" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="2">LEDGERPROOF / ARCHITECTURE ATLAS</text>
+<text x="50" y="90" fill="#223b35" font-family="Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="0">Ownership and the current data model</text>
+<text x="50" y="121" fill="#6c7c76" font-family="Arial, sans-serif" font-size="14" font-weight="400" letter-spacing="0">Today: one bounded typed aggregate per judge case. The normalized production schema is a future migration.</text>
+<rect x="50" y="175" width="300" height="115" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="68" y="205" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Session capability</text>
+<text x="68" y="232" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Random token → stored hash</text>
+<text x="68" y="254" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">24-hour access / reset scope</text>
+<text x="68" y="274" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CASE-SCOPED ACCESS</text>
+<rect x="500" y="175" width="370" height="115" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="518" y="205" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Case / business aggregate</text>
+<text x="518" y="232" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Generation + input / ledger versions</text>
+<text x="518" y="254" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Revision + owner-scoped state</text>
+<text x="518" y="274" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">ONE TRANSACTIONAL UNIT</text>
+<polyline points="350,230 500,230" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#03-data-ownership-arrow)"/>
+<rect x="1010" y="175" width="330" height="115" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="1028" y="205" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Other judge case</text>
+<text x="1028" y="232" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Different capability + state</text>
+<text x="1028" y="254" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">No cross-case record API</text>
+<text x="1028" y="274" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">ISOLATED</text>
+<rect x="50" y="430" width="390" height="160" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="68" y="460" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Evidence</text>
+<text x="68" y="487" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Documents / original storage refs</text>
+<text x="68" y="509" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Normalized invoices / receipts</text>
+<text x="68" y="531" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Issued credits / source IDs</text>
+<text x="68" y="574" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CONTAINED IN CASE</text>
+<rect x="500" y="430" width="390" height="160" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="518" y="460" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Investigation</text>
+<text x="518" y="487" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Runs / provider IDs / states</text>
+<text x="518" y="509" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Findings / proposals</text>
+<text x="518" y="531" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Input-version links</text>
+<text x="518" y="574" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CONTAINED IN CASE</text>
+<rect x="950" y="430" width="390" height="160" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="968" y="460" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Accounting + decisions</text>
+<text x="968" y="487" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Ledger entries / permitted lines</text>
+<text x="968" y="509" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Obligations / scenarios</text>
+<text x="968" y="531" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Decisions / application events</text>
+<text x="968" y="574" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CONTAINED IN CASE</text>
+<polyline points="580,290 580,355 245,355 245,430" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#03-data-ownership-arrow)"/>
+<polyline points="685,290 685,430" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#03-data-ownership-arrow)"/>
+<polyline points="790,290 790,355 1145,355 1145,430" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#03-data-ownership-arrow)"/>
+<rect x="50" y="730" width="620" height="130" rx="12" fill="#ffffff" stroke="#cbd7d0" stroke-width="1.5"/>
+<text x="68" y="760" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Physical storage choices</text>
+<text x="68" y="787" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Local: ignored files, atomic rename, one-process queue</text>
+<text x="68" y="809" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Convex: prepared case row + indexes, schema-validated transition</text>
+<text x="68" y="844" fill="#cbd7d0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">ONLY ONE SELECTED BACKEND</text>
+<rect x="720" y="730" width="620" height="130" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="738" y="760" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Future normalized persistence</text>
+<text x="738" y="787" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Organization → business → case ownership and indexed tables</text>
+<text x="738" y="809" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Field provenance / forecast snapshots / retention / migrations</text>
+<text x="738" y="844" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">PLANNED · NOT IMPLEMENTED</text>
+<polyline points="695,590 695,670 1030,670 1030,730" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#03-data-ownership-arrow)"/>
+<line x1="50" y1="893" x2="1350" y2="893" stroke="#dbe3dc"/>
+<text x="50" y="915" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Ownership is inherited from the aggregate today. Production roles, normalized tables, durable forecast snapshots, and cleanup jobs are not yet present.</text>
+</svg></div></p>
+<p>All current entities inherit one case&#39;s ownership in a bounded aggregate. Local file serialization and future Convex transactions are distinct implementations of the store interface. Production organization roles, normalized tables and persistent forecast snapshots remain future work. <a href="diagrams/03-data-ownership.mmd">Editable source</a>.</p>
+<h2>4. Evidence-to-cash calculation</h2>
+<p><div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="1400" height="890" viewBox="0 0 1400 890" role="img" aria-labelledby="04-cash-bridge-title 04-cash-bridge-desc">
+<title id="04-cash-bridge-title">The evidence-to-cash bridge</title><desc id="04-cash-bridge-desc">A source correction and a collection assumption are different changes. All values are deterministic illustrative USD.</desc>
+<defs><marker id="04-cash-bridge-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d9185"/></marker></defs>
+<rect width="1400" height="890" fill="#f8faf6"/>
+<text x="50" y="46" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="2">LEDGERPROOF / ARCHITECTURE ATLAS</text>
+<text x="50" y="90" fill="#223b35" font-family="Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="0">The evidence-to-cash bridge</text>
+<text x="50" y="121" fill="#6c7c76" font-family="Arial, sans-serif" font-size="14" font-weight="400" letter-spacing="0">A source correction and a collection assumption are different changes. All values are deterministic illustrative USD.</text>
+<rect x="50" y="195" width="390" height="210" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="68" y="225" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">01 / Original assumptions</text>
+<text x="68" y="252" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Opening cash: $20,000</text>
+<text x="68" y="274" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Invoice A in week 1: $20,000</text>
+<text x="68" y="296" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Two payrolls: $24,000</text>
+<text x="68" y="318" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Week 2 closing cash: $16,000</text>
+<text x="68" y="389" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">BASELINE</text>
+<rect x="505" y="195" width="390" height="210" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="523" y="225" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">02 / Approved issued credit</text>
+<text x="523" y="252" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Credit note: $8,000</text>
+<text x="523" y="274" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Receivable remaining: $12,000</text>
+<text x="523" y="296" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Collection still in week 1</text>
+<text x="523" y="318" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Week 2 closing cash: $8,000</text>
+<text x="523" y="389" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">ACCOUNTING CORRECTION</text>
+<rect x="960" y="195" width="390" height="210" rx="12" fill="#eaf3eb" stroke="#36725a" stroke-width="1.5"/>
+<text x="978" y="225" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">03 / Explicit timing scenario</text>
+<text x="978" y="252" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Remaining $12,000 moves to week 3</text>
+<text x="978" y="274" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">No revenue reversal or write-off</text>
+<text x="978" y="296" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Week 2 closing cash: -$4,000</text>
+<text x="978" y="318" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Week 3 closing cash: $8,000</text>
+<text x="978" y="389" fill="#36725a" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">FORECAST ASSUMPTION</text>
+<polyline points="440,300 505,300" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#04-cash-bridge-arrow)"/>
+<polyline points="895,300 960,300" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#04-cash-bridge-arrow)"/>
+<rect x="50" y="535" width="390" height="170" rx="12" fill="#ffffff" stroke="#cbd7d0" stroke-width="1.5"/>
+<text x="68" y="565" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Evidence responsibility</text>
+<text x="68" y="592" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Original invoice / issued credit</text>
+<text x="68" y="614" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Agent cites existing source IDs</text>
+<text x="68" y="636" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Unknown evidence is rejected</text>
+<rect x="505" y="535" width="390" height="170" rx="12" fill="#ffffff" stroke="#cbd7d0" stroke-width="1.5"/>
+<text x="523" y="565" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Posting responsibility</text>
+<text x="523" y="592" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Dr sales returns / Cr receivables</text>
+<text x="523" y="614" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Human reason + expected version</text>
+<text x="523" y="636" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Entry and decision recorded once</text>
+<rect x="960" y="535" width="390" height="170" rx="12" fill="#ffffff" stroke="#cbd7d0" stroke-width="1.5"/>
+<text x="978" y="565" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Calculation responsibility</text>
+<text x="978" y="592" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Weekly opening + receipts - bills</text>
+<text x="978" y="614" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Each invoice allocated at most once</text>
+<text x="978" y="636" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Selected week lists contributions</text>
+<polyline points="245,405 245,535" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#04-cash-bridge-arrow)"/>
+<polyline points="700,405 700,535" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#04-cash-bridge-arrow)"/>
+<polyline points="1155,405 1155,535" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#04-cash-bridge-arrow)"/>
+<line x1="50" y1="778" x2="1350" y2="778" stroke="#dbe3dc"/>
+<text x="50" y="800" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Preview is unapproved. Revised history changes only after review. Other unpaid fixture invoices collect outside the horizon; later bills remain explicit.</text>
+</svg></div></p>
+<p>The $8,000 credit is a reviewed accounting correction; moving collection to week 3 is a timing assumption. Neither change is a default probability or automatic write-off. The UI lets judges inspect contributions rather than trust a fixed reveal. <a href="diagrams/04-cash-bridge.mmd">Editable source</a>.</p>
+<h2>5. Development gates</h2>
+<p><div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000" role="img" aria-labelledby="05-development-roadmap-title 05-development-roadmap-desc">
+<title id="05-development-roadmap-title">A sequenced path to a useful finance product</title><desc id="05-development-roadmap-desc">Roadmap hypotheses, not shipped features or delivery promises. Access and evidence gates come before broader scope.</desc>
+<defs><marker id="05-development-roadmap-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7d9185"/></marker></defs>
+<rect width="1400" height="1000" fill="#f8faf6"/>
+<text x="50" y="46" fill="#6c7c76" font-family="Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="2">LEDGERPROOF / ARCHITECTURE ATLAS</text>
+<text x="50" y="90" fill="#223b35" font-family="Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="0">A sequenced path to a useful finance product</text>
+<text x="50" y="121" fill="#6c7c76" font-family="Arial, sans-serif" font-size="14" font-weight="400" letter-spacing="0">Roadmap hypotheses, not shipped features or delivery promises. Access and evidence gates come before broader scope.</text>
+<rect x="50" y="190" width="610" height="150" rx="12" fill="#fff2e8" stroke="#b07845" stroke-width="1.5"/>
+<text x="68" y="220" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">A / Verify the event core</text>
+<text x="68" y="247" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Actual hosted CREAO run + share link; deployed Convex</text>
+<text x="68" y="269" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Exact judge case; source review; recovery; honest claims</text>
+<text x="68" y="324" fill="#b07845" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">ACCOUNT ACCESS GATE</text>
+<rect x="740" y="190" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="758" y="220" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">B / Complete supported imports</text>
+<text x="758" y="247" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Trial balance / invoice / bank / ledger / obligations</text>
+<text x="758" y="269" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Staged mapping, validation, atomic import and new cases</text>
+<text x="758" y="324" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">REUSABLE DATA GATE</text>
+<rect x="50" y="440" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="68" y="470" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">C / Pilot reliability</text>
+<text x="68" y="497" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Roles / native sync / workflow / parsing isolation</text>
+<text x="68" y="519" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Retention, observability, quotas and restoration proof</text>
+<text x="68" y="574" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">OPERATIONAL TRUST GATE</text>
+<rect x="740" y="440" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="758" y="470" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">D / Accountant workflow</text>
+<text x="758" y="497" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Read-only close assistant and review portal</text>
+<text x="758" y="519" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Consented real cases, mappings, measured review effort</text>
+<text x="758" y="574" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">CUSTOMER VALUE GATE</text>
+<rect x="50" y="690" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="68" y="720" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">E / Repeatable product</text>
+<text x="68" y="747" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Multi-client firms, onboarding, cost controls</text>
+<text x="68" y="769" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Pricing tests, support, retention and narrow distribution</text>
+<text x="68" y="824" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">COMMERCIAL VALIDATION GATE</text>
+<rect x="740" y="690" width="610" height="150" rx="12" fill="#eff1fb" stroke="#6976a0" stroke-width="1.5"/>
+<text x="758" y="720" fill="#223b35" font-family="Arial, sans-serif" font-size="18" font-weight="600" letter-spacing="0">Conditional expansion</text>
+<text x="758" y="747" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">CRS identity / x402 report / research / accessibility</text>
+<text x="758" y="769" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Factory evaluation worker / Fetch.ai discovery</text>
+<text x="758" y="824" fill="#6976a0" font-family="Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1">UTILITY + CAPABILITY GATE</text>
+<polyline points="660,265 740,265" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#05-development-roadmap-arrow)"/>
+<polyline points="1045,340 1045,385 355,385 355,440" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#05-development-roadmap-arrow)"/>
+<polyline points="660,515 740,515" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#05-development-roadmap-arrow)"/>
+<polyline points="1045,590 1045,635 355,635 355,690" fill="none" stroke="#7d9185" stroke-width="1.7"  marker-end="url(#05-development-roadmap-arrow)"/>
+<polyline points="660,765 740,765" fill="none" stroke="#7d9185" stroke-width="1.7" stroke-dasharray="7 6" marker-end="url(#05-development-roadmap-arrow)"/>
+<line x1="50" y1="923" x2="1350" y2="923" stroke="#dbe3dc"/>
+<text x="50" y="945" fill="#6c7c76" font-family="Arial, sans-serif" font-size="13" font-weight="400" letter-spacing="0">Do not add sponsor services before the core works. Stop a path when the data, user need, permissions, or supported capabilities do not fit.</text>
+</svg></div></p>
+<p>Verify the mandatory live core before expanding import breadth, reliability, accountant workflows, or conditional services. Phase estimates and acceptance criteria are in FUTURE-DEVELOPMENT.md. <a href="diagrams/05-development-roadmap.mmd">Editable source</a>.</p>
+<a class="source-link" href="ARCHITECTURE-DIAGRAMS.md">Open editable Markdown ↗</a></article>
+<article id="explanation" data-label="How it works" hidden><h1>How LedgerProof works</h1>
+<h2>The problem and intended user</h2>
+<p>A bookkeeper or fractional CFO serving a small creative agency wants to know whether payroll is covered. A spreadsheet can forecast a collection that is overstated, already partly paid, duplicated in the books, or subject to an unapplied issued credit. LedgerProof investigates those source facts and shows the consequence of a reviewed correction. It does not certify accounts, predict defaults, move funds, or automatically change an external accounting system.</p>
+<p>The initial named community is independent bookkeepers and fractional CFOs serving small creative agencies. This is a product hypothesis, not validated customer research. No interviews or traction are claimed.</p>
+<h2>The complete user journey</h2>
+<ol>
+<li><strong>Start a workspace.</strong> The server creates a random case ID and a high-entropy session token. The browser receives an HttpOnly, same-site cookie; the store retains a hash of the token. Workspaces expire after 24 hours and use synthetic records. Anyone given a workspace share link can review that case; this is a collaboration capability, not a production permission hierarchy.</li>
+<li><strong>Inspect the original baseline.</strong> The deterministic engine computes 13 explicit weeks from imported invoices, historical receipt allocations, opening cash, and dated obligations. Source dates and cents are authoritative; no language model calculates cash.</li>
+<li><strong>Add evidence.</strong> A bounded text-based credit-note PDF or one-row receipt CSV is parsed. The server checks the schema, invoice reference, amount, currency, document hash, size, and page limits. It stores the original and extracted text, increments the input version, and invalidates pending findings based on older evidence.</li>
+<li><strong>Investigate.</strong> The intended investigator is the hosted CREAO agent. The backend passes a complete versioned bundle of records and evidence. The agent identifies discrepancies, cites IDs, requests missing information, and returns findings. The app exposes no approval or posting tool to it. While credentials are unavailable, the user may explicitly choose local deterministic rehearsal. That branch is labeled and is not CREAO evidence.</li>
+<li><strong>Validate the result.</strong> Runtime schemas reject unexpected types, stale versions, unknown evidence, and record IDs outside the current case. Provider status/result IDs must match the stored provider run. Complete JSON output is required; prose is not silently interpreted as financial authority.</li>
+<li><strong>Construct a correction proposal.</strong> A supported credit-note finding can create a proposed debit to sales returns and credit to receivables. Receipt and duplicate findings use similarly narrow transaction templates. Source amounts are recalculated from normalized records; the agent cannot manufacture a numerical impact. Duplicate proposals reverse a source entry and preserve the original.</li>
+<li><strong>Review the evidence.</strong> The reviewer opens extracted text and the original PDF or CSV. Preview cash is labeled unapproved. The reviewer enters a reason and approves or rejects a specific proposal against the expected ledger version.</li>
+<li><strong>Post atomically.</strong> The state transition checks the version and idempotency key, validates balanced permitted accounts, updates the matching source status, writes the journal entry, records the decision, and appends an application event. In Convex this is intended to execute in a database transaction. In local rehearsal a single-process queue serializes file writes. Repeated or competing decisions cannot post the same correction twice in the tested local store.</li>
+<li><strong>Change a scenario.</strong> The reviewer may move an expected collection date. This changes cash timing without reversing revenue. An explicit reduced collection assumption is possible through the scoped API; it is a scenario, not a write-off or calibrated prediction.</li>
+<li><strong>Explain and export.</strong> The cash bridge lists a selected week&#39;s opening cash, receipts, obligations, and closing cash. The report export includes forecast, findings, run modes/references, and review events. JSON export is implemented; a customer-facing financial report PDF/XLSX is future work. The briefing PDF documents the product and is not a case accounting report.</li>
+</ol>
+<h2>The exact demonstration math</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>State</th>
+<th>Week 1</th>
+<th>Week 2</th>
+<th>Week 3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Original baseline</td>
+<td>$20,000 opening + $20,000 invoice − $12,000 payroll = $28,000</td>
+<td>$28,000 − $12,000 payroll = $16,000</td>
+<td>$16,000</td>
+</tr>
+<tr>
+<td>Approved $8,000 credit</td>
+<td>$20,000 + $12,000 receivable − $12,000 payroll = $20,000</td>
+<td>$20,000 − $12,000 payroll = $8,000</td>
+<td>$8,000</td>
+</tr>
+<tr>
+<td>Collection moves to week 3</td>
+<td>$20,000 − $12,000 payroll = $8,000</td>
+<td>$8,000 − $12,000 payroll = −$4,000</td>
+<td>−$4,000 + $12,000 receipt = $8,000</td>
+</tr>
+</tbody></table></div>
+<p>Other unpaid example balances collect outside the forecast horizon. Later studio/software obligations are displayed in their real weeks. A deliberate duplicate ledger posting is represented separately from normalized invoices, so it does not cause the forecast to collect a second invoice. This is an intentional distinction between a messy source ledger and economic invoice identity.</p>
+<p>Week boundaries are local date-only values, start-inclusive and end-exclusive. Calendar arithmetic avoids DST-hour errors. The shortfall indicator tests closing weekly cash below zero; it is not a guarantee that cash stays positive every day within the week. New matched receipts respect their transaction dates. New pre-horizon receipts explicitly reconcile opening cash; future receipts do not silently increase it.</p>
+<h2>Why three views of cash exist</h2>
+<p><strong>Baseline</strong> preserves original imported collection assumptions and excludes newly approved credit corrections and scenarios. <strong>Revised</strong> reflects approved corrections and selected explicit scenario assumptions. <strong>Preview</strong> shows the effect of pending supported credits and remains separate from posted history. Each correction must pass review before it enters revised cash.</p>
+<p>The model records historical invoice/receipt facts separately from collection assumptions. A credit changes the collectible invoice amount and the ledger after approval. A payment delay changes a forecast assumption only. A credit score or risk signal, if ever integrated legitimately, cannot automatically establish a write-off.</p>
+<h2>What each technical layer does</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Goal</th>
+<th>Actual implementation</th>
+<th>Why the boundary matters</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>React interface</td>
+<td>Make sources, review, and cash understandable</td>
+<td>app/page.tsx, app/globals.css</td>
+<td>Model findings do not bypass reviewer actions</td>
+</tr>
+<tr>
+<td>Next.js server routes</td>
+<td>Authenticate workspace, validate requests, keep secrets server-side</td>
+<td>app/api/[...path]/route.ts</td>
+<td>Browser never calls a sponsor with a secret</td>
+</tr>
+<tr>
+<td>Runtime contracts</td>
+<td>Validate uploaded, stored, and provider data</td>
+<td>lib/contracts/index.ts</td>
+<td>An apparently plausible JSON result is not automatically trusted</td>
+</tr>
+<tr>
+<td>Document extraction</td>
+<td>Convert supported sources to explicit facts</td>
+<td>lib/documents.ts, unpdf, pdf-lib</td>
+<td>Extraction coordinates are not invented; scans are rejected</td>
+</tr>
+<tr>
+<td>Finance engine</td>
+<td>Compute balances, allowed journal entries, forecast buckets</td>
+<td>lib/finance/index.ts</td>
+<td>Money stays integer cents, independent of an LLM</td>
+</tr>
+<tr>
+<td>Transition engine</td>
+<td>Enforce approvals, versioning, idempotency, reset behavior</td>
+<td>lib/workflow.ts</td>
+<td>One coherent mutation controls posting and decisions</td>
+</tr>
+<tr>
+<td>Store</td>
+<td>Persist scoped state and originals</td>
+<td>lib/store.ts, convex/cases.ts</td>
+<td>Local files are not mislabeled as Convex</td>
+</tr>
+<tr>
+<td>Investigator</td>
+<td>Interpret evidence and choose discrepancy findings</td>
+<td>lib/providers/creao.ts</td>
+<td>CREAO is substantive when verified; local rehearsal is separately labeled</td>
+</tr>
+<tr>
+<td>Evidence/register docs</td>
+<td>Tie claims to working execution and source requirements</td>
+<td>docs/integration-status.md, SPONSOR-EVIDENCE.md</td>
+<td>Configured code is not a successful integration</td>
+</tr>
+</tbody></table></div>
+<p>See SERVICE-REGISTER.md for every provider, including services not yet integrated.</p>
+<h2>State, ownership, and failure behavior</h2>
+<p>The current bounded workspace is one aggregate with nested typed entities. It contains business, invoices, receipt allocations, credits, sources, obligations, entries, scenarios, runs, findings, proposals, decisions, and events. Convex indexes locate the case and expiry. This makes approval atomicity easy to reason about for a small judge case. It is not a claim that the normalized schema in the full specification has been completed.</p>
+<p>Evidence changes increment inputVersion. Approval increments ledgerVersion. Every mutation increments a workspace revision. Reset increments a generation. A result from an old generation is ignored; a result from old evidence is stale. A second reviewer must act against the same expected ledger version, preventing a decision based on obsolete balances.</p>
+<p>Submission intent becomes unknown before calling CREAO. If the request times out before a provider run ID is safely saved, the application does not blindly submit another run. Account reconciliation is needed. If a run ID is saved, retrieval can resume against that same ID. Retrieval outages are retryable; malformed terminal results become needs_review. No webhook is enabled. Scheduled polling and bounded model-output repair remain unfinished; the present browser/API polling drives retrieval.</p>
+<p>The agent instructions exclude document-borne commands. The code escapes source text and accepts only supported structured fields. Offline prompt-injection tests confirm that uploaded text cannot itself authorize posting; they do not establish that an untested hosted LLM will resist all injection attacks.</p>
+<h2>What has and has not been proved</h2>
+<p>Local tests cover exact forecast values, partial receipts, excess-credit exceptions, journal balance/account checks, competing decisions, session capabilities, reset/stale handling, actual PDF/CSV parsing, and provider-contract mocks. Browser tests exercise the full local review path, shared polling updates, unavailable CREAO, timeout rehearsal, and mobile layout. See EVALUATION.md for current counts.</p>
+<p>Not proved: a live hosted CREAO run; a shared successful agent run; actual Claude use; deployed Convex transactions, subscriptions, or components; external sandbox data; Coinbase agent payments; real customer value; sponsor eligibility; production security or accounting completeness. There is no deployed URL, and no external accounting system has been altered.</p>
+<a class="source-link" href="HOW-IT-WORKS.md">Open editable Markdown ↗</a></article>
+<article id="services" data-label="Service register" hidden><h1>Service-by-service implementation register</h1>
+<p>As of October 24, 2026. WORKING_LOCAL refers to observed local execution; it is not a sponsor integration status. UNTESTED means no successful provider execution, not implicit approval to claim a track. No paid account or subscription was created.</p>
+<h2>Runtime and infrastructure</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Service/component</th>
+<th>Goal</th>
+<th>What I implemented</th>
+<th>Evidence/status</th>
+<th>Next gate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Next.js</td>
+<td>Serve UI and secret-bearing API from one app</td>
+<td>App Router page and scoped Node routes, same-origin mutations, private responses</td>
+<td>WORKING_LOCAL; production build and browser tests</td>
+<td>Choose hosting account/region, configure environment, authorize public deployment</td>
+</tr>
+<tr>
+<td>React</td>
+<td>Interactive judge flow</td>
+<td>Four sections, source drawer, review reason, chart/cash bridge, scenario controls, sharing/reset</td>
+<td>WORKING_LOCAL; desktop/mobile browser checks</td>
+<td>Accessibility audit and real-user usability sessions</td>
+</tr>
+<tr>
+<td>Convex</td>
+<td>Central hosted persistence and atomic state transitions</td>
+<td>Cases schema/indexes, guarded read/create/apply functions, file upload/read integration</td>
+<td>BLOCKED; source typechecked, no deployment</td>
+<td>Account project, URL and backend secret; deploy and verify transactions/storage</td>
+</tr>
+<tr>
+<td>Convex live queries</td>
+<td>Push case changes to collaborators</td>
+<td>Not yet implemented; UI currently polls scoped HTTP state</td>
+<td>NOT IMPLEMENTED; shared local polling is tested</td>
+<td>Native subscription with real auth; two-session/reconnect proof</td>
+</tr>
+<tr>
+<td>Convex Workflow</td>
+<td>Durable scheduled execution and retries</td>
+<td>Not installed/configured</td>
+<td>NOT IMPLEMENTED</td>
+<td>Add component only after runtime contract/account verification; never retry ambiguous non-idempotent submission</td>
+</tr>
+<tr>
+<td>Local filesystem</td>
+<td>Offline persistence while accounts are unavailable</td>
+<td>Ignored .data JSON/originals, token hashes, single-process queue, atomic rename</td>
+<td>WORKING_LOCAL; competing decisions and wrong-token tests</td>
+<td>Keep a rehearsal tool; do not scale to multiple workers</td>
+</tr>
+<tr>
+<td>Identity/session layer</td>
+<td>Scope judge access without signup</td>
+<td>Random bearer capability, HttpOnly cookie, share-link exchange, 24-hour access expiration</td>
+<td>WORKING_LOCAL; isolation/share/reset tests</td>
+<td>Production membership, role policy, revocation and retention cleanup</td>
+</tr>
+</tbody></table></div>
+<h2>Core investigation and evidence</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Service/component</th>
+<th>Goal</th>
+<th>What I implemented</th>
+<th>Evidence/status</th>
+<th>Next gate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CREAO</td>
+<td>Core evidence investigation and evidence-bound challenges</td>
+<td>Hosted-agent instructions, complete bundle, explicit developer-v2 or agent-v1 adapter, status retrieval, result validation</td>
+<td>BLOCKED live; mock contract tests only</td>
+<td>Create/save hosted agent, confirm account/API family and form fields, run changed evidence, retain ID/share link</td>
+</tr>
+<tr>
+<td>Local investigation rules</td>
+<td>Exercise review/forecast offline</td>
+<td>Deterministic duplicate, partial, unmatched-receipt and credit rules</td>
+<td>SIMULATED relative to hosted agent; local counts measured</td>
+<td>Never use as CREAO submission proof</td>
+</tr>
+<tr>
+<td>Anthropic/Claude</td>
+<td>Meaningful extraction or reasoning with traceable model</td>
+<td>No direct SDK call; possible account-supported selection inside CREAO</td>
+<td>BLOCKED; no model trace</td>
+<td>Verify model selection/output and evaluate actual benefit; only add direct extraction if necessary</td>
+</tr>
+<tr>
+<td>Zod</td>
+<td>Reject malformed data and unsupported output</td>
+<td>Contracts shared by provider, state machine, parsers and store</td>
+<td>WORKING_LOCAL; invalid enum/citation/version tests</td>
+<td>Version migrations and explicit return schemas for expanded APIs</td>
+</tr>
+<tr>
+<td>unpdf</td>
+<td>Extract text from supported source PDFs</td>
+<td>Signature/page/size checks, text extraction, resource cleanup</td>
+<td>WORKING_LOCAL; generated PDF parser test</td>
+<td>Process-isolated parsing, time/memory budgets, OCR gate for scans</td>
+</tr>
+<tr>
+<td>pdf-lib</td>
+<td>Produce internally consistent source fixtures</td>
+<td>Invoice/credit PDFs generated from fixture definition; editable credit control</td>
+<td>WORKING_LOCAL</td>
+<td>Separate customer case-report PDF with proper metadata and disclosure</td>
+</tr>
+<tr>
+<td>Finance engine</td>
+<td>Reliable cash and posting calculations</td>
+<td>Integer-cent outstanding balance, narrow entries, dated 13-week forecast, baseline/revised/preview</td>
+<td>WORKING_LOCAL; exact cash/edge-case tests</td>
+<td>General trial-balance/import support and accountant validation</td>
+</tr>
+</tbody></table></div>
+<p>CREAO owns interpretation; the finance engine owns amounts; the reviewer owns approval. Convex owns persistence when configured. The UI owns presentation. Maintaining those boundaries prevents an agent&#39;s plausible explanation from becoming an unauthorized accounting fact.</p>
+<h2>Conditional and adjacent providers</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Potential job</th>
+<th>What actually exists</th>
+<th>Status</th>
+<th>Fit/activation condition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CRS</td>
+<td>Supported identity discrepancy investigation or a transparent collection scenario</td>
+<td>No adapter/request/response</td>
+<td>UNTESTED</td>
+<td>Inspect sandbox catalog, provided identity type, and actual fields. No fictional business credit inference from consumer data</td>
+</tr>
+<tr>
+<td>Coinbase for Agents + x402</td>
+<td>Buyer agent purchases a bounded completed report from seller</td>
+<td>Explicit unavailable commerce route; challenge reviewed</td>
+<td>UNTESTED</td>
+<td>Verify supported test tooling, buyer budget, payment validation, one receipt, recoverable delivery; separate from agency forecast</td>
+</tr>
+<tr>
+<td>Bright Data</td>
+<td>Essential current public counterparty evidence</td>
+<td>No scraping code</td>
+<td>NOT_TARGETED</td>
+<td>Core must truly depend on permitted live public data; synthetic-ledger-only story does not satisfy that requirement</td>
+</tr>
+<tr>
+<td>Factory Droid SDK</td>
+<td>Independent reconciliation regression/evidence-pack worker</td>
+<td>No SDK call</td>
+<td>NOT_TARGETED currently; new conditional path</td>
+<td>Meaningful runtime trigger/output with bounded access, after core works; developer use alone is insufficient</td>
+</tr>
+<tr>
+<td>Fetch.ai</td>
+<td>Discoverable bounded analysis agent for other agents</td>
+<td>No agent registration or SDK</td>
+<td>NOT_TARGETED currently; new conditional path</td>
+<td>Genuine agent-to-agent request/result flow plus verified challenge rules</td>
+</tr>
+<tr>
+<td>Figma</td>
+<td>Real design iteration and traceable workflow</td>
+<td>No Figma files, Make prototype, or Slides</td>
+<td>NOT_TARGETED currently; full criteria retrieved</td>
+<td>Actual intentional Figma use, accessible artifacts, required slides/stage log/embedded prototype, Edu verification</td>
+</tr>
+<tr>
+<td>Microsoft</td>
+<td>Production-minded agent evaluation track</td>
+<td>Architecture, controls and roadmap documents</td>
+<td>Eligibility UNTESTED; not an API integration</td>
+<td>Actual end-to-end agent, measurable usefulness and customer evidence; Azure not inferred as required</td>
+</tr>
+<tr>
+<td>Hyphenate</td>
+<td>Controller-seat judging lens</td>
+<td>Reviewable receivables workflow, honest failure modes and demo script</td>
+<td>Eligibility UNTESTED</td>
+<td>Real CREAO-powered flow and defensible evidence, plus event rules</td>
+</tr>
+<tr>
+<td>SpacetimeDB</td>
+<td>Alternative central shared state</td>
+<td>No implementation</td>
+<td>NOT_TARGETED</td>
+<td>Only reconsider as an intentional Convex replacement, never a duplicate sponsor database</td>
+</tr>
+</tbody></table></div>
+<p>Additional guide sponsors are assessed in EVENT-STRATEGY.md. None has been added as a superficial dependency.</p>
+<h2>Engineering services and developer tools</h2>
+<p>GitHub repository: cloned from ArihantSwain/LedgerProof. Local source is the reviewable deliverable; no external repository publication is assumed. Git records and development provenance should remain honest about implementation dates and tool use.</p>
+<p>Node/npm: dependency installation and lockfile; build toolchain. Playwright: actual headless Chromium checks and documentation rendering. Node test runner/tsx: finance, store, parser, and provider-contract tests. Python standard library: reproducible vector diagram generation. No Figma use is implied by hand-built SVG diagrams, and no sponsor SDK use is implied by generic tooling.</p>
+<p>Google Drive connector: read the Coinbase challenge and Figma brief linked in the supplied guide. This was <strong>research during development</strong>, not a runtime LedgerProof data integration. No Drive files were edited, shared, or sent. Browser/search reads were used for public technical/event verification. They are not evidence of Bright Data, Apify, or a connected runtime web-research feature.</p>
+<h2>Secrets, cost, and failure ownership</h2>
+<p>CREAO_API_KEY, selected API family/base, agent ID, and actual input field belong on the server. Convex URL and backend secret are required together; the same secret must be configured in the backend environment. No key is present in .env.local because that file does not exist yet. A configured key does not change integration status to LIVE_VERIFIED automatically.</p>
+<p>Every hosted provider call may consume credits or create an external effect. No paid subscriptions or real-money transfers have been initiated. Future cost controls should bound runs per case, bundle size, retries, concurrency, extraction pages, storage retention, and report generation. Cost targets must be measured from real provider receipts; there is no verified per-case cost today.</p>
+<a class="source-link" href="SERVICE-REGISTER.md">Open editable Markdown ↗</a></article>
+<article id="future" data-label="Future development" hidden><h1>Future development: from judge demo to a receivables control product</h1>
+<h2>Product direction</h2>
+<p>The strongest initial product is an evidence-to-cash workbench for independent bookkeepers and fractional CFOs who serve small creative agencies. It should earn a narrow seat: check whether receivables supporting a forecast are correct, prepare defensible adjustments, and let an accountable human decide. “Autonomous CFO” would overstate the scope and permissions of the present system.</p>
+<p>The defensible asset is a traceable connection between source documents, normalized facts, corrections, reviewer decisions, and forecast effects. A generic finance chat interface is easy to replace. A reliable review workflow integrated into month-end close and weekly cash planning may be useful; that value still needs customer validation.</p>
+<p>No timeline below is a delivery promise. Effort is an initial engineering estimate assuming one experienced builder and available accounts. Existing blocked integrations must be proved before expanding them. Do not add integrations to increase a sponsor count.</p>
+<h2>Phase gates</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Intended outcome</th>
+<th>Work</th>
+<th>Exit evidence</th>
+<th>Approximate effort</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A: credible event core</td>
+<td>Real investigator, honest live demo</td>
+<td>Save CREAO agent, confirm API family/form, changed-input round trip, deployed Convex, exact judge path</td>
+<td>Agent ID/run share link, two different outputs, source citations, hosted test receipts</td>
+<td>3–8 focused hours after access; provider latency/account issues may extend</td>
+</tr>
+<tr>
+<td>B: complete narrow imports</td>
+<td>New judge inputs work without rewriting fixture</td>
+<td>Opening balances, invoices, batch bank CSV, ledger and obligations import with explicit schema/mapping/preview</td>
+<td>Balanced opening trial balance, atomic import, no duplicated IDs, parser rejection tests, one new independent case</td>
+<td>3–6 builder days</td>
+</tr>
+<tr>
+<td>C: dependable pilot</td>
+<td>Bookkeeper can repeat weekly workflow</td>
+<td>Workspace auth/roles, native sync, durable polling, data retention, parser isolation, monitoring</td>
+<td>Reconnect/restart/concurrency tests, role denial tests, restore drill, documented operational runbook</td>
+<td>1–3 builder weeks</td>
+</tr>
+<tr>
+<td>D: useful accounting workflow</td>
+<td>Reduce real review effort</td>
+<td>Read-only accounting connector, review packets, historical statements, close checklist</td>
+<td>Accountant-reviewed mappings, representative customer cases with consent, measured review-time improvement</td>
+<td>3–6 builder weeks</td>
+</tr>
+<tr>
+<td>E: repeatable product</td>
+<td>Safe multi-client operation</td>
+<td>Organization tenancy, quotas/billing, connector lifecycle, permissions, support tooling</td>
+<td>Retained pilot users, cost/error budgets, end-to-end tenant isolation and deletion proof</td>
+<td>6–12+ builder weeks</td>
+</tr>
+</tbody></table></div>
+<h2>Immediate engineering priorities</h2>
+<p><strong>Prove CREAO before elaborating it.</strong> Create one saved investigator with a clearly named bundle input. Confirm whether the actual account uses agent-v1 or developer-v2, then choose that family explicitly. Retain real status envelopes, model metadata if available, input/output, and share links with secrets removed. Show changed credit amounts and an evidence-bound challenge. No automatic fallback between API families. If the account cannot invoke externally, record the exact blocker rather than replace CREAO with local chat.</p>
+<p><strong>Make execution durable.</strong> Introduce a Convex Workflow or equivalent persisted scheduler for retrieval, validation and review pauses. Store bounded input hashes, provider IDs, attempts, deadlines and next retry time. Separate retryable retrieval from unknown submission outcome. Keep external actions idempotent where documented; otherwise reconcile. A workflow framework does not make an external non-idempotent call safe to repeat. Use notifications only with explicit user authority.</p>
+<p><strong>Finish imports before broadening finance.</strong> Build a staging area with field mapping, validation errors, cross-record reconciliation, and an all-or-nothing commit. Preserve originals and parser versions. Require explicit opening cash cutoffs, allocated receipt identity, and dated obligations. Handle partial allocations, credit-note identity, invoice aliases, duplicates, and overpayments as modeled exceptions. Support a deliberately limited USD service-business schema first; reject unsupported inventory or currency semantics.</p>
+<p><strong>Normalize persistence when aggregate limits matter.</strong> Move business entities to scoped indexed Convex tables without losing atomic approval semantics. Keep decisions, journal lines, source links and event appends in one transaction. Snapshot the exact forecast inputs/results used for a review. Add migrations, pagination, file cleanup, expiry cleanup, and cost/size bounds. Do not market an application event log as immutable cryptographic evidence.</p>
+<p><strong>Harden extraction.</strong> Run untrusted PDF parsing outside the request process with time/memory/page budgets. Add OCR only after evaluating scans, and retain field provenance and uncertainty. A structured Claude extraction step is justified only if it improves the supported document cases and is actually measured. Make model/provider versions observable. Conflicting fields must remain review items rather than guessed “best” values.</p>
+<h2>New product paths worth exploring</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Customer job and why it fits</th>
+<th>Smallest useful experiment</th>
+<th>Success gate / stop condition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Read-only close assistant</td>
+<td>Bookkeeper finds discrepancies before month-end close</td>
+<td>Import one period, reconcile invoice/receipt/credit links, produce review packet</td>
+<td>Accountant confirms findings and mappings; stop if data access produces more cleanup than benefit</td>
+</tr>
+<tr>
+<td>Accountant–owner review portal</td>
+<td>Owner approves understandable corrections while bookkeeper retains control</td>
+<td>Separate preparer/reviewer roles and source-bound comments</td>
+<td>Users complete review with fewer clarification rounds; stop if access or audit expectations exceed controls</td>
+</tr>
+<tr>
+<td>Payroll reserve planning</td>
+<td>CFO needs more than a zero-cash threshold</td>
+<td>Reserve selector, daily/weekly cash bridge, transparent delay/expense grid</td>
+<td>Decisions can be traced to selected assumptions; no probability/calibration claims</td>
+</tr>
+<tr>
+<td>Evidence completeness monitor</td>
+<td>Missing source documents delay close</td>
+<td>Deterministic list of unsupported/unverified balances and requested documents</td>
+<td>Fewer unsupported decisions, no false assertion that a missing item proves fraud</td>
+</tr>
+<tr>
+<td>Counterparty identity checks</td>
+<td>Conflicting legal/payment identity requires investigation</td>
+<td>Only verified supported sandbox fields, source age, discrepancies and escalation</td>
+<td>CRS product/identity type fits; stop if consumer fields must be misrepresented as business facts</td>
+</tr>
+<tr>
+<td>Client remittance portal</td>
+<td>Receipts arrive without invoice allocation</td>
+<td>User uploads remittance advice and proposes allocation for review</td>
+<td>Matching improves on representative evidence; no payment initiation or automatic posting</td>
+</tr>
+<tr>
+<td>Dispute and credit-note workflow</td>
+<td>Agency tracks why an issued credit changes collections</td>
+<td>Credit identity, effective date, source chain, reviewer decision, scenario impact</td>
+<td>Source-backed adjustment stays distinct from collection hypothesis</td>
+</tr>
+<tr>
+<td>Cash sensitivity laboratory</td>
+<td>Owner wants to understand several independent delays</td>
+<td>Deterministic grid across amounts/dates/obligations with exact contributions</td>
+<td>Values match engine invariants and clearly state assumptions; no unearned risk scores</td>
+</tr>
+<tr>
+<td>Financial evidence API</td>
+<td>Other tools need bounded, cited findings</td>
+<td>Scoped read-only bundle/result API with schema versions and report hashes</td>
+<td>Consumers can verify scope/citations and handle stale results; no arbitrary SQL or provider-secret exposure</td>
+</tr>
+<tr>
+<td>Report-as-a-service commerce</td>
+<td>A buyer agent needs one completed evidence packet</td>
+<td>Fixed-price test report, bounded agent budget, verified x402 flow, order/delivery reconciliation</td>
+<td>Authentic tooling and test receipt, no duplicate fulfillment; stop if it distracts from core readiness</td>
+</tr>
+<tr>
+<td>Public-source collections research</td>
+<td>A real investigation needs current public counterparty information</td>
+<td>Permitted source retrieval tied to a specific evidence question</td>
+<td>Bright Data/Apify is essential and live; stop if removing retrieval leaves the product equally useful</td>
+</tr>
+<tr>
+<td>Accessibility-first cash briefing</td>
+<td>Reviewer cannot comfortably use dense tables</td>
+<td>Keyboard-first review and plain-language/source-linked briefing; voice only after user research</td>
+<td>Task completion improves in observed use; do not add voice solely for a track</td>
+</tr>
+<tr>
+<td>Reconciliation regression worker</td>
+<td>Teams need repeatable proof after mappings change</td>
+<td>Trigger bounded evaluation suite; independent worker assembles test diffs/evidence pack</td>
+<td>Factory SDK actually executes runtime work; no book-writing permission and no replacement of CREAO investigation</td>
+</tr>
+<tr>
+<td>Discoverable analysis agent</td>
+<td>Another agent can discover and request the service</td>
+<td>Fetch.ai discovery/message path around a bounded case bundle and reply</td>
+<td>Working agent-to-agent exchange has a user need, verified SDK/runtime, and no duplicate backend</td>
+</tr>
+</tbody></table></div>
+<p>These are opportunities, not implemented features. The top expansion bets are imports, a read-only close assistant, payroll reserve planning, and an accountant review portal. Commerce, voice, and public web research should follow demonstrated demand.</p>
+<h2>Customer validation plan</h2>
+<p>Start with five independent bookkeepers or fractional CFOs who serve small creative agencies. Recruit only through authorized outreach; none has been contacted. Ask them to describe their last receivables discrepancy and payroll planning workflow before showing the demo. Record current tools, frequency, review duration, source availability, error cost, and approval responsibilities. Obtain consent before recording or handling real records.</p>
+<p>Then run a moderated task using synthetic data first: find the credit, inspect source, decide, explain the cash effect, and challenge a finding. Observe completion, misunderstanding, and time; do not lead the participant to the expected answer. A later pilot may use redacted records under an appropriate agreement. Keep time saved, acceptance rate, false positives and data-cleanup effort separate. A positive interview is not a paying customer or proof of retention.</p>
+<h2>Measurement and evaluation</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Definition</th>
+<th>Initial target hypothesis</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Task completion</td>
+<td>Users complete source → review → explained forecast unaided</td>
+<td>At least 4 of first 5 moderated users; revise based on observed friction</td>
+</tr>
+<tr>
+<td>Supported-finding precision</td>
+<td>Accountant-supported findings / all actionable findings on labeled cases</td>
+<td>Set only after collecting a representative labeled dataset</td>
+</tr>
+<tr>
+<td>Missed discrepancy rate</td>
+<td>Known supported discrepancies not detected / labeled discrepancies</td>
+<td>Stratify by type/document quality; do not hide misses in a single percentage</td>
+</tr>
+<tr>
+<td>Review effort</td>
+<td>Median minutes plus clarification rounds per case</td>
+<td>Compare same case/workflow against actual baseline, not guessed labor cost</td>
+</tr>
+<tr>
+<td>Correction integrity</td>
+<td>Duplicate postings, stale approvals, cross-tenant mutations</td>
+<td>Zero tolerated in required tests and observed pilot; incident process if violated</td>
+</tr>
+<tr>
+<td>Agent usefulness</td>
+<td>Reviewer can explain evidence and next action from findings</td>
+<td>Qualitative rubric plus accepted/rejected reasons, independent of prose fluency</td>
+</tr>
+<tr>
+<td>Runtime reliability</td>
+<td>Terminal result or actionable failure within declared deadline</td>
+<td>Measure queue, provider, validation and review latency separately</td>
+</tr>
+<tr>
+<td>Cost per completed case</td>
+<td>Actual provider + storage + compute costs including retries</td>
+<td>Establish from receipts before pricing; no current measured figure</td>
+</tr>
+</tbody></table></div>
+<p>Expand evaluation beyond the current authored fixture: clean invoices, partial allocations, real issued-credit variants, false duplicate candidates, stale imports, conflicting references, scans, timeout recovery, and injection attempts. Split examples into development/evaluation sets. Record exact provider/model/prompt/schema versions, counts and uncertainty. Human approval remains necessary even with a strong evaluation score.</p>
+<h2>Production architecture direction</h2>
+<p>Use organization → business → case ownership, with viewer/preparer/reviewer/admin roles and a formal authorization matrix. Replace shared bearer editing links with revocable scoped invitations for production. Keep demo and customer environments separate. Add environment-specific keys, minimum data retention, encrypted storage managed by the selected platform, deletion workflows, original-file access controls, audit export and incident response. Security claims require verification; no certification is implied.</p>
+<p>Operate with a Node-capable Next.js host and a genuine Convex deployment. Add native subscriptions or an authenticated server relay, background retrieval workers, limits per organization/provider, observability with sanitized request IDs, model cost budgets, and a deployment rollback plan. Test expiry and restore behavior. Avoid logging raw financial/identity responses or share tokens. A database transaction can make local posting atomic; it cannot make an external payment and local delivery globally atomic.</p>
+<h2>Commercial angle and distribution hypotheses</h2>
+<p>Possible packaging: a per-case investigation tool for independent bookkeepers; a recurring multi-client workspace for fractional CFO firms; or an evidence API/report service. Pricing, willingness to pay, market size and channel performance are unvalidated. Do not invent an addressable-market number or an hourly savings figure.</p>
+<p>For a per-case hypothesis, contribution margin equals price minus actual extraction, investigator, storage/compute, payment fees, support, and retry costs. For a subscription, model included cases and guard against one heavy user consuming the whole allowance. Measure completion, monthly reuse, churn, support burden and source-import effort before adding automated billing. Accounting firms may be a better initial channel than direct sales to every small agency, but interviews must test that hypothesis.</p>
+<h2>Explicit stop conditions</h2>
+<p>Stop adding sponsor integrations if the mandatory live investigator or deterministic review path is not ready. Stop a credit-data path if supported fields do not fit the identity/business story. Stop scraping if evidence is non-public or behind a login/paywall. Stop autonomous posting/payment scope until a separately authorized design, identity policy and controls exist. Stop claiming statements are complete when the trial balance, cutoff or opening balances cannot be reconciled.</p>
+<h2>Recommended next release</h2>
+<p>Release 0.2 should prove live CREAO + Convex, finish a narrow reusable import pipeline, produce a complete scoped case report, and add resilient polling. Release 0.3 should support a real read-only pilot with roles, explicit retention, and accountant-reviewed mappings. Reserve secondary statements and payment commerce for later gates. The current product deserves a reliable receivables seat before it asks for a broader finance seat.</p>
+<a class="source-link" href="FUTURE-DEVELOPMENT.md">Open editable Markdown ↗</a></article>
+<article id="event" data-label="Event strategy" hidden><h1>Cal Hacks 13.0 — strategy and additional paths</h1>
+<p>Source baseline: user-supplied hacker guide, preserved at sources/cal-hacks-13-guide.txt. Retrieved October 24, 2026: <a href="https://www.calhacks.io/">Cal Hacks official site</a>, <a href="https://community.creao.ai/CalHacks2026">CREAO event pack</a>, <a href="https://drive.google.com/file/d/12TnPLguduV3gh1zY_TJ176XmVDz2RGW9/view">Coinbase challenge PDF</a>, <a href="https://docs.google.com/document/d/1HjzThDGveSLiilIdEPEHq12ZVLZ5eS0T8CQC5_m_-rg/edit">Figma challenge</a>, and <a href="https://www.fetch.ai/events/calhacks-13-0">Fetch.ai event page</a>. The Drive documents were read through the connected Google Drive skill; they were not edited. Some guide “more details” links were lost in pasted plain text.</p>
+<h2>Schedule and provenance</h2>
+<p>The supplied guide gives Sunday submission at 9:00 AM, judging 10:30 AM–12:30 PM, and requires presence for judging. In the October 23–25 weekend, that Sunday is <strong>October 25, 2026, Pacific time</strong>. This calendar mapping is an inference from the dated event context and supplied guide, not a fetched Devpost deadline field. Confirm the actual Devpost countdown upon return. The guide recommends an initial draft Saturday night. A draft was prepared locally; nothing was submitted.</p>
+<p>The official site independently confirms in-person participation, a maximum of four teammates, and implementation during the event. Preserve real development chronology; do not change commit dates to manufacture eligibility. CREAO&#39;s page labels its pack October 23–24, while the guide includes Sunday judging; treat the guide/Devpost schedule as the event timing reference to check, rather than silently resolving that discrepancy. Fetch.ai&#39;s current page also differs from the guide in prize amounts; no expected winnings are calculated here.</p>
+<h2>Priority decision</h2>
+<ol>
+<li><strong>Core:</strong> prove the CREAO investigator, exact cash math, source drilldown, review, recovery, and a runnable judge flow.</li>
+<li><strong>Primary narrative:</strong> a receivables controller assistant for Hyphenate; a production-minded finance agent for Microsoft; an AI-first receivables investigation for CREAO.</li>
+<li><strong>Backend proof:</strong> actually deploy and demonstrate Convex, with live state and durable execution rather than source-only claims.</li>
+<li><strong>Conditional:</strong> traceable Claude use; defensible CRS sandbox use; authentic test Coinbase Payment Agents flow.</li>
+<li><strong>New paths:</strong> evaluate Figma workflow and Factory runtime evaluation worker only when their real work exists. Do not rewrite the product to enter every track.</li>
+</ol>
+<p>CREAO&#39;s event pack requires a hosted core agent, its ID/run share link, and visible execution. AI-First Disruptor is the clearest proposed fit. One-Person Company would need an actual coordinated organization of role agents, which is not implemented. Team Empowerment could fit a proven preparer/reviewer workflow, but track selection should follow the actual live product. Local rehearsal is engineering support, not the sponsor entry.</p>
+<h2>New sponsor paths reviewed from the guide</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Track/provider</th>
+<th>Product-fit path</th>
+<th>Decision now</th>
+<th>Evidence needed before any claim</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Factory Droid SDK</td>
+<td>Trigger a bounded reconciliation regression worker that produces diffs and evidence after an import/mapping change</td>
+<td>CONDITIONAL NEW PATH</td>
+<td>Actual SDK execution in running product, trigger, restricted workspace, plan/result artifacts; coding assistance alone does not qualify</td>
+</tr>
+<tr>
+<td>Fetch.ai</td>
+<td>Discoverable report/investigation agent with structured agent-to-agent requests</td>
+<td>CONDITIONAL NEW PATH</td>
+<td>Verified SDK/catalog rules and live requester/service exchange; no substitution for CREAO core</td>
+</tr>
+<tr>
+<td>Figma</td>
+<td>Traceable iteration of source review and cash-bridge interaction</td>
+<td>CONDITIONAL NEW PATH</td>
+<td>Real Design/Make/agent use, public artifacts, required slides, stage log, embedded prototype, ≤3-minute video and Edu verification</td>
+</tr>
+<tr>
+<td>Capital One Nessie</td>
+<td>Dedicated synthetic transaction-import adapter for sandbox accounting demonstrations</td>
+<td>FUTURE ONLY</td>
+<td>Actual supported sandbox API/data, useful mapping, reconciliation tests; do not call it real bank connectivity</td>
+</tr>
+<tr>
+<td>Cartesia</td>
+<td>Accessible spoken cash review for a user who needs voice as the main interaction</td>
+<td>DEFER</td>
+<td>Actual voice-centered customer task, working audio controls/latency/privacy; narration tacked on to dashboard is insufficient</td>
+</tr>
+<tr>
+<td>Apify</td>
+<td>Essential public counterparty source retrieval for an investigation</td>
+<td>DEFER / SAME FIT GATE AS BRIGHT DATA</td>
+<td>Live meaningful retrieval, provenance/failure handling, permitted sources; no duplicate scraper merely for another logo</td>
+</tr>
+<tr>
+<td>Elastic</td>
+<td>Search a large multi-period evidence corpus by source/field</td>
+<td>FUTURE ONLY</td>
+<td>Real scale/search need, indexed scoped evidence and measurable retrieval quality; current 10-invoice case does not need it</td>
+</tr>
+<tr>
+<td>Moss</td>
+<td>Retrieval over prior reviewer decisions with scoped memory</td>
+<td>FUTURE ONLY</td>
+<td>Verified retrieval benefit, tenant filtering, stale evidence rules; current context is already a bounded bundle</td>
+</tr>
+<tr>
+<td>Atlassian</td>
+<td>Route reviewed finance exceptions into an existing operational workflow</td>
+<td>UNASSESSED RULES</td>
+<td>Full linked challenge not preserved in paste; then verify actual agent/workforce role and integration</td>
+</tr>
+<tr>
+<td>Mana.space</td>
+<td>Real planning/prototype workflow with shareable process artifacts</td>
+<td>NOT USED</td>
+<td>Actual usage that changed the build, public links and demo moment; cannot retroactively claim it</td>
+</tr>
+<tr>
+<td>Notability</td>
+<td>Authentic contemporaneous design/research notebook</td>
+<td>NOT USED</td>
+<td>Real evolving notes and feature use; generated docs alone are not Notability work</td>
+</tr>
+<tr>
+<td>Meta</td>
+<td>Collaborative owner–bookkeeper problem solving that materially strengthens connection</td>
+<td>WEAK CURRENT FIT</td>
+<td>User evidence and central AI collaboration, not generic finance automation with two accounts</td>
+</tr>
+<tr>
+<td>Armadin security</td>
+<td>Evidence prompt-injection and approval-boundary protections</td>
+<td>RULES UNKNOWN</td>
+<td>Published challenge plus independent attack/defense evidence; tests alone do not establish competition eligibility</td>
+</tr>
+<tr>
+<td>Bitdeer Model Studio</td>
+<td>Material extraction model serving role</td>
+<td>DEFER</td>
+<td>Actual model inference and evaluation; avoid a second inference service without demonstrated need</td>
+</tr>
+<tr>
+<td>Visa</td>
+<td>Bounded agent purchase/review workflow could touch commerce</td>
+<td>WEAK CURRENT FIT</td>
+<td>Genuine shopping/commerce problem and full rules; selling one report does not establish eligibility</td>
+</tr>
+<tr>
+<td>SpaceXAI</td>
+<td>Space-domain finance/research adaptation</td>
+<td>NOT_TARGETED</td>
+<td>Space-data and specified tool requirements do not fit this product; do not claim unperformed Cursor/API usage</td>
+</tr>
+<tr>
+<td>Spacetime</td>
+<td>Alternate central realtime architecture</td>
+<td>NOT_TARGETED</td>
+<td>Would replace Convex intentionally; no competing database added</td>
+</tr>
+<tr>
+<td>Hardware / planet-first</td>
+<td>No essential hardware/environmental role in receivables MVP</td>
+<td>NOT_TARGETED</td>
+<td>Do not fabricate relevance</td>
+</tr>
+</tbody></table></div>
+<p>These are evaluated paths, not integrations or submissions. New optional dependencies were not installed because their account contracts, utility and eligibility remain unproved.</p>
+<h2>Figma: changed from TBD to known requirements</h2>
+<p>The linked brief asks for a working demo with an honest workflow across ideation, prototyping, handoff, and code generation. Its specific deliverables include a short demo video, stage log (up to 200 words per stage), Figma Slides, accessible Figma artifacts/embedded prototype and repository, and Edu verification. The stage log should identify actual product use, elapsed minutes, a 1–5 assessment and downstream use. See WORKFLOW-STAGE-LOG.md for honest current history: <strong>no Figma use has occurred</strong>, so eligibility is not claimed.</p>
+<p>An honest future Figma contribution could test a clearer source-review interaction with an accountant and carry that change into code. A decorative prototype created only to claim the track would not tell a convincing workflow story. Creating a Figma account, Edu verification, sharing artifacts, and making a video require account/human actions not available in this run.</p>
+<h2>Coinbase: primary brief reconciled with guide</h2>
+<p>The linked PDF supports the planned Payment Agents track: a bounded buyer can purchase the completed analysis through Coinbase agent tooling and x402. Its submission asks for a summary, reusable working example, architecture/controls/limits, and firsthand builder feedback. It permits clearly labeled simulation and does not score money spent. Actual account eligibility and the one-prize-per-person condition must be checked personally; the guide&#39;s aggregate prize wording does not override those terms. No eligibility, SDK execution, protocol interaction or settlement has been established here.</p>
+<p>Keep buyer budget, quote, payment status, report delivery, and receipt reconciliation in a separate commerce state machine. Do not add simulated report revenue to the agency&#39;s payroll fixture. Avoid trading as a second primary direction. No real-money action is necessary or authorized.</p>
+<h2>Evidence capture checklist</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Claim</th>
+<th>Minimum artifact</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CREAO does core work</td>
+<td>Actual saved agent ID, successful run share link, changed-input result, live run in demo</td>
+</tr>
+<tr>
+<td>Finance is correct</td>
+<td>Independent expected manifest, exact changed-input tests, selected-week contribution bridge</td>
+</tr>
+<tr>
+<td>Human control</td>
+<td>Source inspection, reasoned approval/rejection, repeat/competing decision proof</td>
+</tr>
+<tr>
+<td>Recovery</td>
+<td>Real provider ID retained through interrupted retrieval; clearly separate simulated timeout</td>
+</tr>
+<tr>
+<td>Convex is central</td>
+<td>Dashboard deployment/function evidence, two clients, reconnect/restart, transaction and storage checks</td>
+</tr>
+<tr>
+<td>Claude contributes</td>
+<td>Actual model trace and output affecting supported findings/extraction, evaluation and limits</td>
+</tr>
+<tr>
+<td>CRS is meaningful</td>
+<td>Actual sandbox request/response, provided identity type, supported fields, visible defensible impact</td>
+</tr>
+<tr>
+<td>Customer usefulness</td>
+<td>Consented interview/task observations and measured comparison; no invented testimonials</td>
+</tr>
+<tr>
+<td>Source chronology</td>
+<td>Real local Git history, stage log, implementation dates, original guide/source pointers</td>
+</tr>
+</tbody></table></div>
+<h2>Two pitches to prepare</h2>
+<p>For the finance judge: “We fill the receivables controller assistant seat. This agency expects $16,000 after payroll. An issued credit and collection timing change reveal a $4,000 gap. The investigator cites evidence; the human approves; the deterministic engine explains the cash.” Open with the shortfall moment and then show how it was discovered.</p>
+<p>For the technical judge: explain the agent/accounting/approval boundary, case ownership, stale-generation guard, idempotent atomic posting, genuine provider status and recovery. Name which services actually ran. If CREAO is still blocked, disclose that before showing the rehearsal; no phrasing should imply a live integration.</p>
+<a class="source-link" href="EVENT-STRATEGY.md">Open editable Markdown ↗</a></article>
+<article id="actions" data-label="Your action items" hidden><h1>Core actions for your return</h1>
+<p>Everything possible without account decisions was handled locally. No response is required while you are away. Start with the two account tasks below; optional sponsor tasks should not delay the core.</p>
+<h2>P0 — make the mandatory agent real</h2>
+<p><strong>Where:</strong> agent.creao.ai, using your event-upgraded account. <strong>Estimated human interaction:</strong> 10–20 minutes plus provider execution time; not a guarantee.</p>
+<ol>
+<li>Finish the fresh build of <strong>LedgerProof Receivables Investigator</strong>. Use CREAO-AGENT.md. Its job is evidence-backed reconciliation; it must not send email, approve corrections, post entries or transfer funds.</li>
+<li>Save it as a reusable hosted agent, not just an unsaved conversation. If using the agent-v1 form, add a text input named <strong>bundle</strong> that accepts the serialized JSON evidence bundle. Retain the exact field name.</li>
+<li>Locate external invocation settings. Confirm <strong>which API family this account actually supports</strong>. The app now supports explicit <code>agent-v1</code> or <code>developer-v2</code>; it never switches families automatically. If agent-v1 is supported, use base <code>https://agent.creao.ai/api/v1</code>; if developer-v2, use <code>https://developer.creao.ai/v2</code>. An agent ID/key from one family is not presumed compatible with the other.</li>
+<li>Put the key and agent ID in LedgerProof/.env.local through your secure local/hosting environment. Never paste the key into chat or commit it. Set CREAO_API_FAMILY, CREAO_API_BASE and, for agent-v1, CREAO_INPUT_FIELD to match the confirmed account. Set CREAO_CONTRACT_VERIFIED=true only after checking that contract.</li>
+<li>If supported, select a traceable Claude model and retain the actual model ID. Do not claim Anthropic otherwise.</li>
+<li>Run the opt-in smoke script only with authorized event credits/account access: <code>node --env-file=.env.local --import tsx scripts/smoke-creao.ts</code>. Confirm changed $8,000/$6,000 credit inputs produce source-bound results, and run the UI flow with CREAO selected.</li>
+<li>Capture the actual <strong>agent ID and successful run share link</strong>. Add them to README, SPONSOR-EVIDENCE.md and SUBMISSION.md. A run ID alone is not a shared run link. If the form/output differs, keep the real sanitized response and adjust the adapter explicitly.</li>
+</ol>
+<p>Manual test inputs are ready in fixtures/creao/input-credit-8000.json and input-credit-6000.json. The exact machine-readable result contract is fixtures/creao/output-schema.json. These are fixtures and expectations, not live outputs. <code>npm run doctor</code> checks the current shell configuration; use Node&#39;s <code>--env-file=.env.local</code> form to load a local file.</p>
+<p><strong>Done when:</strong> hosted CREAO actually investigates changed inputs, valid cited findings enter the review queue, and the shared successful run is accessible to judges. Current status remains BLOCKED until then.</p>
+<h2>P0 — activate the real persistent backend</h2>
+<p><strong>Where:</strong> your Convex account/project.</p>
+<ol>
+<li>Run <code>npx convex dev</code> from LedgerProof and select/create the intended project using available event credits. Stop before any paid subscription or unintended project change.</li>
+<li>Configure server-only CONVEX_URL in .env.local and the same strong random LEDGERPROOF_BACKEND_SECRET in .env.local and the Convex deployment environment. Keep secrets out of source/chat.</li>
+<li>Deploy the prepared schema/functions to the authorized development deployment. Test create/read, original-file storage, changed evidence, concurrent decisions, reset and retrieval resume.</li>
+<li>Verify shared updates in two browser contexts against the actual backend. Current UI uses polling; native subscriptions and a Workflow component are still not implemented and must not be claimed.</li>
+</ol>
+<p><strong>Done when:</strong> test receipts prove the hosted backend is central, durable and scoped. Local filesystem tests alone do not prove Convex behavior.</p>
+<h2>P0 — event participation and submission</h2>
+<p>Check the actual Devpost countdown. The supplied guide says Sunday 9:00 AM submission and 10:30 AM–12:30 PM in-person judging; the current weekend maps Sunday to <strong>October 25, 2026, Pacific time</strong>. Verify that mapping/countdown with the event site/app. Confirm participant eligibility, registration, teammates (maximum four), and actual implementation chronology. Be present for the full judging window as required by the guide.</p>
+<p>The draft is docs/SUBMISSION.md; the two-minute story is docs/DEMO.md; source and evidence are indexed in START-HERE.md. A Saturday draft is recommended by the guide. <strong>No Devpost submission has been made.</strong> Source publication, a public deployment, video recording/public sharing, and submission still need your concrete account decisions/authorization. “Any command” was used for local work; it was not interpreted as permission to spend money, contact people, trade, or submit on your behalf.</p>
+<h2>P1 — only if the core is already working</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Action</th>
+<th>What only you can supply</th>
+<th>What would make it useful</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Confirm real user problem</td>
+<td>Your lived experience or a consenting independent bookkeeper/fractional CFO serving creative agencies</td>
+<td>Observed workflow/task feedback; no fabricated interview</td>
+</tr>
+<tr>
+<td>CRS capability gate</td>
+<td>Event sandbox credentials, provided test identity, catalog access</td>
+<td>Supported fields and identity type genuinely inform a visible investigation/scenario</td>
+</tr>
+<tr>
+<td>Coinbase test tooling</td>
+<td>Eligible account confirmation, authorized test keys/tooling, environment choice</td>
+<td>Actual bounded buyer-agent/x402 report purchase with recoverable delivery; no real funds needed</td>
+</tr>
+<tr>
+<td>Figma path</td>
+<td>Edu verification and access to Design/Make/Slides</td>
+<td>Real iteration reflected in code, accessible artifacts, honest stage log and demo video</td>
+</tr>
+<tr>
+<td>Factory/Fetch.ai</td>
+<td>Verified event SDK access only if pursuing a real runtime role</td>
+<td>Independent evaluation worker or genuine agent-to-agent exchange; never replace CREAO core</td>
+</tr>
+<tr>
+<td>Hosting</td>
+<td>Preferred existing account/domain and publishing decision</td>
+<td>Deploy a tested build with real backend and exact APP_ORIGIN; record real URL</td>
+</tr>
+</tbody></table></div>
+<h2>What you do not need to supply now</h2>
+<p>No real bank credentials, customer financial records, personal credit identity, payment authority, broad email access, or paid subscription is needed for the synthetic judge core. Bright Data, Spacetime, voice, hardware and other extra tracks are not blockers.</p>
+<h2>Copyable handoff after account work</h2>
+<p>Tell the next coding run: “CREAO is saved. The nonsecret API family is ___, agent ID is ___, input field is ___, and the run share link is ___. Secrets are configured locally, not in chat. Convex project/URL is configured. Verify actual execution, update integration-status, finish outstanding core gaps, then rerun the full judge flow.” Do not say the integration works until the execution artifacts support it.</p>
+<a class="source-link" href="ACTION-ITEMS.md">Open editable Markdown ↗</a></article>
+<article id="evaluation" data-label="Evaluation" hidden><h1>Evaluation</h1>
+<p>Executed October 24, 2026. None of these checks establishes live provider readiness.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Actual result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>npm test</code></td>
+<td>20/20 passing finance, workflow, PDF/CSV parser, capability, concurrent local-store and mock-provider contract tests</td>
+</tr>
+<tr>
+<td><code>npm run typecheck</code></td>
+<td>Passed</td>
+</tr>
+<tr>
+<td><code>npm run build</code></td>
+<td>Passed with Next.js 16.4.3, static page and dynamic scoped API</td>
+</tr>
+<tr>
+<td><code>npm run fixtures</code></td>
+<td>Generated 10 invoice PDFs, credit PDF, bank/ledger/obligations CSVs</td>
+</tr>
+<tr>
+<td><code>npm run test:e2e</code></td>
+<td>3/3 passing in 6.8 s on final autonomous pass against production build: credit upload → rehearsal → review → forecast; shared browser updates and unrelated isolation; blocked CREAO + simulated timeout resume; mobile fit/navigation</td>
+</tr>
+<tr>
+<td><code>node --import tsx scripts/evaluate.ts</code></td>
+<td>3/3 authored anomalies detected, 0 missed, 0 false-positive anomalies; 1 benign partial payment finding; validation failures 0; local elapsed 1.541 ms</td>
+</tr>
+<tr>
+<td>npm dependency audit at installation</td>
+<td>0 reported vulnerabilities</td>
+</tr>
+<tr>
+<td><code>npm run fixtures:creao</code></td>
+<td>Generated two-document $8,000/$6,000 credit evidence bundles and exact JSON result schema, with no provider calls</td>
+</tr>
+<tr>
+<td><code>npm run doctor</code></td>
+<td>Reported missing CREAO/Convex/account environment actions without printing secrets or making network calls</td>
+</tr>
+<tr>
+<td><code>npm run docs:build</code> / <code>docs:export</code></td>
+<td>Generated five SVG/PNG diagrams, a 10-section offline HTML briefing and a 26-page PDF; navigation/search/empty-state/mobile checks passed</td>
+</tr>
+</tbody></table></div>
+<p>Browser screenshots were inspected for desktop dashboard and mobile review. Browser artifacts are ignored under test-results/. Initial browser attempt exposed a test synchronization issue (navigation before upload completion); corrected by waiting for the upload response and testing the production build. Disk exhaustion during install left a damaged compiler, which was replaced before successful checks.</p>
+<p>Declared synthetic evaluation set: 10 invoices with normal fully matched receipts, one partial payment, one unmatched receipt, one duplicated ledger entry, plus an optional uploaded issued credit. Expected results live independently in fixtures/expected.json. This small authored set is not production performance evidence.</p>
+<p>Required checks: exact cash transitions; date boundaries/rollover; balance/account enforcement; overpayment exceptions; preview separation; amount changes; timing preserves revenue; no risk write-off; duplicate and competing decisions; stale/reset behavior; scoped sessions; citation/enum rejection; prompt injection remains data; explicit blocked provider status; source-upload browser path. Browser test source is in tests/browser.</p>
+<p>Measured offline rule sample: one authored synthetic agency, 10 invoices, 7 clean negative invoices after credit introduction, three seeded anomalies (credit, unmatched receipt, duplicate posting), and one legitimate partial payment. See evaluation-results.json. This is a small deterministic rule check, not a general accuracy benchmark or evidence of CREAO quality. The explicit 1.541 ms measurement excludes network/model/extraction time.</p>
+<p>Live CREAO extraction/matching accuracy, missed errors, false positives, model latency, share links, Claude trace, Convex concurrency/subscriptions, and sponsor sandbox evidence: <strong>not measured</strong>. Customer interviews: none. No fabricated customer feedback or benchmark percentage.</p>
+<p>Autonomous architecture review added regression tests for dated newly posted receipts and fractional-dollar display, plus mock HTTP tests for explicit CREAO API-family separation, mismatched base rejection, structured text parsing, wrong-run rejection, stale result rejection and unavailable credentials. These are offline contract checks, not successful provider calls. Malformed terminal results now escalate to review rather than repeating retrieval indefinitely. A GitHub Actions workflow was prepared but has not executed remotely because source has not been pushed.</p>
+<a class="source-link" href="EVALUATION.md">Open editable Markdown ↗</a></article>
+<article id="workflow" data-label="Workflow stage log" hidden><h1>Workflow stage log — honest draft</h1>
+<p>Prepared for traceability; <strong>not a Figma-track eligibility claim</strong>. Figma&#39;s linked brief asks for short stage records including product, purpose, minutes, rating and downstream use. No Figma product has been used. Exact stage durations were not instrumented, so they are not invented. This file can be extended with actual later work, without rewriting earlier history.</p>
+<h2>Ideation</h2>
+<p>User supplied the LedgerProof build specification: verify receivables behind a 13-week payroll cash forecast. It defined mandatory CREAO, preferred Convex, review controls, provider capability gates, and exact synthetic cash values. The coding agent translated that brief into a local implementation and explicit integration register. Tools: user-authored specification, Codex, local Markdown. Figma product: none. Minutes: not instrumented. Figma rating: not applicable. Output: preserved specification, accounting assumptions, contracts, fixture/expected manifest and phased scope. Customer problem remains a hypothesis; no interview is claimed.</p>
+<h2>Prototyping</h2>
+<p>The prototype was built directly in React/CSS with a source drawer, cash chart/bridge, activity and approval queue. Generated PDFs/CSVs supported a real local upload path. Playwright exercised desktop/mobile layouts and sharing/isolation. Source text stays escaped and human approval remains explicit. Tools: React, Next.js, pdf-lib/unpdf, Playwright and Codex. Figma product: none. Minutes: not instrumented. Figma rating: not applicable. Output: working local rehearsal plus observed screenshots; no separate Figma prototype exists.</p>
+<h2>Handoff</h2>
+<p>Shared runtime contracts connect parsed sources, provider output, state transitions and finance. CREAO-AGENT.md defines the hosted investigator&#39;s role, input and exact output. Service/status registers distinguish prepared source, local tests and absent hosted execution. The new architecture atlas, service explanation, roadmap and action list make gaps reviewable without the original conversation. Tools: TypeScript/Zod, Markdown, generated SVG/HTML/PDF. Figma product: none. Minutes: not instrumented. Rating: not applicable. Output: reproducible code, docs and explicit account actions; no design artifact is falsely attributed to Figma.</p>
+<h2>Code generation and verification</h2>
+<p>Codex implemented source locally after cloning the empty repository. Tests verify finance/state invariants, actual limited PDF/CSV extraction, local concurrent decisions and provider-contract mocks. Browser checks cover the end-to-end rehearsal. Disk exhaustion damaged a dependency; clearing a disposable cache and replacing the compiler enabled a successful build. Browser test timing was corrected to await upload completion. Architecture review found and fixed future receipts incorrectly entering opening cash. Tools: Codex, npm, Node/tsx, TypeScript, Next.js and Playwright. Figma product: none. Minutes: not instrumented. Rating: not applicable. Output: tested local code; hosted integrations remain blocked.</p>
+<h2>Later genuine Figma work, if any</h2>
+<p>Append actual product/file links, minutes, 1–5 assessment, observed friction and the specific change carried into code. Complete the required Slides and public prototype/embed deliverables only if the track is pursued. Do not backfill claims of usage or measured time savings that did not occur.</p>
+<a class="source-link" href="WORKFLOW-STAGE-LOG.md">Open editable Markdown ↗</a></article>
+<article id="sources" data-label="Sources and decisions" hidden><h1>Sources, decisions, and confidence</h1>
+<p>Retrieved/reviewed October 24, 2026. Facts from source documents are distinct from implementation evidence. No account capability is inferred from a documentation page. No event eligibility is inferred from a technical integration alone.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>What was actually available</th>
+<th>How used / limitation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>User LedgerProof specification</td>
+<td>Complete pasted implementation brief, preserved as BUILD-SPECIFICATION.md</td>
+<td>Scope, exact forecast values, mandatory CREAO, accounting/approval rules and provider gates</td>
+</tr>
+<tr>
+<td>User Cal Hacks 13.0 guide</td>
+<td>Complete pasted plain text, preserved at sources/cal-hacks-13-guide.txt</td>
+<td>Sunday schedule, live/in-person judging, sponsor summaries; some embedded links/images lost in paste</td>
+</tr>
+<tr>
+<td><a href="https://www.calhacks.io/">Cal Hacks official site</a></td>
+<td>Public page retrieved</td>
+<td>In-person, team maximum and event-start implementation requirements; no authenticated Devpost countdown</td>
+</tr>
+<tr>
+<td><a href="https://community.creao.ai/CalHacks2026">CREAO CalHacks2026 pack</a></td>
+<td>Search-indexed official page retrieved; direct open failed</td>
+<td>Core hosted agent / actual ID and share link / visible run; track fit. Page dates differ from Sunday guide context</td>
+</tr>
+<tr>
+<td><a href="https://developer.creao.ai/docs/v2/runs/create">CREAO developer v2 create</a> and <a href="https://developer.creao.ai/docs/v2/runs/get">get</a></td>
+<td>Public indexed documentation</td>
+<td>Prepared developer-v2 adapter contract; live account and exact successful output not verified</td>
+</tr>
+<tr>
+<td><a href="https://community.creao.ai/AI_hackathon_UCLA2026/tech">CREAO API Trigger technical page</a></td>
+<td>Public indexed documentation for another event</td>
+<td>Prepared optional agent-v1 contract only; <strong>not a Cal Hacks eligibility authority</strong>, no automatic endpoint fallback</td>
+</tr>
+<tr>
+<td><a href="https://docs.convex.dev/client/javascript/node">Convex Node client</a>, <a href="https://docs.convex.dev/functions/mutation-functions">mutations</a>, <a href="https://docs.convex.dev/agents/workflows">workflows</a></td>
+<td>Official technical pages retrieved</td>
+<td>Backend design and future durability/subscription direction; no deployment receipt</td>
+</tr>
+<tr>
+<td><a href="https://drive.google.com/file/d/12TnPLguduV3gh1zY_TJ176XmVDz2RGW9/view">Coinbase CalHacks PDF</a></td>
+<td>Connected Drive readable text, title Coinbase CalHacks Challenge 2026.pdf, modified October 21, 2026</td>
+<td>Primary Payment Agents/submission/eligibility source. No Coinbase account or SDK execution inferred</td>
+</tr>
+<tr>
+<td><a href="https://docs.google.com/document/d/1HjzThDGveSLiilIdEPEHq12ZVLZ5eS0T8CQC5_m_-rg/edit">Figma challenge</a></td>
+<td>Connected Drive readable text, title Cal Hacks &lt;&gt; Figma, modified October 24, 2026</td>
+<td>Replaced TBD with actual stage-log/slides/prototype/video/Edu requirements; no actual Figma use</td>
+</tr>
+<tr>
+<td><a href="https://www.fetch.ai/events/calhacks-13-0">Fetch.ai CalHacks page</a></td>
+<td>Public official event page</td>
+<td>New conditional agent-discovery path; prize/address details differ from supplied guide, so no payout forecast</td>
+</tr>
+<tr>
+<td><a href="https://calhacks.crscreditapi.com/">CRS sandbox entry</a></td>
+<td>Direct page open unsuccessful; guide provides description</td>
+<td>Catalog/test identities remain unavailable; no field or identity-type assumptions</td>
+</tr>
+<tr>
+<td><a href="https://docs.factory.ai/">Factory docs</a></td>
+<td>Official plans page discoverable; guessed SDK overview route unsuccessful</td>
+<td>No SDK contract or execution claimed. Only guide-grounded conditional worker design</td>
+</tr>
+<tr>
+<td>Repository code/tests</td>
+<td>Local inspected source and executed checks</td>
+<td>Source of actual implementation/status claims; see EVALUATION.md</td>
+</tr>
+</tbody></table></div>
+<h2>Architecture decisions</h2>
+<p><strong>One investigator boundary:</strong> preserve CREAO for substantive investigation; local rules are explicitly rehearsal. Do not use another provider to pretend the mandatory dependency works.</p>
+<p><strong>One selected hosted database:</strong> Convex remains central by design. Do not add Spacetime just to collect a track. The local filesystem is an offline rehearsal implementation of the store interface and is disabled by default for production hosting.</p>
+<p><strong>Money stays deterministic:</strong> source-backed amounts, integer cents, dated obligations, narrow balanced entries, explicit exceptions. The investigator supplies cited interpretations rather than authoritative cash numbers.</p>
+<p><strong>Human authority is explicit:</strong> interpretation, proposal creation, approval, posting and scenario change remain distinct operations. Approval persists with its entry and event. No external book writes or payments are exposed to the agent.</p>
+<p><strong>Provider families are explicit:</strong> support developer-v2 and agent-v1 as separate selected adapters behind one interface. Never mix casing, forms, IDs, bases or result assumptions. Account confirmation still gates live calls.</p>
+<p><strong>Failed verification changes the claim:</strong> a malformed terminal result becomes needs_review; a failed retrieval retries the same ID; an ambiguous submission requires reconciliation. Public documentation, credentials, and mock responses never set LIVE_VERIFIED.</p>
+<p><strong>New paths must earn their place:</strong> the guide reveals possible Factory, Fetch.ai and Figma paths. They remain conditional because no meaningful runtime/tool workflow has been executed. Optional research/voice/commerce must not displace the receivables core.</p>
+<h2>Unknowns deliberately preserved</h2>
+<p>Actual CREAO agent ID/share link/API family/input form; model trace; Convex project/deployment; current Devpost countdown and participant eligibility; full linked Hyphenate/Atlassian briefs; CRS catalog/test identities; sponsor stacking limits; customer feedback; hosting account/region; real provider costs/latencies. These are ACTION-ITEMS, not missing values to fabricate.</p>
+<a class="source-link" href="SOURCES-AND-DECISIONS.md">Open editable Markdown ↗</a></article><div id="empty" class="empty" hidden>No matching section. Try a service name or “approval”.</div><footer>Built from repository code, the supplied event guide and attributed official sources. Synthetic business data; simulated rehearsal explicitly labeled. Public publication/submission not performed.</footer></main><script>
+const articles=[...document.querySelectorAll('article')],buttons=[...document.querySelectorAll('nav button')],search=document.getElementById('search'),status=document.getElementById('search-status');
+function select(id,scroll=true){search.value='';articles.forEach(a=>a.hidden=a.id!==id);buttons.forEach(b=>b.dataset.target===id?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));status.textContent='';document.getElementById('empty').hidden=true;history.replaceState(null,'','#'+id);if(scroll)window.scrollTo(0,0);}
+buttons.forEach(b=>b.addEventListener('click',()=>select(b.dataset.target)));
+search.addEventListener('input',()=>{const query=search.value.trim().toLowerCase();if(!query){select('overview',false);return;}buttons.forEach(b=>b.removeAttribute('aria-current'));let count=0;articles.forEach(a=>{a.hidden=!a.textContent.toLowerCase().includes(query);if(!a.hidden)count++;});status.textContent=count+' matching section'+(count===1?'':'s');document.getElementById('empty').hidden=count>0;});
+document.getElementById('print').addEventListener('click',()=>window.print());
+document.addEventListener('click',e=>{const link=e.target.closest('a');if(!link)return;const href=link.getAttribute('href');const map={"START-HERE.md":"overview","ARCHITECTURE-DIAGRAMS.md":"architecture","HOW-IT-WORKS.md":"explanation","SERVICE-REGISTER.md":"services","FUTURE-DEVELOPMENT.md":"future","EVENT-STRATEGY.md":"event","ACTION-ITEMS.md":"actions","EVALUATION.md":"evaluation","WORKFLOW-STAGE-LOG.md":"workflow","SOURCES-AND-DECISIONS.md":"sources"};if(map[href]){e.preventDefault();select(map[href]);}});
+const initial=location.hash.slice(1);if(articles.some(a=>a.id===initial))select(initial,false);
+</script></body></html>

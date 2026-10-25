@@ -1,0 +1,9 @@
+flowchart TB
+  capability[Session token / stored hash] --> case[Case: generation + versions + revision]
+  case --> sources[Documents / invoices / receipts / credits]
+  case --> agent[Runs / findings / proposals]
+  case --> accounting[Entries / obligations / scenarios]
+  case --> decisions[Idempotent decisions / application events]
+  case --> store[One bounded aggregate: local or Convex]
+  store -. future migration .-> normalized[Organization-scoped normalized entities / snapshots / retention]
+  separate[Other case: different token / isolated state]

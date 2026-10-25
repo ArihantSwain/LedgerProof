@@ -1,0 +1,14 @@
+{
+  "mode": "LOCAL_REHEARSAL",
+  "scope": "One authored synthetic agency; offline rule evaluation, no LLM/provider/extraction accuracy claim",
+  "invoiceCount": 10,
+  "cleanNegativeInvoices": 7,
+  "knownAnomalies": 3,
+  "supportedAnomalies": 3,
+  "missedAnomalies": 0,
+  "falsePositiveAnomalies": 0,
+  "benignPartialPaymentFindings": 1,
+  "validationFailures": 0,
+  "localElapsedMs": 1.541,
+  "liveProviderLatencyMs": null
+}

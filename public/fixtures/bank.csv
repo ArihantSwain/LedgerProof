@@ -1,0 +1,11 @@
+externalId,invoiceNumber,postedDate,amountCents
+receipt-1,INV-002,2026-10-20,200000
+receipt-2,INV-003,2026-10-20,100000
+receipt-3,INV-004,2026-10-20,400000
+receipt-4,INV-005,2026-10-20,500000
+receipt-5,INV-006,2026-10-20,600000
+receipt-6,INV-007,2026-10-20,700000
+receipt-7,INV-008,2026-10-20,800000
+receipt-8,INV-009,2026-10-20,900000
+receipt-9,INV-010,2026-10-20,1000000
+receipt-unmatched,INV-003,2026-10-21,50000

@@ -1,0 +1,18 @@
+stateDiagram-v2
+  [*] --> queued: versioned evidence
+  queued --> blocked: CREAO account unavailable
+  queued --> unknown: persist submission intent
+  unknown --> submitted: provider ID saved
+  unknown --> reconciliation: ambiguous outcome / no blind resubmit
+  submitted --> running: authenticated retrieval
+  running --> validating: terminal result
+  running --> retry_scheduled: retrieval failure
+  retry_scheduled --> running: same provider ID
+  validating --> needs_review: invalid output / missing evidence
+  validating --> completed: valid cited result
+  completed --> pending_proposal: deterministic supported correction
+  pending_proposal --> approved: human source review + CAS + key
+  pending_proposal --> rejected: human reason
+  approved --> posted: atomic entry + decision + event
+  running --> stale: input changes
+  running --> ignored: reset generation changes

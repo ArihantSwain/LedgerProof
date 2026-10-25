@@ -1,0 +1,9 @@
+{
+  "offlineNavigation": "passed",
+  "serviceSearch": "passed",
+  "searchEmptyState": "passed",
+  "mobileActionView": "passed",
+  "svgExports": 5,
+  "pdfExport": "passed",
+  "providerVerification": "none"
+}

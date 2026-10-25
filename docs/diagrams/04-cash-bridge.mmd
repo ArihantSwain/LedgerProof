@@ -1,0 +1,6 @@
+flowchart LR
+  baseline[Original: opening 20000 + invoice 20000 - payroll 24000 = 16000]
+  corrected[Approve issued credit 8000: remaining 12000; week 2 cash 8000]
+  delayed[Move remaining collection to week 3: week 2 -4000; week 3 8000]
+  baseline -->|Evidence + human-approved accounting correction| corrected
+  corrected -->|Explicit timing assumption / no revenue reversal| delayed
