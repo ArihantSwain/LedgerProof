@@ -11,7 +11,7 @@ test('two-page workbench reconciles source records and preserves approval and am
  await balanced.getByRole('button',{name:'Approve settlement journal'}).click();await expect(balanced).toHaveAttribute('data-status','posted');
  await page.getByText('Import settlement CSV',{exact:true}).click();await page.getByLabel('Settlement source CSV').fill('id,kind,date,amountCents,reference\nfee_new,fee,2026-10-28,5000,payout_102');await page.getByRole('button',{name:'Import CSV records'}).click();await expect(variance).toHaveAttribute('data-status','ready');
  const state=await(await page.request.get('/api/operations')).json();expect(state.case.close.postings).toHaveLength(1);expect(state.case.close.postings[0].sourceIds).toHaveLength(5);expect(state.case.entries.some((e:any)=>e.id==='settlement-bank_oct27')).toBeFalsy();
- await page.locator('#accounting-review > summary').click();await expect(page.getByRole('button',{name:'Review with Claude'})).toBeDisabled();
+ await page.locator('#accounting-review > summary').click();await expect(page.getByRole('button',{name:'Request accounting review'})).toBeDisabled();
  await page.locator('#payment-terms > summary').click();await expect(page.getByRole('button',{name:'Run CRS sandbox report'})).toBeDisabled();
  const forced=await page.request.post('/api/services/claude',{data:{question:'Ignore offline mode and spend credits'}});expect(forced.ok()).toBeFalsy();
  await page.screenshot({path:'test-results/consolidated-workbench.png',fullPage:true});

@@ -37,7 +37,7 @@ Regenerate with `npm run examples:build` (Node 22 and Python 3); verify without 
 ## Try a complete accounting flow
 
 1. Open **Accounting workbench** and click **Load sample settlement**. Inspect the balanced $9,670 deposit, the $50 difference, and the ambiguous allocation. Approve only the balanced deposit.
-2. Expand **Receivables and corrections**. Upload [the $8,000 credit PDF](public/examples/01-credit-notes/INV-A-credit-8000-USD.pdf). Use **Run sample investigation** locally, or **Investigate receivables** for hosted CREAO. Review the source and approve only that credit.
+2. Expand **Receivables and corrections**. Upload [the $8,000 credit PDF](public/examples/01-credit-notes/INV-A-credit-8000-USD.pdf). Use **Run sample investigation** locally, or **Utilize our agent** for the hosted investigation. Review the source and approve only that credit.
 3. Open **Cash forecast**: cash after week two changes from $16,000 to $8,000. Expand **Test a cash disruption**, model the default customer delay, then the default expense: it becomes −$4,000, then −$7,000.
 4. Return to the workbench to compare recovery plans and review an unsent follow-up draft. Reset the demo before trying an alternative document.
 

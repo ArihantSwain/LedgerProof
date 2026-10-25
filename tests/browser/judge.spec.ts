@@ -3,7 +3,7 @@ test('uploaded credit moves through investigation and human approval into the sa
  await page.goto('/');await page.getByRole('button',{name:'Start finance demo'}).click();await expect(page.locator('.forecast-kpis article').nth(1)).toContainText('$16,000');
  await page.getByRole('navigation').getByRole('link',{name:'Accounting workbench'}).click();await page.locator('#receivables > summary').click();
  const uploadResponse=page.waitForResponse(r=>r.url().endsWith('/api/documents')&&r.request().method()==='POST');await page.getByLabel('Upload evidence').setInputFiles('public/examples/01-credit-notes/INV-A-credit-8000-USD.pdf');expect((await uploadResponse).ok()).toBeTruthy();
- await page.getByText('Investigation settings and challenge',{exact:true}).click();await page.getByLabel('Use local deterministic rehearsal').check();await page.getByRole('button',{name:'Investigate receivables',exact:true}).click();await expect(page.getByText('Local rules rehearsal',{exact:true})).toBeVisible();
+ await page.getByText('Investigation settings and challenge',{exact:true}).click();await page.getByLabel('Use local deterministic rehearsal').check();await page.getByRole('button',{name:'Utilize our agent',exact:true}).click();await expect(page.getByText('Local rules rehearsal',{exact:true})).toBeVisible();
  await page.locator('.proposal').filter({hasText:'Apply issued credit note'}).getByRole('button',{name:'Approve correction'}).click();
  await page.getByRole('navigation').getByRole('link',{name:'Cash forecast'}).click();await expect(page.locator('.forecast-kpis article').nth(1)).toContainText('$8,000');
  await page.getByText('Test a cash disruption',{exact:true}).click();await page.getByRole('button',{name:'Model customer delay'}).click();await expect(page.locator('.forecast-kpis article').nth(1)).toContainText('-$4,000');
@@ -13,7 +13,7 @@ test('uploaded credit moves through investigation and human approval into the sa
 });
 test('unavailable hosted investigations stay disabled and the sample flow can resume safely',async({page})=>{
  await page.goto('/workbench');await page.getByRole('button',{name:'Start finance demo'}).click();await page.locator('#receivables > summary').click();
- await expect(page.getByRole('button',{name:'Investigate receivables',exact:true})).toBeDisabled();await page.getByRole('button',{name:'Run sample investigation',exact:true}).click();await expect(page.locator('.run .status')).toHaveText('Completed');
+ await expect(page.getByRole('button',{name:'Utilize our agent',exact:true})).toBeDisabled();await page.getByRole('button',{name:'Run sample investigation',exact:true}).click();await expect(page.locator('.run .status')).toHaveText('Completed');
  await page.getByText('Investigation settings and challenge',{exact:true}).click();await page.getByRole('button',{name:'Inject simulated timeout'}).click();await expect(page.locator('.run').first()).toContainText('Practice interruption');await page.getByRole('button',{name:'Resume same run'}).click();await expect(page.locator('.run').first().locator('.status')).toHaveText('Completed');await expect(page.locator('.run')).toHaveCount(2);await expect(page.locator('.error[role=alert]')).toHaveCount(0);
 });
 test('legacy receivables link now opens the forecast with no separate navigation tree',async({page})=>{

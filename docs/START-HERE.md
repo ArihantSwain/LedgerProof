@@ -17,7 +17,7 @@ There are two pages:
 
 1. Start on **Cash forecast** and explain the expected cash after week two.
 2. Open **Accounting workbench** and click **Load sample settlement**. Explain $10,000 charges − $300 refunds − $30 fees = $9,670. The other deposits retain their missing-evidence and ambiguous-match exceptions.
-3. Inspect the journal and approve it. Open **Receivables and corrections** for the credit-note → CREAO investigation → human approval flow. For local practice, **Run sample investigation** provides an explicitly simulated result. **Accounting review** asks Claude for a source-based explanation.
+3. Inspect the journal and approve it. Open **Receivables and corrections** for the credit-note → **Utilize our agent** → human approval flow. For local practice, **Run sample investigation** provides an explicitly simulated result. **Accounting review** asks Claude for a source-based explanation.
 4. Return to **Cash forecast**. Expand **Test a cash disruption** and model a late customer payment and an unexpected expense.
 5. Open **Compare a recovery plan** to return to the workbench. Prepare and approve a conditional plan, then inspect its unsent follow-up draft.
 

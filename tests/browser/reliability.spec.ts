@@ -5,7 +5,7 @@ test('missing inputs, repeated imports and unavailable tools disable their actio
  await page.getByLabel('Delayed collection date').fill('');await expect(page.getByRole('button',{name:'Model customer delay'})).toBeDisabled();
  await page.getByLabel('Unexpected expense · USD').fill('');await expect(page.getByRole('button',{name:'Model unexpected expense'})).toBeDisabled();
  await page.getByLabel('Delayed collection date').fill('2026-11-09');await page.getByRole('button',{name:'Model customer delay'}).click();await expect(page.getByRole('button',{name:'Model customer delay'})).toBeDisabled();
- await page.getByRole('navigation').getByRole('link',{name:'Accounting workbench'}).click();await page.locator('#accounting-review > summary').click();await expect(page.getByRole('button',{name:'Review with Claude'})).toBeDisabled();
+ await page.getByRole('navigation').getByRole('link',{name:'Accounting workbench'}).click();await page.locator('#accounting-review > summary').click();await expect(page.getByRole('button',{name:'Request accounting review'})).toBeDisabled();
  await page.getByText('Import settlement CSV',{exact:true}).click();await page.getByLabel('Settlement source CSV').fill('');await expect(page.getByRole('button',{name:'Import CSV records'})).toBeDisabled();
  await page.getByRole('button',{name:'Load sample settlement'}).click();await page.getByLabel('Settlement source CSV').fill('id,kind,date,amountCents,reference\nbank_oct27,bank,2026-10-27,967000,payout_101');await expect(page.getByRole('button',{name:'Import CSV records'})).toBeDisabled();
  await page.locator('#missing-context > summary').click();await page.getByLabel('Investigation charge amount').fill('');await expect(page.getByRole('button',{name:'Add investigation charge'})).toBeDisabled();
@@ -46,4 +46,23 @@ test('an incomplete successful response keeps the valid workspace and offers rec
  await page.route('**/api/close',route=>route.fulfill({status:200,json:{error:'Unexpected upstream response'}}));
  await page.getByRole('button',{name:'Load sample settlement'}).click();await expect(page.locator('.error[role=alert]')).toContainText('could not confirm');await expect(page.getByRole('heading',{name:'Accounting workbench',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Refresh workspace'})).toBeEnabled();
  await page.getByRole('button',{name:'Refresh workspace'}).click();await expect(page.locator('.error[role=alert]')).toHaveCount(0);await expect(page.getByRole('button',{name:'Load sample settlement'})).toBeEnabled();
+});
+
+test('navigation keeps the same workspace shell without flashing the landing page while requests are slow',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'Start finance demo'}).click();await expect(page.getByRole('heading',{name:'Cash forecast',exact:true})).toBeVisible();
+ await page.evaluate(()=>{
+  const state=window as typeof window & {savedWorkspaceShell?:Element|null;landingFlashed?:boolean};state.savedWorkspaceShell=document.querySelector('.shell');state.landingFlashed=false;
+  new MutationObserver(records=>{for(const record of records)for(const node of record.addedNodes)if(node instanceof Element&&(node.matches('.welcome')||node.querySelector('.welcome')))state.landingFlashed=true;}).observe(document.body,{childList:true,subtree:true});
+ });
+ await page.route('**/api/operations',async route=>{await new Promise(resolve=>setTimeout(resolve,1500));await route.continue().catch(()=>{});});
+ for(let index=0;index<2;index++){
+  await page.getByRole('navigation').getByRole('link',{name:'Accounting workbench'}).click();await expect(page.getByRole('heading',{name:'Accounting workbench',exact:true})).toBeVisible();
+  await page.getByRole('navigation').getByRole('link',{name:'Cash forecast'}).click();await expect(page.getByRole('heading',{name:'Cash forecast',exact:true})).toBeVisible();
+ }
+ const result=await page.evaluate(()=>{const state=window as typeof window & {savedWorkspaceShell?:Element|null;landingFlashed?:boolean};return {sameShell:state.savedWorkspaceShell===document.querySelector('.shell'),landingFlashed:state.landingFlashed};});expect(result).toEqual({sameShell:true,landingFlashed:false});
+});
+test('an existing workspace reload shows a neutral loading state instead of the landing page',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'Start finance demo'}).click();await expect(page.getByRole('heading',{name:'Cash forecast',exact:true})).toBeVisible();
+ await page.route('**/api/operations',async route=>{await new Promise(resolve=>setTimeout(resolve,1200));await route.continue().catch(()=>{});});
+ await page.reload({waitUntil:'domcontentloaded'});await expect(page.getByText('Opening your workspace…')).toBeVisible();await expect(page.locator('.welcome')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Cash forecast',exact:true})).toBeVisible();
 });
