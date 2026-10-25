@@ -1,6 +1,6 @@
 {
   "origin": "https://ledgerproof-one.vercel.app",
-  "verifiedAt": "2026-10-25T07:57:22.160Z",
+  "verifiedAt": "2026-10-25T08:40:55.095Z",
   "checks": [
     "Only Cash forecast and Accounting workbench appear in navigation",
     "Anonymous browser started the hosted demo without a Vercel account",
@@ -8,10 +8,44 @@
     "Workspace cookie uses Secure and HttpOnly",
     "Cross-origin mutations rejected",
     "Hosted journal survives page reload",
-    "Hosted desktop and mobile layout checked"
+    "Hosted desktop and mobile layout checked",
+    "Hosted AI review stays disabled until source records are added",
+    "Hosted document upload, explicit sample investigation and human approval complete successfully",
+    "Hosted forecast shows approved $8,000 credit and blocks an empty date",
+    "Hosted interrupted request gives readable guidance that clears on navigation",
+    "Verified official CRS sandbox reports are available for viewing without a new credit request",
+    "Public ZIP hash matches the committed example pack; guide and review export download",
+    "No uncaught browser exceptions or paid/external-provider requests during hardening verification"
   ],
   "paidSearchExecuted": false,
   "claudeCallExecuted": false,
   "status": "LIVE_HOSTED_VERIFIED",
-  "uiOnly": true
+  "uiOnly": true,
+  "judgeReadiness": {
+    "nodeTests": 55,
+    "convexTests": 7,
+    "browserJourneys": 15,
+    "productionBuild": "passed",
+    "archiveSha256": "4b4adc9ae0989db897b15a42351f2dd4d7febfb1ecc3c6cffe3c8be2031af98e",
+    "freshCheckout": {
+      "verifiedAt": "2026-10-25T08:39:01.105Z",
+      "commit": "070d59f",
+      "freshCheckout": true,
+      "credentialsPresent": false,
+      "dependencyInstall": "npm ci",
+      "startup": "npm run demo -- --port 3111",
+      "checks": [
+        "Fresh local clone installs and starts without env files",
+        "Seeded forecast starts at $16,000 in week two",
+        "Sample settlement imports and human-approved journal posts",
+        "Repository credit PDF uploads and sample investigation produces proposals",
+        "Human-approved $8,000 credit changes week-two forecast to $8,000",
+        "Service history and review export work without provider accounts",
+        "Judge ZIP downloads successfully",
+        "No uncaught browser exceptions"
+      ],
+      "providerCalls": 0,
+      "status": "PASSED"
+    }
+  }
 }
