@@ -1,0 +1,11 @@
+{
+  "status": "LIVE_AGENT_TOOLING_VERIFIED",
+  "verifiedAt": "2026-10-25T06:20:03.777Z",
+  "provider": "Coinbase CDP MCP",
+  "package": "@coinbase/cdp-cli@2.0.124",
+  "transport": "stdio",
+  "tool": "cdp_evm_accounts_list",
+  "apiAuthenticated": true,
+  "walletSigningVerified": false,
+  "paymentExecuted": false
+}

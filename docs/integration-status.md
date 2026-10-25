@@ -1,22 +1,28 @@
 # Integration status
 
-Updated October 24, 2026. No provider is LIVE_VERIFIED. Repository was empty at clone.
+Updated October 25, 2026, America/Los_Angeles. Configuration and simulation are distinguished from actual service execution.
 
-| Provider | Status | Evidence | Next action |
-| --- | --- | --- | --- |
-| CREAO (mandatory) | BLOCKED | No CREAO variables in execution environment. Public v2 create/get documentation discoverable, account contract unverified. No agent ID or share link. | Create hosted agent using docs/CREAO-AGENT.md; configure server environment, verify contract and execute changed-input smoke tests. |
-| Convex | BLOCKED | No deployment URL or credentials. Transactional backend source will be prepared; local rehearsal must be labeled. | Create deployment, configure backend secret, deploy functions; verify durable resume and two-session updates. |
-| Anthropic | BLOCKED | No verified CREAO model selection or direct call. | Capture traceable Claude model ID and successful meaningful extraction/investigation. |
-| CRS | UNTESTED | No sandbox catalog, test identities, credentials, or verified fit supplied. | Inspect account catalog and supported identity type before implementation. |
-| Coinbase Payment Agents | UNTESTED | Official x402 tooling docs discovered; no tooling execution, keys, or settlement proof. | Verify test environment and buyer/seller tooling before claiming protocol support. |
-| Bright Data | NOT_TARGETED | Conditional; core synthetic case has no essential public-source requirement. | Revisit only with supported investigation need. |
-| Hyphenate | UNTESTED | Local judge flow verified by 3 browser tests; product fits controller/receivables duties. Full event rules absent. | Verify official rules and capture actual CREAO-powered evidence. |
-| Microsoft | UNTESTED | Full challenge rules unavailable. | Verify eligibility and measure useful completed product. |
-| Spacetime | NOT_TARGETED | Convex selected. | None. |
-| Figma | NOT_TARGETED | Full linked challenge retrieved through Drive: Slides, stage log, prototype/embed, video and Edu requirements. No Figma use occurred. | Conditional only after real intentional workflow use; see EVENT-STRATEGY.md. |
+| Integration | Current evidence | Remaining work |
+| --- | --- | --- |
+| Vercel hosting | **LIVE_HOSTED_VERIFIED**: https://ledgerproof-one.vercel.app on Hobby. Anonymous browser, settlement posting, reload persistence, mobile layout, hosted CRS, CDP MCP and Exa quote verified. See evidence/vercel-verification.json. | Real paid Exa delivery still awaits wallet funding. Existing provider budgets remain active. |
+| CREAO — required | **LIVE_VERIFIED**: real hosted runs with $8,000 and $6,000 credit inputs; source references validated. See evidence/creao-800000.json and creao-600000.json. | Hosted agent emits two observed native artifact shapes. Adapter validates input bindings, versions and citations; uncited missing documents become requests, never invented citations. Capture a judge-facing share link if supported. |
+| Convex | **LIVE_VERIFIED**: deployed cases, atomic competing approvals, isolation and two native subscriptions. Actual provider reservations and result persistence also used by Claude. | Browser collaboration currently polls. Workflow component and storage roundtrip are not claimed as verified. |
+| Claude | **LIVE_VERIFIED**: direct Haiku 4.5 accounting review; strict tool output and source IDs validated; same input reused without a second API call. See evidence/claude-verification.json. | Conservative app-wide $5 / 50-reservation cap. No claim to meter other API clients or the provider account balance. |
+| Coinbase Payment Agents — required | **LIVE_API_AUTHENTICATED** through the CDP SDK. External Exa x402 buyer implemented with bounded authorization, native-asset accounting and chain proof. | Buyer created and its identity verified through CDP MCP; it is currently unfunded. Signing and a real paid delivery are **not verified**. No trading-agent claim. |
+| Exa through x402 | **LIVE_QUOTE_VERIFIED**: real HTTP402 challenge for POST /search; Base exact USDC option quoted at 7,000 atomic units. See evidence/exa-x402-quote.json. | No paid search or settled transfer yet. Public vendor documentation is context, not a bank receipt or identity proof. |
+| CRS — required | **LIVE_SANDBOX_VERIFIED**: authenticated and retrieved the official P01 TransUnion synthetic report; file returned, provider-declared TransUnionVantageScore4.0 score 790, 12 tradelines. See evidence/crs-verification.json. | Consumer sandbox evidence only; no live identity check, real business credit result or automatic ledger decision claimed. |
+| Hyphenate — required | Accounting seats, human gates, provenance and judge-editable workflow implemented. | Full eligibility/platform brief remains unverified. No separate Hyphenate API is claimed. |
+| Finances | Suggested optional connection. | Not confirmed connected. Chat access would not constitute a LedgerProof runtime integration. |
+| Bright Data | Not integrated. | A separate scraping integration is not being claimed for Exa searches. |
 
-References: [CREAO create run](https://developer.creao.ai/docs/v2/runs/create), [get run](https://developer.creao.ai/docs/v2/runs/get), [Convex Next.js](https://docs.convex.dev/quickstart/nextjs), [Coinbase x402](https://docs.cdp.coinbase.com/x402/welcome). Public docs establish discovery leads, not successful integration. The subsequently supplied event guide is preserved in sources/cal-hacks-13-guide.txt. Linked Coinbase/Figma challenge content was retrieved through Drive; screenshots and other lost embedded links remain unavailable.
+The original Base-Sepolia report self-purchase remains a development protocol harness. The product’s intended Coinbase flow purchases context from the real external Exa API.
 
-Local deterministic investigation and injected timeout are **SIMULATED** product rehearsals, never CREAO evidence. Verified local checks: 20 unit/backend/provider-contract tests, 3 browser tests, typecheck, build. The browser tests include PDF upload, review, exact forecast changes, shared polling updates, unrelated-session isolation, explicit blocked CREAO, timeout resume, and mobile navigation. See EVALUATION.md.
+Offline model/provider fixtures and tests are **SIMULATED contracts**, not service proof. Actual proof files contain no API credentials, session capabilities, signed download URLs or fabricated settlement hashes.
 
-Additional review: explicit CREAO developer-v2 and agent-v1 contracts are mock-tested behind one interface; the selected account family is still unknown. Coinbase challenge terms were read, but tooling execution is UNTESTED. Factory/Fetch.ai are conditional new paths only; no runtime use. Detailed sources and provenance: SOURCES-AND-DECISIONS.md.
+Provider SDKs currently retain transitive Zod 3 dependencies covered by an oversized-collection advisory. The application uses patched Zod 4, bounds all request bodies and provider outputs, and restricts purchase destinations. No incompatible forced dependency downgrade was applied. Production use needs a dependency review and authenticated business roles.
+
+CRS sessions now persist as authenticated AES-256-GCM ciphertext in a server-only Convex table. Credential-bound login guards survive Vercel restarts; expired sessions can renew within the existing CRS call cap. Tokens and private local fixtures are excluded from deployment uploads and function traces.
+
+The public UI now has two pages: **Cash forecast** and **Accounting workbench**. The workbench contains reconciliation, receivables investigation, AI review, optional external evidence/credit checks, and follow-up plans as expandable sections. Legacy navigation is redirected. Public browser evidence is in `evidence/consolidation-verification.json`. UI verification makes no new Claude calls or purchases.
+
+Judge readiness: the repository includes 90 fictional example documents and expected outcomes. `npm run demo` starts a credential-free local rehearsal. Buttons check inputs, service availability, stale proposals, repeated imports, and purchase funding before enabling an action. Page messages clear on navigation. Network and malformed responses retain the last valid workspace and offer recovery; older polling responses cannot replace newer records. CRS can display a previously verified official sandbox report without a new provider request. External outages remain possible; no permanent availability guarantee is made.

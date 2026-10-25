@@ -1,0 +1,1 @@
+export default function NotFound(){return <div className="welcome"><div className="welcome-content"><h1>Find your workspace.</h1><p>LedgerProof has two pages: Cash forecast and Accounting workbench.</p><div className="button-row"><a className="primary page-action" href="/">Cash forecast</a><a href="/workbench">Accounting workbench</a></div></div></div>;}

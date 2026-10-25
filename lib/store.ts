@@ -11,7 +11,7 @@ const root=path.join(process.cwd(),'.data');
 const globalStore=globalThis as typeof globalThis & {ledgerproofQueue?:Promise<unknown>};
 export function tokenHash(token:string){return createHash('sha256').update(token).digest('hex');}
 function localAllowed(){if(process.env.NODE_ENV==='production'&&process.env.LEDGERPROOF_ALLOW_LOCAL!=='true')throw Error('Configure Convex before hosting. Local rehearsal persistence is disabled in production unless explicitly enabled.');}
-function convex(){if(!process.env.CONVEX_URL)return null;if(!process.env.LEDGERPROOF_BACKEND_SECRET)throw Error('Convex backend secret is missing');return new ConvexHttpClient(process.env.CONVEX_URL);}
+function convex(){if(process.env.LEDGERPROOF_OFFLINE_REHEARSAL==='true')return null;const url=process.env.CONVEX_URL||process.env.NEXT_PUBLIC_CONVEX_URL;if(!url)return null;if(!process.env.LEDGERPROOF_BACKEND_SECRET)throw Error('Convex backend secret is missing; run npm run setup:convex after account setup');return new ConvexHttpClient(url);}
 async function rpc(name:string,a:Access,extra:Record<string,unknown>={},mutation=false){const client=convex()!;const args={secret:process.env.LEDGERPROOF_BACKEND_SECRET!,caseId:a.caseId,tokenHash:tokenHash(a.token),...extra};return mutation?client.mutation(makeFunctionReference<'mutation'>(`cases:${name}`),args):client.query(makeFunctionReference<'query'>(`cases:${name}`),args);}
 function validateAccess(a:Access){if(!/^[a-f0-9-]{36}$/.test(a.caseId)||! /^[a-f0-9]{64}$/.test(a.token))throw Error('Session unavailable');}
 async function locked<T>(fn:()=>Promise<T>){const previous=globalStore.ledgerproofQueue??Promise.resolve();const next=previous.catch(()=>{}).then(fn);globalStore.ledgerproofQueue=next.catch(()=>{});return next;}

@@ -7,3 +7,9 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 .DS_Store
+.vercel/
+
+# Local MCP configuration may contain service credentials.
+.mcp.json
+.cursor/mcp.json
+.vscode/mcp.json

@@ -1,0 +1,4 @@
+id,kind,date,amountCents,reference
+retail_bank,bank,2026-10-27,48500,retail_batch
+retail_sale,charge,2026-10-26,50000,retail_batch
+retail_fee,fee,2026-10-27,1500,retail_batch

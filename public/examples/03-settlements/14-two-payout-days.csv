@@ -1,0 +1,7 @@
+id,kind,date,amountCents,reference
+day1_bank,bank,2026-10-27,194000,day1_batch
+day1_sale,charge,2026-10-26,200000,day1_batch
+day1_fee,fee,2026-10-27,6000,day1_batch
+day2_bank,bank,2026-10-28,291000,day2_batch
+day2_sale,charge,2026-10-27,300000,day2_batch
+day2_fee,fee,2026-10-28,9000,day2_batch

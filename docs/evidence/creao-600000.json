@@ -1,0 +1,64 @@
+{
+  "agentId": "bdd3a27c-ebcf-4c6a-87d6-243a03bcfeaa",
+  "runId": "e51c0a11-bab3-4bdc-b5a4-3b58af1539be",
+  "amountCents": 600000,
+  "startedAt": "2026-10-25T04:39:27.673Z",
+  "status": "LIVE_VERIFIED",
+  "completedAt": "2026-10-25T04:43:54.506Z",
+  "model": null,
+  "result": {
+    "schemaVersion": "1",
+    "inputVersion": 2,
+    "findings": [
+      {
+        "type": "unapplied_credit_note",
+        "affectedRecordIds": [
+          "test-credit",
+          "invoice-0"
+        ],
+        "evidenceRefs": [
+          "doc-inv-0",
+          "test-credit-document"
+        ],
+        "explanation": "Credit note test-credit for $6,000.00 shows no application and no ledger reduction\ncreditNotes record test-credit (evidence test-credit-document) states Invoice: INV-A, AmountCents: 600000, Date: 2026-10-26, approved: false. The matching invoice invoice-0 / INV-A is carried at AmountCents: 2000000 in the invoice record (evidence doc-inv-0). No ledger entry in the bundle credits accounts_receivable by 600000; the only accounts_receivable line is the entry-invoice-0 debit of 2000000. No receipt or application record in the bundle links the credit note to INV-A.\nThe credit note is stated as issued for INV-A at 600000 cents but receivables are still carried at the full 2000000 cents. The bundle contains no application of the credit and no approval record, so it cannot be determined whether the note is valid, void, or simply unposted.\nA human should locate the approval record for test-credit and the invoice it was actually applied to, then decide whether to post the reduction. This agent has not netted, posted, or approved anything.",
+        "certaintyLabel": "possible",
+        "proposedAction": "review_credit_application",
+        "needsHumanReview": true
+      },
+      {
+        "type": "insufficient_evidence",
+        "affectedRecordIds": [
+          "doc-inv-0",
+          "test-credit-document"
+        ],
+        "evidenceRefs": [
+          "doc-inv-0",
+          "test-credit-document"
+        ],
+        "explanation": "Document integrity hashes for doc-inv-0 and test-credit-document are placeholders, so no document can be integrity-verified\nThe evidence records doc-inv-0 and test-credit-document carry sha256 values 'fixture-generated' and 'synthetic-verification'. These are not 64-character hexadecimal digests, and the bundle supplies extracted text only: no page numbers, no page count, and no PDF artifact.\nA sha256 field is present but does not hold a hash, so the extracted text cannot be tied to the named PDF files (INV-A.pdf, issued-credit.pdf). Content is readable but provenance is unverified.\nA human should re-export the evidence with real sha256 digests and page-level extraction so each cited statement can be traced to a page.",
+        "certaintyLabel": "insufficient",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      },
+      {
+        "type": "inconsistent_amount",
+        "affectedRecordIds": [
+          "test-credit"
+        ],
+        "evidenceRefs": [
+          "test-credit-document"
+        ],
+        "explanation": "Credit note test-credit is recorded as issued but flagged approved: false, and its document is dated on the bundle start date\ncreditNotes record test-credit carries approved: false and date 2026-10-26, which is the same date as business.startDate (2026-10-26). Its evidence record test-credit-document is a document titled 'issued-credit.pdf' whose extraction states only Type: credit_note, Invoice: INV-A, Currency: USD, AmountCents: 600000, Date: 2026-10-26 - it contains no approval, sign-off, or reason line.\nThe record is treated as an issued credit note (it is listed under creditNotes and has an 'issued' document) while its own status field says it is not approved, and the document offers no approval evidence either way. The bundle does not resolve whether this note is a live obligation or an unapproved draft.\nA human should confirm the approval status and issue date of test-credit against the document of record before this note is counted in receivables or in any collections decision.",
+        "certaintyLabel": "possible",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      }
+    ],
+    "missingEvidence": [
+      "Opening cash of $20,000.00 is posted against source document doc-ledger, which is not in the bundle",
+      "Document integrity hashes for doc-inv-0 and test-credit-document are placeholders, so no document can be integrity-verified"
+    ],
+    "summary": "CREAO returned 4 review items. Only findings citing present sources are admitted; uncited missing documents remain evidence requests. The run is bound to the submitted source versions. Native confidence is unspecified: all findings remain conservative human-review suggestions. This is not a certified audit."
+  },
+  "shareLink": null
+}

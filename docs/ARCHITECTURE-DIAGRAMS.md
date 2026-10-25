@@ -1,3 +1,39 @@
+# Current accounting and x402 architecture
+
+Updated October 24, 2026. Current provider verification is in [integration-status.md](integration-status.md). The older exported diagrams below describe the initial build.
+
+```mermaid
+flowchart TD
+  owner[Owner and bookkeeper] --> input[Settlement sources and unexplained charge cases]
+  input --> engine[Deterministic reconciliation and journal validation]
+  engine --> review[Human accounting review]
+  review --> subledger[Balanced settlement subledger]
+  input --> need{Local evidence available?}
+  need -->|Yes| local[Review existing evidence without purchasing]
+  need -->|No| quote[Exa live HTTP402 quote]
+  quote --> approval[Source-bound owner authorization]
+  approval --> reserve[Convex global USDC reservation]
+  reserve --> wallet[CDP managed wallet verified through CDP MCP]
+  wallet --> buyer[x402 exact-scheme buyer with spend controls]
+  buyer --> exa[External Exa search of official vendor domain]
+  exa --> delivery[Bounded source URLs and text]
+  exa --> receipt[Settlement response]
+  receipt --> chain[Verify Base USDC Transfer payer/payee/amount]
+  chain --> unique[Convex unique receipt identity]
+  unique --> cost[Balanced atomic-USDC expense journal]
+  delivery --> controller[Claude accounting review with source-ID checks]
+  local --> controller
+  controller --> review
+  input --> creao[CREAO receivables investigator]
+  creao --> review
+  reserve --> unknown[Unknown outcome retains reservation; no blind repurchase]
+  unknown --> chain
+```
+
+Claude does not sign or post. The Exa query contains a public vendor name/domain, not bank amounts or private descriptions. Public documentation is context; original receipts and human accounting judgment remain necessary. Native USDC costs, settlement postings and the agency forecast stay separate. No current diagram claims that an unpaid quote establishes a successful purchase.
+
+---
+
 # Architecture atlas
 
 Each diagram has an editable Mermaid source, portable SVG and exported PNG under diagrams/. Regenerate SVG with `python3 scripts/render-diagrams.py`; regenerate briefing/PDF/PNG using the npm docs scripts. Green denotes a working local component, orange a prepared but blocked hosted path, and blue a future/conditional path. A box is not evidence of a live integration.

@@ -1,0 +1,8 @@
+{
+  "status": "LIVE_API_AUTHENTICATED",
+  "verifiedAt": "2026-10-25T05:17:22.589Z",
+  "operation": "List EVM accounts (read only)",
+  "responseReceived": true,
+  "walletSigningVerified": false,
+  "paymentExecuted": false
+}

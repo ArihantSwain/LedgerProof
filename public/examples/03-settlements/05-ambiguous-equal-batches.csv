@@ -1,0 +1,4 @@
+id,kind,date,amountCents,reference
+amb_bank,bank,2026-10-29,25000,
+amb_sale_a,charge,2026-10-28,25000,amb_batch_a
+amb_sale_b,charge,2026-10-28,25000,amb_batch_b

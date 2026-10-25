@@ -2,12 +2,28 @@ import { Case, Command, commandSchema, caseSchema } from './contracts';
 import { createFixture } from '../fixtures/agency';
 import { outstanding, validateEntry, forecast } from './finance';
 import { validateResult, findingId } from './investigation';
+import { operationsCommandSchema } from './contracts/operations';
+import { applyOperations } from './operations';
+import {closeCommandSchema} from './contracts/close';
+import {applyClose} from './close';
+import {evidenceCommandSchema} from './contracts/evidence';
+import {applyEvidence} from './evidence';
 
 export function transition(original:Case,raw:Command,now=Date.now()):Case{
  const cmd=commandSchema.parse(raw);let c=structuredClone(original);
  if(c.expiresAt<now)throw Error('Demo session expired');
  const before=c.inputVersion;
  const event=(action:string,targetId:string,reason:string)=>c.events.push({id:`event-${c.revision+1}-${c.events.length}`,action,targetId,reason,timestamp:now,beforeVersion:before,afterVersion:c.inputVersion,actor:'demo-reviewer'});
+ const evidenceCommand=evidenceCommandSchema.safeParse(cmd);
+ if(evidenceCommand.success){if(!applyEvidence(c.evidencePurchases,evidenceCommand.data,now))return original;event(cmd.type,c.id,'reason' in evidenceCommand.data?evidenceCommand.data.reason:'Evidence procurement record updated');c.revision++;return caseSchema.parse(c);}
+ const closeCommand=closeCommandSchema.safeParse(cmd);
+ if(closeCommand.success){if(!applyClose(c.close,closeCommand.data,now))return original;event(cmd.type,c.id,'reason' in closeCommand.data?closeCommand.data.reason:'Imported settlement evidence');c.revision++;return caseSchema.parse(c);}
+ const operation=operationsCommandSchema.safeParse(cmd);
+ if(operation.success){
+   if(!applyOperations(c,operation.data,now))return original;
+   event(operation.data.type,c.id,'reason' in operation.data?operation.data.reason:'Finance operations planning / review; no external action executed');
+   c.revision++;return caseSchema.parse(c);
+ }
  if(cmd.type==='reset'){const reset=createFixture(c.id,now,c.generation+1,c.mode);reset.revision=c.revision+1;return reset;}
  if(cmd.type==='edit_invoice'){
    if(c.proposals.some(p=>p.status==='approved'))throw Error('Reset before changing imported invoice amounts after posting');
@@ -44,7 +60,7 @@ export function transition(original:Case,raw:Command,now=Date.now()):Case{
    c.findings=result.findings.map((f,i)=>({...f,id:findingId(run.id,i)}));c.proposals=c.proposals.filter(p=>p.status!=='pending');
    for(const f of c.findings){
      const base={findingId:f.id,baseLedgerVersion:c.ledgerVersion,status:'pending' as const};
-     if(f.type==='unapplied_credit_note'&&f.proposedAction==='review_credit_application'&&f.certaintyLabel==='supported')for(const cr of c.credits.filter(x=>f.affectedRecordIds.includes(x.id)&&f.evidenceRefs.includes(x.evidenceId)&&!x.approved)){
+     if(f.type==='unapplied_credit_note'&&f.proposedAction==='review_credit_application'&&['supported','possible'].includes(f.certaintyLabel))for(const cr of c.credits.filter(x=>f.affectedRecordIds.includes(x.id)&&f.affectedRecordIds.includes(x.invoiceId)&&f.evidenceRefs.includes(x.evidenceId)&&f.evidenceRefs.includes(c.invoices.find(i=>i.id===x.invoiceId)!.evidenceId)&&!x.approved)){
        if(c.proposals.some(p=>p.kind==='credit'&&p.targetId===cr.id&&p.status!=='rejected'))continue;
        const reserved=c.proposals.filter(p=>p.kind==='credit'&&p.status==='pending'&&c.credits.find(x=>x.id===p.targetId)?.invoiceId===cr.invoiceId).reduce((s,p)=>s+p.amountCents,0);
        if(cr.amountCents+reserved>outstanding(c,cr.invoiceId))continue;

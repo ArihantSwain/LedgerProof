@@ -1,0 +1,17 @@
+{
+  "origin": "https://ledgerproof-one.vercel.app",
+  "verifiedAt": "2026-10-25T07:57:22.160Z",
+  "checks": [
+    "Only Cash forecast and Accounting workbench appear in navigation",
+    "Anonymous browser started the hosted demo without a Vercel account",
+    "Imported settlement evidence and persisted exactly one human-approved journal in Convex",
+    "Workspace cookie uses Secure and HttpOnly",
+    "Cross-origin mutations rejected",
+    "Hosted journal survives page reload",
+    "Hosted desktop and mobile layout checked"
+  ],
+  "paidSearchExecuted": false,
+  "claudeCallExecuted": false,
+  "status": "LIVE_HOSTED_VERIFIED",
+  "uiOnly": true
+}

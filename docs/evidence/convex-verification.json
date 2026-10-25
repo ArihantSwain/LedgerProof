@@ -1,0 +1,20 @@
+{
+  "provider": "Convex",
+  "status": "LIVE_VERIFIED",
+  "verifiedAt": "2026-10-25T04:01:22.667Z",
+  "deploymentURL": "https://exuberant-bison-914.convex.cloud",
+  "checks": {
+    "createRead": true,
+    "wrongCapabilityDenied": true,
+    "conditionalRecoveryMath": true,
+    "concurrentPlanApprovalOnce": true,
+    "draftPersisted": true,
+    "twoNativeSubscriptionClients": true,
+    "unrelatedCaseIsolated": true
+  },
+  "limitations": [
+    "Browser UI currently polls; native subscriptions were verified with two Node clients.",
+    "Synthetic records only.",
+    "Workflow component and file-storage roundtrip are not verified by this script."
+  ]
+}

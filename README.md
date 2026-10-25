@@ -1,91 +1,75 @@
 # LedgerProof
 
-Verify the invoices behind a small agency's cash forecast, review evidence-backed corrections, and see whether payroll is covered. Built for bookkeepers, fractional CFOs, and service-business owners. This is accounting investigation and decision support, not a certified audit.
+Live demo: **https://ledgerproof-one.vercel.app** — click **Start finance demo**. No judge login required.
 
-**Readiness: tested local rehearsal; mandatory CREAO hosted execution BLOCKED. No sponsor integration is LIVE_VERIFIED. No hosted URL or public deployment.**
+Two pages: **Cash forecast** for the cash outlook and **Accounting workbench** for source records, reconciliation, investigations, review and follow-up. Optional external checks expand inside the workbench.
 
-## Local setup
+An accounting team for small businesses: reconcile messy transactions, investigate discrepancies, prepare balanced entries, and retain the evidence behind every decision.
 
-Node 22+, npm. Clone https://github.com/ArihantSwain/LedgerProof.
+The **Evidence Buyer** uses Coinbase CDP and x402 to purchase public vendor billing context from the real Exa API. It checks local evidence first, enforces a small spending budget, verifies the USDC Transfer on Base, and records its own investigation expense without losing sub-cent amounts.
+
+**Current verification:** Convex, Claude and CREAO have live evidence. Exa has a verified live HTTP402 quote. Coinbase API authentication is verified; the named buyer wallet is created and verified through CDP MCP; funding and a real paid Exa delivery remain pending. CRS sandbox credit reports are verified, including from the hosted app. See [integration status](docs/integration-status.md).
+
+## Run
+
+Node 22:
 
 ```sh
 npm ci
-cp .env.example .env.local
-npm run fixtures
-npm run dev
+npm run demo
 ```
 
-Open http://localhost:3000. Start demo creates an isolated 24-hour synthetic workspace; Reset my demo affects only that workspace. Share workspace creates a bearer-capability link; anyone with the link can review that synthetic workspace. Local rehearsal persists under ignored `.data/`, with serialization within a single Node process and atomic file replacement. It is deliberately not a multi-process production database. Use Convex for hosted operation. Production fails closed without Convex unless LEDGERPROOF_ALLOW_LOCAL=true is explicitly set for a single-process rehearsal.
+Open http://localhost:3000 and click **Start finance demo**. No API keys, account setup, or `.env` file is needed. This command uses local storage and clearly labeled sample investigations; unavailable live services stay disabled.
 
-The UI labels offline investigation **LOCAL REHEARSAL**. It runs deterministic rules; it is never represented as CREAO. To exercise the full local flow, upload a credit, open Investigation activity, check local rehearsal, run, inspect and approve the credit, then move collection to week 3.
+For live integrations, configure the services in `.env.example` and run `npm run dev`. Keep credentials in ignored `.env.local`; do not overwrite existing credentials. The hosted demo uses the configured live services.
 
-## CREAO account setup
+- **Cash forecast:** inspect the 13-week outlook and test a cash disruption.
+- **Accounting workbench:** reconcile deposits, upload credit notes or receipts, investigate with CREAO, review with Claude, and approve entries. Vendor evidence, CRS sandbox checks, recovery plans and drafts expand in the same workbench.
 
-Follow [the complete agent setup](docs/CREAO-AGENT.md). Create/save the hosted investigator, confirm its actual API family (`developer-v2` or `agent-v1`), configure the matching base/key/agent ID and actual form field in `.env.local`, and verify that account contract before setting CREAO_CONTRACT_VERIFIED=true. Both explicit adapters use server-side Bearer authentication and authenticated retrieval; they never automatically fall back across API families. Contract mocks pass, but real account/output execution remains blocked. Browser receives no API keys.
+## Judging documents
+
+[Download the complete judging pack](https://ledgerproof-one.vercel.app/examples/ledgerproof-judge-pack.zip) · [Browse the examples in this repo](public/examples/README.md) · [Printable judge guide](public/examples/JUDGE-GUIDE.pdf)
+
+The pack includes alternative credit-note PDFs, one-row bank receipts, settlement datasets, intentional failure cases, and clearly labeled reference-only originals. Each scenario includes independently specified expected outcomes. Reset the synthetic workspace between alternatives. For settlements, choose the CSV under **Import settlement CSV**; credit PDFs and one-row receipts use **Receivables and corrections**.
+
+Regenerate with `npm run examples:build` (Node 22 and Python 3); verify without provider calls using `npm run examples:verify`.
+
+## Try a complete accounting flow
+
+1. Open **Accounting workbench** and click **Load sample settlement**. Inspect the balanced $9,670 deposit, the $50 difference, and the ambiguous allocation. Approve only the balanced deposit.
+2. Expand **Receivables and corrections**. Upload [the $8,000 credit PDF](public/examples/01-credit-notes/INV-A-credit-8000-USD.pdf). Use **Run sample investigation** locally, or **Investigate receivables** for hosted CREAO. Review the source and approve only that credit.
+3. Open **Cash forecast**: cash after week two changes from $16,000 to $8,000. Expand **Test a cash disruption**, model the default customer delay, then the default expense: it becomes −$4,000, then −$7,000.
+4. Return to the workbench to compare recovery plans and review an unsent follow-up draft. Reset the demo before trying an alternative document.
+
+The example pack contains 90 fictional documents, including the judge guide, with expected outcomes. CSV receipts and settlement CSVs have separate import controls; the guide explains each.
+
+## Limits
+
+Claude uses a fixed Haiku 4.5 model, at most 2,000 output tokens, a bounded input, saved-result reuse, no automatic retries, and a Convex-backed **$5 / 50-reservation lifetime app cap**. This does not meter other clients using the same Anthropic account.
+
+Real Exa purchases allow only the fixed HTTPS endpoint, curated official vendor domains, exact Base-USDC payments to the verified provider address, **0.01 USDC per purchase and 0.10 USDC / 10 reservations per deployment**. Purchasing is disabled until `LEDGERPROOF_X402_EVIDENCE_ENABLED=true`. No bank records are included in the search query. Failed/unknown purchases cannot be blindly repeated; saved receipts can be reconciled separately.
+
+Public vendor documentation provides context. It cannot establish that a particular bank charge is valid, replace its receipt, or authorize a business payment. Native USDC investigation expenses, processor settlement entries and the synthetic agency forecast are separate subledgers. Production accounting exports, fiat valuation and authenticated business roles remain future work.
+
+## Verification
 
 ```sh
-node --env-file=.env.local --import tsx scripts/smoke-creao.ts
-```
-
-This opt-in command executes real provider calls and may consume provider credits; run only with a suitable authorized account. Retain real run IDs and share links. None are currently available. Never put secrets in commits or chat.
-
-## Convex setup
-
-```sh
-npx convex dev
-```
-
-Complete account/project selection. Set server-only CONVEX_URL in `.env.local`. Generate a random LEDGERPROOF_BACKEND_SECRET, set it in `.env.local` and the Convex deployment environment. Functions require this secret plus a hashed session token; all browser operations go through scoped server routes. Deploy only after authorization. Core workspace aggregates use Convex transactions for compare-and-set decisions, durable provider IDs, and document storage; see [architecture](docs/ARCHITECTURE.md). Convex runtime behavior has not been verified. UI currently polls scoped state rather than using a native browser subscription. Workflow component not integrated.
-
-## Formats
-
-Generated originals and templates are under public/fixtures. Ten invoice PDFs, issued credit PDF, ledger, bank CSV, and obligations CSV come from fixtures/agency.ts. This MVP starts from that fixed chart of accounts and synthetic imported ledger. Arbitrary opening-trial-balance, invoice, ledger, and obligations uploads are **not implemented**.
-
-Supported runtime uploads: UTF-8 single-receipt bank CSV, or text-based issued credit-note PDF (≤1 MB, ≤5 pages). No OCR. PDF fields must each be on their own line:
-
-```text
-Type: credit_note
-Invoice: INV-A
-Currency: USD
-AmountCents: 800000
-Date: 2026-10-26
-```
-
-```csv
-externalId,invoiceNumber,postedDate,amountCents
-new-receipt-001,INV-003,2026-10-26,50000
-```
-
-Unknown invoice numbers, duplicate hashes/external IDs, unsupported currencies, oversized documents, and overpayment/credit amounts are rejected. Unsupported scans need manual review. Source text is escaped; no source instructions are executed. Parser is bounded but not process-isolated: add parser sandboxing before accepting untrusted production documents.
-
-## Checks
-
-```sh
-npm run typecheck
 npm test
+npm run test:convex
 npm run build
 npm run test:e2e
+npm run doctor
 ```
 
-Browser tests require a prior build and Playwright Chromium (`npx playwright install chromium --only-shell`). Offline tests do not prove hosted provider execution. Verified: 20 unit/backend/provider-contract tests, 3 browser tests, typecheck, and production build. Results and limits: [evaluation](docs/EVALUATION.md). Judge walkthrough: [demo](docs/DEMO.md). Reproduce the small declared rule evaluation with `node --import tsx scripts/evaluate.ts`.
+Offline tests disable providers and never spend credits. Explicit live checks:
 
-## Provider status
+```sh
+npm run verify:x402                         # unpaid live quote only
+npm run verify:x402 -- --prepare-wallet    # provision/read buyer; no transfer
+npm run verify:convex
+npm run verify:creao                       # resume saved run ID
+npm run verify:creao -- --changed-input
+npm run verify:claude                      # can spend credits; explicit only
+```
 
-| Provider | Status |
-| --- | --- |
-| CREAO | BLOCKED: account credentials, hosted agent, real run/share link missing |
-| Convex | BLOCKED: backend prepared; deployment and runtime tests missing |
-| Anthropic | BLOCKED: actual Claude use not traced |
-| CRS | UNTESTED: no catalog or test identity; capability gate unopened |
-| Coinbase | UNTESTED: purchase workflow unimplemented; no x402 or settlement claim |
-| Bright Data / Spacetime / Figma | NOT_TARGETED |
-
-See [integration status](docs/integration-status.md), [sponsor evidence](docs/SPONSOR-EVIDENCE.md), [submission draft](docs/SUBMISSION.md), and the preserved [build specification](docs/BUILD-SPECIFICATION.md).
-
-Limitations: no real user interviews, hosted readiness, live CREAO verification, direct Claude extraction, arbitrary import pipeline, native Convex subscription, signed callbacks, automated malformed-result repair, calibrated risk model, three-statement model, sponsor eligibility validation, or real funds movement. Missing core requirements remain visible; this is not submission-ready.
-
-## Architecture and development briefing
-
-Start at [the return briefing](docs/START-HERE.md), open [the offline interactive guide](docs/briefing.html), or read [the printable PDF](docs/LedgerProof-Briefing.pdf). Five architecture diagrams are available as SVG, PNG and editable Mermaid. Detailed [service responsibilities](docs/SERVICE-REGISTER.md), [future development](docs/FUTURE-DEVELOPMENT.md), [event opportunities](docs/EVENT-STRATEGY.md), and [your core action list](docs/ACTION-ITEMS.md) are included.
-
-`npm run doctor` checks configuration without printing secrets or calling providers. To load your configured environment: `node --env-file=.env.local --import tsx scripts/doctor.ts`. `npm run fixtures:creao` prepares two-document changed-input bundles and the exact JSON output schema for manual hosted-agent testing. `npm run docs:build` rebuilds the offline briefing; `npm run docs:export` regenerates PDF/PNG assets and tests offline navigation/search/mobile.
+[Start here](docs/START-HERE.md) · [Remaining account actions](docs/ACTION-ITEMS.md) · [Architecture](docs/ARCHITECTURE-DIAGRAMS.md)

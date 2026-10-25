@@ -1,0 +1,4 @@
+id,kind,date,amountCents,reference
+cent_bank,bank,2026-10-27,1,cent_batch
+cent_sale,charge,2026-10-26,2,cent_batch
+cent_fee,fee,2026-10-27,1,cent_batch

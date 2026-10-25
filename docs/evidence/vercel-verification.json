@@ -1,0 +1,65 @@
+{
+  "origin": "https://ledgerproof-one.vercel.app",
+  "verifiedAt": "2026-10-25T07:40:34.472Z",
+  "checks": [
+    "Anonymous browser started the hosted demo without a Vercel account",
+    "Imported settlement evidence and persisted exactly one human-approved journal in Convex",
+    "Workspace cookie uses Secure and HttpOnly",
+    "Cross-origin mutations rejected",
+    "Hosted journal survives page reload",
+    "Hosted Coinbase SDK and local CDP MCP process verified the same managed wallet without transferring funds",
+    "Hosted Exa HTTP402 quote obtained without payment",
+    "Hosted CRS synthetic report retrieved using the shared encrypted session",
+    "Hosted desktop and mobile layout checked"
+  ],
+  "paidSearchExecuted": false,
+  "claudeCallExecuted": false,
+  "wallet": {
+    "httpStatus": 200,
+    "address": "0xE2F668e5EFBA8F9197988Cf75aD57Ab1736c0B9C",
+    "balanceAtomic": "0",
+    "agentToolingVerified": true,
+    "error": null
+  },
+  "exa": {
+    "httpStatus": 200,
+    "amountAtomic": 7000,
+    "network": "eip155:8453"
+  },
+  "crs": {
+    "httpStatus": 200,
+    "state": "completed",
+    "result": {
+      "product": "TransUnion prequalification sandbox",
+      "report": {
+        "creditFiles": [
+          {
+            "borrowerSourceType": "Borrower",
+            "creditFileInfileDate": "2019-09-10",
+            "creditFileResultStatusType": "FileReturned",
+            "sourceType": "TransUnion"
+          }
+        ],
+        "creditPullType": "unspecified",
+        "disclosure": "Official synthetic consumer test subject. A score is not a business default probability or a lending approval. No agency receivable, reserve or ledger balance changed.",
+        "scores": [
+          {
+            "modelName": "TransUnionVantageScore4.0",
+            "noScoreReasonType": null,
+            "scoreValue": "790"
+          }
+        ],
+        "tradelineCount": 12
+      },
+      "requestId": "76e68247-d19e-4067-93b8-057499bdb31e",
+      "source": "CRS sandbox API",
+      "subject": {
+        "id": "P01",
+        "kind": "official synthetic consumer",
+        "name": "MARGARET OKAFOR"
+      }
+    },
+    "error": null
+  },
+  "status": "LIVE_HOSTED_VERIFIED"
+}

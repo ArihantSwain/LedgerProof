@@ -1,0 +1,18 @@
+{
+  "status": "WALLET_READY_UNFUNDED",
+  "verifiedAt": "2026-10-25T06:23:11.199487+00:00",
+  "address": "0xE2F668e5EFBA8F9197988Cf75aD57Ab1736c0B9C",
+  "network": "eip155:8453",
+  "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "balanceAtomic": "0",
+  "agentTooling": {
+    "provider": "Coinbase CDP MCP",
+    "tool": "cdp_evm_accounts_by_name",
+    "accountName": "ledgerproof-evidence-buyer",
+    "address": "0xE2F668e5EFBA8F9197988Cf75aD57Ab1736c0B9C",
+    "verified": true
+  },
+  "suggestedFunding": "0.10 USDC on Base mainnet",
+  "disclosure": "Public receiving address only. No transfer or signing performed.",
+  "paymentExecuted": false
+}

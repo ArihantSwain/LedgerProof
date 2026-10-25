@@ -1,0 +1,3 @@
+id,kind,date,amountCents,reference
+wrong_ref_bank,bank,2026-10-28,50000,wrong_batch
+wrong_ref_sale,charge,2026-10-27,50000,actual_batch

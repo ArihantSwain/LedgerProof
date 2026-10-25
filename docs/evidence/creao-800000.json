@@ -1,0 +1,82 @@
+{
+  "agentId": "bdd3a27c-ebcf-4c6a-87d6-243a03bcfeaa",
+  "runId": "925db4e5-8ea9-4cd2-9376-8d5c6e457fbb",
+  "amountCents": 800000,
+  "startedAt": "2026-10-25T03:59:32.332Z",
+  "status": "LIVE_VERIFIED",
+  "completedAt": "2026-10-25T04:34:15.155Z",
+  "model": null,
+  "result": {
+    "schemaVersion": "1",
+    "inputVersion": 2,
+    "findings": [
+      {
+        "type": "unapplied_credit_note",
+        "affectedRecordIds": [
+          "test-credit",
+          "invoice-0",
+          "entry-invoice-0"
+        ],
+        "evidenceRefs": [
+          "test-credit-document",
+          "doc-inv-0"
+        ],
+        "explanation": "Credit note test-credit (USD 8,000.00) shows no application to INV-A and no ledger reduction\nCredit note record test-credit (amountCents 800000, date 2026-10-26, invoiceId invoice-0) carries evidenceId test-credit-document. The extraction of test-credit-document (issued-credit.pdf) states Type: credit_note, Invoice: INV-A, Currency: USD, AmountCents: 800000, Date: 2026-10-26. The bundle contains no credit-note application record, and no ledger entry references test-credit: the only revenue-side postings are entry-invoice-0 (accounts_receivable debit 2000000 / service_revenue credit 2000000, sourceReference doc-inv-0) and opening. No ledger line reduces accounts_receivable.\nA credit note of 800000 cents against INV-A exists in the creditNotes table with a supporting extraction, but accounts_receivable remains 2000000 cents and service_revenue remains 2000000 cents with no credit posting. The stated credit amount is therefore unapplied.\nA human should confirm with the credit-note approval record whether test-credit was validly issued, then verify whether a credit application to INV-A was ever posted. No netting or adjustment is performed here.",
+        "certaintyLabel": "possible",
+        "proposedAction": "review_credit_application",
+        "needsHumanReview": true
+      },
+      {
+        "type": "insufficient_evidence",
+        "affectedRecordIds": [
+          "invoice-0",
+          "entry-invoice-0"
+        ],
+        "evidenceRefs": [
+          "doc-inv-0",
+          "test-credit-document"
+        ],
+        "explanation": "No bank receipt or statement evidence exists for the USD 20,000.00 receivable on INV-A\nThe bundle receipts array is empty (0 records). Invoice-0 (INV-A, Aster Advisory, amountCents 2000000, issueDate 2026-10-01, dueDate 2026-11-01, expectedDate 2026-10-28) is supported by doc-inv-0, whose extraction restates the same amount and dates. Ledger entry entry-invoice-0 (sourceReference doc-inv-0) debits accounts_receivable 2000000 and credits service_revenue 2000000. The bundle's evidence array contains only doc-inv-0 (invoice) and test-credit-document (credit note): no bank receipt, remittance advice, deposit slip or bank statement is supplied for the business.\nThe unmatched-receipt check cannot be completed in either direction: there is no receipt record to match to an invoice, and no receipt evidence exists to substantiate collection of the 2000000 cents receivable. The expectedDate of 2026-10-28 for INV-A is unsupported by any collection evidence in the bundle.\nA human should obtain the bank statement covering the period from the business start date and compare it to invoice-0; if nothing has been received, record the receivable as outstanding without writing anything off.",
+        "certaintyLabel": "insufficient",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      },
+      {
+        "type": "insufficient_evidence",
+        "affectedRecordIds": [
+          "opening"
+        ],
+        "evidenceRefs": [
+          "doc-inv-0",
+          "test-credit-document"
+        ],
+        "explanation": "Opening ledger entry cites sourceReference doc-ledger, which is absent from the bundle\nLedger entry opening (effectiveDate 2026-10-01) records cash debit 2000000 and opening_equity credit 2000000, with sourceReference doc-ledger. No evidence record with id doc-ledger exists: the bundle's evidence array contains only doc-inv-0 and test-credit-document. The other ledger entry, entry-invoice-0, does resolve to its document (doc-inv-0).\nThe 2000000 cents of opening cash and opening equity rest on a referenced document that is not in the bundle, so the opening balance cannot be traced to a supplied source. Amount is deliberately not carried into amount_flagged_usd: the finding is the absent document, not a disputed balance.\nA human should supply the opening-balance document referenced as doc-ledger and confirm it agrees to the cash and opening_equity postings. No entry is posted or amended here.",
+        "certaintyLabel": "insufficient",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      },
+      {
+        "type": "inconsistent_amount",
+        "affectedRecordIds": [
+          "agency",
+          "opening",
+          "entry-invoice-0",
+          "invoice-0"
+        ],
+        "evidenceRefs": [
+          "doc-inv-0"
+        ],
+        "explanation": "Dates disagree: business startDate 2026-10-26, but the opening entry and invoice are dated 2026-10-01\nbusiness.startDate is 2026-10-26 (timezone America/Los_Angeles). Ledger entry opening has effectiveDate 2026-10-01 and ledger entry entry-invoice-0 has effectiveDate 2026-10-01. Invoice-0 is stated with issueDate 2026-10-01 in the invoice record and again in the doc-inv-0 extraction (IssueDate: 2026-10-01). The credit note is dated 2026-10-26, which matches startDate.\nThree records place activity (opening balance, invoice issuance, revenue recognition) 25 days before the bundle's declared business startDate. Either the startDate is a data-entry error or the 2026-10-01 postings belong to a prior period that the bundle does not define. The conflicting values are quoted and not resolved. No amount is attached because the conflict concerns dates, not money.\nA human should confirm the intended fiscal period start date and whether the 2026-10-01 postings are opening balances carried forward. No dates are amended in the bundle.",
+        "certaintyLabel": "possible",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      }
+    ],
+    "missingEvidence": [
+      "No bank receipt or statement evidence exists for the USD 20,000.00 receivable on INV-A",
+      "Opening ledger entry cites sourceReference doc-ledger, which is absent from the bundle"
+    ],
+    "summary": "CREAO returned 4 source-bound findings in its native artifact format. The submitted bundle was checked against the current records. Native confidence is unspecified: all findings remain conservative human-review suggestions. This is not a certified audit."
+  },
+  "shareLink": null
+}

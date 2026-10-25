@@ -1,20 +1,26 @@
 # Sponsor evidence register
 
-All tracks NOT_READY. The user-supplied event guide is now preserved and the linked Coinbase/Figma challenge content has been read through Drive. Original screenshots and some pasted embedded links remain unavailable. Recheck official event rules, limits, eligibility, and stacking before submission. Implementation fit alone does not establish eligibility.
+Updated October 24, 2026. The current verification table is [integration-status.md](integration-status.md).
 
-| Track | Required proof | Implemented path / visible action | Actual evidence | Limitation / wording |
-| --- | --- | --- | --- | --- |
-| CREAO | Hosted agent performs substantive investigation, changed inputs, ID/shared run | lib/providers/creao.ts explicit API family; Investigation activity | No agent ID, run, or share link | Mandatory BLOCKED; offline rules are local rehearsal only |
-| Hyphenate | Useful controller role, review, escalation/recovery, messy data | Sources → investigate → approve → forecast | 20 unit/backend/provider-contract tests, 3 browser tests; synthetic local rehearsal | Describe intended receivables controller assistant, not proven eligibility |
-| Convex | Central backend and actual shared/resumable state, component evidence | convex/cases.ts transactional aggregate, file storage | No deployed functions/runtime receipt | Backend prepared; subscriptions/component not implemented |
-| Anthropic | Meaningful verified Claude execution/model trace | Could select traceable Claude inside CREAO | None | BLOCKED, no Claude-powered claim |
-| Microsoft | Useful complete agent, user/evaluation/security evidence | Judge flow and docs | No live deployment or interviews | Full challenge missing; no Azure requirement asserted |
-| CRS | Real sandbox field changes defensible supported scenario | Not implemented | No catalog, identity or response | Capability gate unopened; no business credit/default score claim |
-| Coinbase Payment Agents | Actual tooling/x402 buyer/seller receipt/delivery | Explicit unavailable API only | No execution or simulation | UNTESTED; no receipt, settlement, or purchase claim |
-| Bright Data | Essential permitted public evidence retrieved live | Not implemented | None | NOT_TARGETED: no genuine core need established |
-| Figma | Full linked brief now read; Slides/stage log/prototype/video/Edu | No Figma product usage | Honest WORKFLOW-STAGE-LOG.md only | NOT_TARGETED until actual required work exists |
-| Spacetime | Core selected realtime backend | Not implemented; Convex retained | None | NOT_TARGETED |
+## Coinbase Payment Agents — primary Coinbase track
 
-CREAO ID: **missing**. Shared successful run: **missing**. Hosted URL: **not deployed**. Model ID: **unverified**. Do not replace these with invented sample values.
+**User:** a small-business bookkeeper investigating unexplained charges. **Job:** buy missing public vendor billing context within a small approved budget, retain the evidence, and account for the investigation itself.
 
-Public technical references checked October 24, 2026: [CREAO create](https://developer.creao.ai/docs/v2/runs/create), [CREAO get](https://developer.creao.ai/docs/v2/runs/get), [Convex mutations](https://docs.convex.dev/functions/mutation-functions), [Coinbase Bazaar MCP](https://docs.cdp.coinbase.com/api-reference/v2/rest-api/x402-facilitator/bazaar-mcp-server). These are not event eligibility authorities.
+**Tools:** official Coinbase CDP MCP for managed-wallet identity checks; CDP SDK for managed signing; x402 exact Base-USDC payments to the real Exa API; viem for independent Transfer verification; Convex for durable reservations, receipts and native-unit journals. The application exposes a fixed read-only MCP operation, never generic model access to wallet tools.
+
+**Working evidence:** authenticated CDP SDK account read, authenticated CDP MCP account-list call, and a real Exa HTTP402 quote for 7,000 atomic USDC. See `evidence/cdp-authentication.json`, `cdp-mcp-verification.json` and `exa-x402-quote.json`. The buyer wallet is created and CDP-MCP-verified; signing and a paid delivery are pending funding; no settlement is claimed yet.
+
+**Demo:** add a charge → inspect local evidence → inspect actual 402 quote → authorize a bounded external purchase → inspect sources/transaction/expense journal → ask for a source-bound accounting review. A 0.007 USDC purchase stays exactly 7,000 atomic units. Reused vendor context does not trigger another payment in the same case generation. Unknown payments are reconciled from saved receipts.
+
+**Controls:** fixed provider and curated domains; no private bank records in searches; 0.01 USDC per purchase and 0.10 across the deployment; source-version and expiry checks; unique receipt identity across cases; exact native-asset debits/credits; no business invoice payment or external bookkeeping writes.
+
+**Builder feedback from this build:** the API key and wallet secret are separate and the wallet-secret location was hard to find. The retail Coinbase MCP currently documents x402 as coming soon; the official CDP MCP/SDK builder path supports this server-side design. Track wording should be clarified with the sponsor if they require the retail endpoint specifically. A first-class idempotent purchase-and-retrieve API with durable settlement/delivery status would simplify recovery after ambiguous transport failures.
+
+The supplied challenge PDF requires project summary, working example, architecture and builder feedback. It says real-money transactions are not required. A verified Coinbase account and other eligibility requirements still apply; no eligibility or recruiter outcome is guaranteed.
+
+## Other required integrations
+
+- **CREAO:** real $8,000 and $6,000 credit-input runs, normalized native artifacts, source/version validation. Proof is in `evidence/creao-800000.json` and `creao-600000.json`. Share link remains uncaptured.
+- **Hyphenate:** controller, investigator and bookkeeper duties, messy source data, human gates and interactive challenges are implemented. Full platform/eligibility brief remains unverified.
+- **CRS:** official developer MCP connected and request schema retrieved. Runtime adapter and official synthetic personas are prepared; sandbox credentials and a real report remain pending.
+- **Convex / Anthropic:** actual runtime proof is recorded separately from offline tests. No other sponsor is claimed merely because a dependency or diagram exists.

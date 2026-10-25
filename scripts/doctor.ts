@@ -1,8 +1,13 @@
 import {existsSync} from 'node:fs';
+if(existsSync('.env.local'))process.loadEnvFile('.env.local');
 const env=process.env;
 const family=env.CREAO_API_FAMILY??'developer-v2';
 const expected=family==='agent-v1'?'https://agent.creao.ai/api/v1':'https://developer.creao.ai/v2';
 const checks=[
+ {name:'Claude API key',ok:!!env.ANTHROPIC_API_KEY,action:'Add server-only ANTHROPIC_API_KEY. App cap is $5 / 50 reservations.'},
+ {name:'CRS sandbox account',ok:!!(env.CRS_USERNAME&&env.CRS_PASSWORD),action:'Add sandbox CRS_USERNAME and quoted CRS_PASSWORD from the CRS team.'},
+ {name:'Coinbase CDP credentials',ok:!!(env.CDP_API_KEY_ID&&env.CDP_API_KEY_SECRET&&env.CDP_WALLET_SECRET),action:'Add the three CDP server credentials from portal.cdp.coinbase.com.'},
+ {name:'Real x402 evidence purchasing enabled',ok:env.LEDGERPROOF_X402_EVIDENCE_ENABLED==='true',action:'Prepare/fund the buyer wallet, then enable bounded real purchases. Unpaid Exa quotes need no key.'},
  {name:'Local environment file',ok:existsSync('.env.local'),action:'Copy .env.example to .env.local and configure it securely.'},
  {name:'CREAO agent ID',ok:!!env.CREAO_AGENT_ID,action:'Save the hosted investigator and obtain its actual ID.'},
  {name:'CREAO server key',ok:!!env.CREAO_API_KEY,action:'Configure the account-supported key locally; do not paste it into chat.'},

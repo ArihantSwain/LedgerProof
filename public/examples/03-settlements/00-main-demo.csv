@@ -1,0 +1,11 @@
+id,kind,date,amountCents,reference
+bank_oct27,bank,2026-10-27,967000,payout_101
+charge_a,charge,2026-10-26,600000,payout_101
+charge_b,charge,2026-10-26,400000,payout_101
+refund_a,refund,2026-10-26,30000,payout_101
+fee_a,fee,2026-10-27,3000,payout_101
+bank_oct28,bank,2026-10-28,495000,payout_102
+charge_c,charge,2026-10-27,500000,payout_102
+bank_oct29,bank,2026-10-29,250000,
+charge_d,charge,2026-10-28,250000,payout_103
+charge_e,charge,2026-10-28,250000,payout_104

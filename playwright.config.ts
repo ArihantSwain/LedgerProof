@@ -1,2 +1,2 @@
 import {defineConfig} from '@playwright/test';
-export default defineConfig({testDir:'./tests/browser',timeout:60000,use:{baseURL:'http://localhost:3000'},webServer:{command:'npm run start -- --hostname 127.0.0.1',env:{LEDGERPROOF_ALLOW_LOCAL:'true'},url:'http://localhost:3000',reuseExistingServer:!process.env.CI},workers:1});
+export default defineConfig({testDir:'./tests/browser',timeout:60000,use:{baseURL:'http://localhost:3107'},webServer:{command:'npm run start -- --hostname 127.0.0.1 --port 3107',env:{LEDGERPROOF_ALLOW_LOCAL:'true',LEDGERPROOF_OFFLINE_REHEARSAL:'true',APP_ORIGIN:'http://localhost:3107'},url:'http://localhost:3107',reuseExistingServer:false},workers:1});

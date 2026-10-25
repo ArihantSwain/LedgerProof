@@ -1,0 +1,43 @@
+{
+  "status": "LIVE_SANDBOX_VERIFIED",
+  "verifiedAt": "2026-10-25T07:18:55.795Z",
+  "jobKey": "0d6068a06f863b9ddb8c1a20b00efe42cfc84fd823d777a9252fac969416b13f",
+  "state": "completed",
+  "result": {
+    "product": "TransUnion prequalification sandbox",
+    "report": {
+      "creditFiles": [
+        {
+          "borrowerSourceType": "Borrower",
+          "creditFileInfileDate": "2019-09-10",
+          "creditFileResultStatusType": "FileReturned",
+          "sourceType": "TransUnion"
+        }
+      ],
+      "creditPullType": "unspecified",
+      "disclosure": "Official synthetic consumer test subject. A score is not a business default probability or a lending approval. No agency receivable, reserve or ledger balance changed.",
+      "scores": [
+        {
+          "modelName": "TransUnionVantageScore4.0",
+          "noScoreReasonType": null,
+          "scoreValue": "790"
+        }
+      ],
+      "tradelineCount": 12
+    },
+    "requestId": "7df6c061-247a-4566-be91-a879b4324de7",
+    "source": "CRS sandbox API",
+    "subject": {
+      "id": "P01",
+      "kind": "official synthetic consumer",
+      "name": "MARGARET OKAFOR"
+    }
+  },
+  "error": null,
+  "checks": [
+    "Password parsed with its literal hash character",
+    "Official synthetic CRS persona only",
+    "Durable login and report guards; no automatic retry",
+    "No business credit assessment or ledger change"
+  ]
+}

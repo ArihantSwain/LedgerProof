@@ -1,0 +1,69 @@
+{
+  "status": "LIVE_VERIFIED",
+  "verifiedAt": "2026-10-25T04:36:57.787Z",
+  "jobKey": "11abc6eac42946ecee9c2008d3d80f5b45d2db067aef0adeb9da43ac06818b7e",
+  "chargedMicros": 13318,
+  "result": {
+    "closeVersion": 2,
+    "disclosure": "AI interpretation with validated source IDs. No accounting posting or external action executed.",
+    "generation": 1,
+    "inputVersion": 1,
+    "ledgerVersion": 1,
+    "model": "claude-haiku-4-5-20251001",
+    "operationsVersion": 1,
+    "review": {
+      "checks": [
+        {
+          "assessment": "supported",
+          "explanation": "Bank deposit of 967,000¢ matches documented activity: gross charges (600,000¢ + 400,000¢ = 1,000,000¢) less refunds (30,000¢) less fees (3,000¢). Arithmetic is deterministic and all transactional records are cited.",
+          "sourceIds": [
+            "bank_oct27",
+            "charge_a",
+            "charge_b",
+            "refund_a",
+            "fee_a"
+          ],
+          "title": "Payout 101: Balanced reconciliation deterministically verified"
+        },
+        {
+          "assessment": "needs_review",
+          "explanation": "Bank deposit 495,000¢ versus documented charge 500,000¢ creates a 5,000¢ shortfall. No fee, refund, or adjustment record supports this reduction. Do not infer a missing fee; obtain the missing settlement record explaining the variance before posting.",
+          "sourceIds": [
+            "bank_oct28",
+            "charge_c"
+          ],
+          "title": "Payout 102: Unexplained 5,000¢ variance requires missing documentation"
+        },
+        {
+          "assessment": "needs_review",
+          "explanation": "Bank deposit 250,000¢ (2026-10-29) matches the net amount of either payout_103 or payout_104 individually, but lacks a settlement reference to prove which batch cleared. Amount matches alone cannot distinguish allocation. Add the reference or obtain additional bank details.",
+          "sourceIds": [
+            "bank_oct29",
+            "charge_d",
+            "charge_e"
+          ],
+          "title": "Payout 103 and 104: Ambiguous allocation due to missing settlement reference"
+        }
+      ],
+      "nextSteps": [
+        "Obtain the missing settlement record or fee journal entry for bank_oct28 (payout_102) explaining the 5,000¢ variance.",
+        "Request the settlement reference from the bank or processor for bank_oct29 (2026-10-29, 250,000¢) to determine whether it clears payout_103 or payout_104.",
+        "Do not create hypothetical fees or adjustments to force a reconciliation; require documentary evidence.",
+        "Confirm that processor clearing account is credited for gross charges only, without double-recognition of sales.",
+        "Once variances are explained or removed, post the settlement subledger entries separately from agency accounts receivable."
+      ],
+      "summary": "Settlement reconciliation review for payout batches 101–104. Payout 101 (bank_oct27, 967,000¢) reconciles perfectly: gross charges 1,000,000¢ minus refunds 30,000¢ and fees 3,000¢ equals the bank deposit. Payout 102 (bank_oct28, 495,000¢) shows a 5,000¢ unexplained variance against documented charges of 500,000¢; no supporting documentation for the reduction is evident. Payout 103 and 104 deposits (bank_oct29, 250,000¢) cannot be allocated deterministically because the bank record lacks a settlement reference, and the 250,000¢ amount matches both remaining batch net amounts individually, creating ambiguity without additional evidence."
+    },
+    "usage": {
+      "input_tokens": 7343,
+      "output_tokens": 751
+    }
+  },
+  "checks": [
+    "Live Claude API request",
+    "Strict tool JSON validated",
+    "Source IDs validated",
+    "Same evidence and question returned cached job without a second API call",
+    "Shared Convex budget reservation and settlement"
+  ]
+}

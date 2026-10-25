@@ -1,0 +1,12 @@
+{
+  "status": "DEVELOPER_TOOLING_VERIFIED",
+  "verifiedAt": "2026-10-25T05:02:32.267Z",
+  "package": "@crscreditapi/crs-calhacks-mcp-server@1.1.2",
+  "transport": "MCP stdio",
+  "tool": "get_api_schema",
+  "product": "credit_report",
+  "responseBytes": 9220,
+  "responseSha256": "17ee4b9b6c7458b2bba7c8852795f5b266e6bfc9cc57756a28e394513a94eaa4",
+  "creditApiExecuted": false,
+  "limitation": "Documentation tooling is connected. Live sandbox reports still need CRS account credentials."
+}

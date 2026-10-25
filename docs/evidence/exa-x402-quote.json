@@ -1,0 +1,40 @@
+{
+  "verifiedAt": "2026-10-25T06:22:09.790Z",
+  "status": "LIVE_QUOTE_VERIFIED",
+  "paymentExecuted": false,
+  "documentation": [
+    "https://exa.ai/docs/integrations/payments/x402/quickstart",
+    "https://www.coinbase.com/developer-platform/discover/launches/exa"
+  ],
+  "quote": {
+    "provider": "Exa",
+    "status": "LIVE_QUOTE_VERIFIED",
+    "fingerprint": "3d5d8d6e378b1bdf720236f58bd3ac4c4453e8b66674630b6d1cd99119556d99",
+    "chargeId": "github-investigation-example",
+    "terms": {
+      "scheme": "exact",
+      "network": "eip155:8453",
+      "amount": "7000",
+      "payTo": "0x6d6E695b09861467c7d462f5AAF31cF3540B9192",
+      "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "maxTimeoutSeconds": 60,
+      "amountAtomic": 7000
+    },
+    "request": {
+      "query": "GitHub official billing documentation bank statement charges invoices subscription metered usage refunds",
+      "type": "auto",
+      "numResults": 3,
+      "includeDomains": [
+        "docs.github.com"
+      ],
+      "contents": {
+        "text": {
+          "maxCharacters": 1500
+        }
+      }
+    },
+    "createdAt": 1792909329790,
+    "expiresAt": 1792909629790,
+    "disclosure": "Unpaid live x402 quote. Searches disclose only a public vendor name and official domain. Public documentation is context, not proof of this bank charge or a replacement for its receipt."
+  }
+}

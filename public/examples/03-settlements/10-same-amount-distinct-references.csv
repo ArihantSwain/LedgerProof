@@ -1,0 +1,5 @@
+id,kind,date,amountCents,reference
+same_bank_a,bank,2026-10-28,50000,same_batch_a
+same_bank_b,bank,2026-10-28,50000,same_batch_b
+same_sale_a,charge,2026-10-27,50000,same_batch_a
+same_sale_b,charge,2026-10-27,50000,same_batch_b

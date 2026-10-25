@@ -1,0 +1,16 @@
+.env*
+.data
+.git
+.next
+.agents
+.claude
+CLAUDE.md
+skills-lock.json
+docs
+test-results
+playwright-report
+*.tsbuildinfo
+
+.mcp.json
+.cursor
+.vscode

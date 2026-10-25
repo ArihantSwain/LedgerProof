@@ -1,3 +1,4 @@
+process.env.LEDGERPROOF_OFFLINE_REHEARSAL='true';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createSession,readCase,applyCommand} from '../lib/store';

@@ -1,0 +1,5 @@
+id,kind,date,amountCents,reference
+competing_bank_a,bank,2026-10-27,97000,competing_batch
+competing_bank_b,bank,2026-10-27,97000,competing_batch
+competing_sale,charge,2026-10-26,100000,competing_batch
+competing_fee,fee,2026-10-27,3000,competing_batch

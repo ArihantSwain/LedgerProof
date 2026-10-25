@@ -1,45 +1,32 @@
-# LedgerProof — return briefing
+# LedgerProof: start here
 
-Prepared October 24, 2026, America/Los_Angeles. This is the index for the autonomous work package.
+Live demo: **https://ledgerproof-one.vercel.app**. Click **Start finance demo**. Judges need no account.
 
-LedgerProof checks whether the invoices behind a cash forecast are trustworthy. The demo agency looks comfortable at $16,000 after two payrolls; an approved credit reduces that to $8,000, and a collection delay reveals a $4,000 shortfall. The useful product is the chain from source evidence to a reviewed correction to an understandable cash decision.
+Fresh checkout: use Node 22, run `npm ci` then `npm run demo`, and open http://localhost:3000. No keys are required for sample investigations. Live services are clearly disabled when unavailable.
 
-**Current state:** working local rehearsal; mandatory hosted CREAO execution and Convex deployment are still blocked by account setup. Code and diagrams do not establish live integration or sponsor eligibility.
+[Download 90 judging documents](https://ledgerproof-one.vercel.app/examples/ledgerproof-judge-pack.zip) · [Example workflows and expected outcomes](../public/examples/README.md)
 
-## Read or open these first
+LedgerProof helps a small business explain its money, review accounting corrections, and understand what cash it can count on.
 
-| Artifact | What you get |
-| --- | --- |
-| [Interactive briefing](briefing.html) | Self-contained offline guide, diagrams, service search, and roadmap tabs; no account or server required |
-| [Printable briefing](LedgerProof-Briefing.pdf) | Portable report for reviewing or sharing after checking its contents |
-| [Architecture atlas](ARCHITECTURE-DIAGRAMS.md) | Editable Mermaid plus standalone SVG/PNG architecture, lifecycle, ownership, and roadmap diagrams |
-| [How it works](HOW-IT-WORKS.md) | Full user flow, cash calculations, code paths, design choices, failure behavior, and service responsibilities |
-| [Service register](SERVICE-REGISTER.md) | Exactly what is built, configured, tested, blocked, and deliberately excluded for each service |
-| [Future development](FUTURE-DEVELOPMENT.md) | Sequenced technical/product roadmap, new expansion paths, metrics, commercial hypotheses, and stop conditions |
-| [Event strategy](EVENT-STRATEGY.md) | Updated guide interpretation, newly discovered tracks, fit ranking, evidence gaps, and schedule |
-| [Your action list](ACTION-ITEMS.md) | Prioritized actions that need your accounts, eligibility information, or publishing/submission decisions |
-| [Evaluation](EVALUATION.md) | Actual executed checks; offline evaluation separated from live provider verification |
+There are two pages:
 
-## Local use
+- **Cash forecast** — the landing page. Thirteen weeks of cash, payroll coverage, and a week-by-week cash bridge. Expand **Test a cash disruption** to model a delayed payment or unexpected expense.
+- **Accounting workbench** — reconcile deposits, investigate receivables, inspect sources, and approve entries in one place. AI review, vendor context, payment-term checks, and follow-up plans expand only when needed.
 
-```sh
-npm ci
-npm run fixtures
-npm run dev
-```
+## Short demonstration
 
-Open http://localhost:3000 in LedgerProof. Start demo → upload the generated credit → open Investigation activity → explicitly select local rehearsal → run → inspect evidence → approve credit → move collection to November 9. Select weeks 2 and 3 to trace exact cash movements. Reset only your own workspace. See DEMO.md.
+1. Start on **Cash forecast** and explain the expected cash after week two.
+2. Open **Accounting workbench** and click **Load sample settlement**. Explain $10,000 charges − $300 refunds − $30 fees = $9,670. The other deposits retain their missing-evidence and ambiguous-match exceptions.
+3. Inspect the journal and approve it. Open **Receivables and corrections** for the credit-note → CREAO investigation → human approval flow. For local practice, **Run sample investigation** provides an explicitly simulated result. **Accounting review** asks Claude for a source-based explanation.
+4. Return to **Cash forecast**. Expand **Test a cash disruption** and model a late customer payment and an unexpected expense.
+5. Open **Compare a recovery plan** to return to the workbench. Prepare and approve a conditional plan, then inspect its unsent follow-up draft.
 
-For the briefing alone, open docs/briefing.html directly. Diagrams are under docs/diagrams. Rebuild documentation assets with `npm run docs:build`; export PDF/PNG with `npm run docs:export` after installing Playwright Chromium.
+Optional checks remain in the same workbench:
 
-## Autonomous changes made in this pass
+- **Find missing vendor context**: Exa supplies public vendor documentation; Coinbase CDP and x402 handle an approved purchase. Inspect the live wallet and unpaid quote. A real paid delivery still awaits wallet funding; do not claim settlement.
+- **Check payment terms**: CRS returns official synthetic consumer reports, separately from Cedar’s business customers. It never automatically approves credit or changes an invoice.
+- **How the tools help with this work**: short provider responsibilities and limitations. Convex persists the shared record and provider budgets.
 
-Added the architecture atlas, service inventory, operating explanation, development strategy, event/source register, stage log, submission checklist, and an offline navigable/printable briefing. Reviewed the user-supplied event guide and retrieved the linked Coinbase and Figma challenge content through Google Drive.
+The accounting engine calculates amounts; agents interpret evidence. Financial changes require human review. Draft approvals never send messages. Scenario changes do not rewrite posted transactions.
 
-Hardened CREAO configuration: one explicitly selected API family, no automatic cross-family fallback, family-specific request/response validation, structured text handling, bounded payloads, wrong-run rejection, and malformed outputs escalated to review. Both adapters are contract-tested with mock HTTP responses, **not live verified**.
-
-Corrected a finance edge case found during architecture review: newly posted receipts now enter the forecast in their actual date bucket, rather than all being added to opening cash. Source amounts with fractional dollars now retain cents in the display. The exact judge cash story remains unchanged.
-
-No sponsor was added merely to claim another track. No paid service was purchased, real money moved, customer contacted, public deployment made, or Devpost submission sent. Missing account access is summarized in ACTION-ITEMS.md, so you do not need to reconstruct the conversation.
-
-Final verification: 20 unit/backend/provider-contract tests, 3 browser tests, typecheck and production build pass. Five diagrams, offline navigation/search/mobile behavior, and the 26-page PDF were checked. A local-only configuration doctor, changed-input test bundles, and an offline GitHub Actions workflow are prepared. Remote CI has not run; no source push occurred.
+Legacy `/ledger` and `/operations` links redirect into the two-page experience. Current service evidence is in [integration status](integration-status.md).

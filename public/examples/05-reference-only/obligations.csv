@@ -1,0 +1,5 @@
+id,date,amountCents,category,description
+payroll-1,2026-10-30,1200000,payroll,Week 1 payroll
+payroll-2,2026-11-06,1200000,payroll,Week 2 payroll
+expense-1,2026-11-18,150000,expense,Studio lease
+expense-2,2026-11-20,50000,expense,Software subscriptions
