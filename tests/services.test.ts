@@ -4,7 +4,7 @@ import {reserveBudget} from '../lib/providers/budget';
 import {parseClaudeReview,reviewSchema,strictToolSchema,reviewInput} from '../lib/providers/claude';
 import {summarizeCredit} from '../lib/providers/crs';
 import {validateSettlementReceipt,closePacket} from '../lib/providers/coinbase';
-import {normalizeNativeCreao} from '../lib/providers/creao';
+import {normalizeNativeCreao,getInvestigation} from '../lib/providers/creao';
 import {evidenceBundle} from '../lib/investigation';
 import {createFixture} from '../fixtures/agency';
 import {z} from 'zod';
@@ -62,4 +62,10 @@ test('CREAO native artifacts bind actual submitted inputs, retain uncertainty an
  const result=normalizeNativeCreao(c,raw,bundle);assert.equal(result.findings[0].certaintyLabel,'possible');assert.equal(result.inputVersion,c.inputVersion);
  assert.throws(()=>normalizeNativeCreao(c,raw,{...bundle,inputVersion:99}),/does not match/);
  assert.throws(()=>normalizeNativeCreao(c,{...raw,findings:[{...raw.findings[0],evidence_ids:['invented']}]},bundle),/Unknown/);
+});
+
+test('completed CREAO artifact envelopes are retrieved without treating artifacts as malformed prose',async()=>{
+ const keys=['LEDGERPROOF_OFFLINE_REHEARSAL','CREAO_API_KEY','CREAO_AGENT_ID','CREAO_CONTRACT_VERIFIED','CREAO_API_FAMILY','CREAO_API_BASE'];const env=Object.fromEntries(keys.map(k=>[k,process.env[k]]));const originalFetch=globalThis.fetch;
+ try{Object.assign(process.env,{LEDGERPROOF_OFFLINE_REHEARSAL:'false',CREAO_API_KEY:'test-only',CREAO_AGENT_ID:'test-agent',CREAO_CONTRACT_VERIFIED:'true',CREAO_API_FAMILY:'agent-v1',CREAO_API_BASE:'https://agent.creao.ai/api/v1'});const c=createFixture('artifact-check',Date.now());const id='test-run';const raw={bundle_version:'1',findings:[{category:'evidence_conflict',evidence_ids:['doc-inv-0'],affected_record_ids:['invoice-0'],title:'Check receipt',facts:'No confirmed receipt',discrepancy:'Collection uncertain',proposed_review_step:'Request evidence',review_status:'needs_human_review'}]};globalThis.fetch=async input=>{const url=new URL(String(input));if(url.pathname.endsWith('/artifacts/download'))return Response.json(url.searchParams.get('name')==='bundle.json'?evidenceBundle(c):raw);return Response.json({id,status:'completed',result:{artifacts:['bundle.json','ledgerproof_findings.json'].map(name=>({title:name,url:'https://agent.creao.ai/api/v1/runs/'+id+'/artifacts/download?name='+name}))}});};const result=await getInvestigation(id,c);assert.equal(result.status,'completed');assert.equal(result.result?.findings.length,1);
+ }finally{globalThis.fetch=originalFetch;for(const key of keys)if(env[key]===undefined)delete process.env[key];else process.env[key]=env[key];}
 });

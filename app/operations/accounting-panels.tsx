@@ -23,7 +23,7 @@ export function ClaudeReview({c,api,run,busy,initialQuestion}:{c:Case;api:Api;ru
  const [question,setQuestion]=useState(initialQuestion??'Review the accounting records. Explain what reconciles, what evidence is missing, and which entries need review. Cite the source records; do not invent missing fees.');
  const [history,setHistory]=useState<any>();const [status,setStatus]=useState('');
  useEffect(()=>{let active=true;void api('services').then(value=>{if(active)setHistory(value);}).catch(()=>{if(active)setStatus('Live review is unavailable right now. Your accounting records are still available.');});return()=>{active=false;};},[c.id]);
- const jobs=history?.jobs?.filter((j:any)=>j.provider==='anthropic')??[],budget=history?.claudeBudget;
+ const jobs=history?.jobs?.filter((j:any)=>j.provider==='anthropic'&&j.result?.kind!=='import_conversion')??[],budget=history?.claudeBudget;
  const allowed=!!history?.capabilities?.accountingReview&&!!budget&&budget.calls<budget.callCap&&budget.chargedMicros+budget.reservedMicros+100000<=budget.capMicros;
  const enoughEvidence=hasReviewEvidence(c),ready=allowed&&enoughEvidence&&!!question.trim();
  const hint=!history?(status||'Checking review availability…'):!history.capabilities?.accountingReview?'Live AI review is not connected here. You can investigate the sample records and approve entries without it.':!enoughEvidence?'Import settlement records, a credit note or a receipt before requesting a review.':!allowed?'The demo review allowance has been used. Saved reviews remain available.':!question.trim()?'Add a question for the reviewer.':'';
@@ -32,7 +32,7 @@ export function ClaudeReview({c,api,run,busy,initialQuestion}:{c:Case;api:Api;ru
 }
 
 export function CrsReview({c,providers,api,run,busy}:{c:Case;providers:Record<string,string>;api:Api;run:Run;busy:boolean}){
- const [history,setHistory]=useState<any>();const [persona,setPersona]=useState('P01');const [saved,setSaved]=useState<any>();
+ const [history,setHistory]=useState<any>();const [persona,setPersona]=useState(c.documents.some(d=>d.id==='doc-returned-payment')?'P05':'P01');const [saved,setSaved]=useState<any>();
  useEffect(()=>{let active=true;void api('services').then(value=>{if(active)setHistory(value);}).catch(()=>{});return()=>{active=false;};},[c.id]);
  const jobs=(history?.jobs??[]).filter((job:any)=>job.provider==='crs');
  const existing=history?.savedCrsReports?.find((job:any)=>job.result?.subject?.id===persona);

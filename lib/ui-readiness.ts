@@ -11,6 +11,7 @@ export function inForecast(value:string,start:string){return validDate(value)&&v
 export function humanMessage(error:unknown):string{
  const raw=error instanceof Error?error.message:typeof error==='string'?error:'';
  if(/^(Add settlement records|These records are|This demo session|The records changed|An investigation is already|This amount is larger|This file refers|Choose a |Use a one-receipt|Check the settlement|This settlement has|The demo allowance|This live service|The buyer wallet|Please wait|Check the amount|This deposit needs|We could not confirm)/.test(raw))return raw;
+ if(/^(Each converted|Each invoice|Each uploaded|Each bill|Choose the source|A payment or credit|A receipt or credit|An invoice number|Check every|This workspace supports)/.test(raw))return raw;
  if(/already imported|duplicate ingestion|duplicate source record/i.test(raw))return 'These records are already in this workspace. Choose a different file, or reset the demo to start again.';
  if(/session unavailable|session expired|demo session expired/i.test(raw))return 'This demo session has ended. Start a new demo to continue.';
  if(/ledger changed|inputs changed|evidence changed|stale|changed; refresh/i.test(raw))return 'The records changed during this review. Refresh the workspace and review the latest figures before approving.';

@@ -78,7 +78,7 @@ export async function getInvestigation(providerRunId:string,c:Case):Promise<{sta
  const r=await request('/runs/'+encodeURIComponent(providerRunId));if(r.id!==providerRunId)throw new ProviderResultError('Provider returned another run ID');
  let result:AgentResult|undefined;
  if(r.status==='completed')try{
-  const structured=structuredResult(r.result);
+  const structured=r.result&&typeof r.result==='object'&&'artifacts' in r.result?undefined:structuredResult(r.result);
   if(structured&&typeof structured==='object'&&'schemaVersion' in structured)result=validateResult(c,structured);
   else if(config().family==='agent-v1'){
    const native=await artifact(r.result,'ledgerproof_findings.json',providerRunId);

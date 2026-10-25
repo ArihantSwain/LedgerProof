@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import {importCommandSchema} from './import';
 import { operationsSchema, operationsCommands, emptyOperations } from './operations';
 import {closeStateSchema,closeCommands,emptyClose} from './close';
 import {evidenceStateSchema,evidenceCommands,emptyEvidence} from './evidence';
@@ -36,6 +37,7 @@ export type Case = z.infer<typeof caseSchema>;
 export type Invoice = z.infer<typeof invoiceSchema>;
 export type Run = z.infer<typeof runSchema>;
 export const commandSchema = z.discriminatedUnion('type',[
+  importCommandSchema,
   ...evidenceCommands,
   ...closeCommands,
   ...operationsCommands,

@@ -5,3 +5,7 @@
 .consolidated-app button:disabled{cursor:not-allowed;opacity:.55;background:#edf0eb;color:#6f7b6d;border-color:#dce2d9}.control-disabled{opacity:.5;cursor:not-allowed}.field-hint{font-size:12px;line-height:1.7;color:#61715b;margin:12px 0}.working-status{font-size:12px;color:#42684a;padding:10px 0}.action-feedback{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.action-feedback>span{flex:1;min-width:180px}.action-feedback button{font-size:11px;padding:7px 10px}.welcome-example-link{font-size:12px!important;margin:18px 0!important}
 
 .workspace-loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#647261;background:#f7f9f4}.workspace-loading p{font-size:14px}
+
+.import-anonymous{max-width:1200px;margin:auto;padding:28px}.import-anonymous>header{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px}.import-anonymous main{margin:0}.welcome .page-action{margin-right:12px}.welcome .large{margin-top:10px}
+
+.workbench-fields{border:0;padding:0;margin:0;min-width:0}.workbench-fields:disabled{opacity:.7}.recording-incident p{margin-bottom:0}

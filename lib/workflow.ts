@@ -1,5 +1,5 @@
 import { Case, Command, commandSchema, caseSchema } from './contracts';
-import { createFixture } from '../fixtures/agency';
+import { createRecordingFixture as createFixture } from '../fixtures/agency';
 import { outstanding, validateEntry, forecast } from './finance';
 import { validateResult, findingId } from './investigation';
 import { operationsCommandSchema } from './contracts/operations';
@@ -8,10 +8,12 @@ import {closeCommandSchema} from './contracts/close';
 import {applyClose} from './close';
 import {evidenceCommandSchema} from './contracts/evidence';
 import {applyEvidence} from './evidence';
+import {importWorkspace} from './import-workflow';
 
 export function transition(original:Case,raw:Command,now=Date.now()):Case{
  const cmd=commandSchema.parse(raw);let c=structuredClone(original);
  if(c.expiresAt<now)throw Error('Demo session expired');
+ if(cmd.type==='import_workspace')return caseSchema.parse(importWorkspace(original,cmd,now));
  const before=c.inputVersion;
  const event=(action:string,targetId:string,reason:string)=>c.events.push({id:`event-${c.revision+1}-${c.events.length}`,action,targetId,reason,timestamp:now,beforeVersion:before,afterVersion:c.inputVersion,actor:'demo-reviewer'});
  const evidenceCommand=evidenceCommandSchema.safeParse(cmd);
@@ -50,6 +52,7 @@ export function transition(original:Case,raw:Command,now=Date.now()):Case{
  if(cmd.type==='update_run'){
    const run=c.runs.find(r=>r.id===cmd.runId);if(!run||cmd.generation!==c.generation)return original;
    if(cmd.patch.id&&cmd.patch.id!==run.id)throw Error('Run identity cannot change');
+   if(cmd.patch.state&&['submitted','running','validating','completed'].includes(cmd.patch.state)&&!cmd.patch.error)delete run.error;
    Object.assign(run,cmd.patch);if(run.inputVersion!==c.inputVersion)run.state='stale';event('investigation_status',run.id,run.state);
  }
  if(cmd.type==='apply_result'){

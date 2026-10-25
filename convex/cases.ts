@@ -1,6 +1,6 @@
 import { mutationGeneric as mutation,queryGeneric as query } from 'convex/server';
 import { v } from 'convex/values';
-import { createFixture } from '../fixtures/agency';
+import { createRecordingFixture as createFixture } from '../fixtures/agency';
 import { caseSchema,commandSchema } from '../lib/contracts';
 import { transition } from '../lib/workflow';
 

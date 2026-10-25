@@ -2,7 +2,9 @@
 
 Live demo: **https://ledgerproof-one.vercel.app** — click **Start finance demo**. No judge login required.
 
-Two pages: **Cash forecast** for the cash outlook and **Accounting workbench** for source records, reconciliation, investigations, review and follow-up. Optional external checks expand inside the workbench.
+Start with **Upload your business records** or visit [/import](https://ledgerproof-one.vercel.app/import). Upload a set of CSVs, Excel workbooks, PDFs, Word documents, photos, JSON or text; check the editable conversion before importing your own invoices, payments, credits and bills. [Try these ordinary business files](public/examples/import-ready). Missing or ambiguous fields need confirmation. Text/table conversion runs locally; scans and photos can use a bounded Claude extraction within the existing app budget.
+
+**Cash forecast** for the cash outlook and **Accounting workbench** for source records, reconciliation, investigations, review and follow-up. Optional external checks expand inside the workbench.
 
 An accounting team for small businesses: reconcile messy transactions, investigate discrepancies, prepare balanced entries, and retain the evidence behind every decision.
 
@@ -73,3 +75,7 @@ npm run verify:claude                      # can spend credits; explicit only
 ```
 
 [Start here](docs/START-HERE.md) · [Remaining account actions](docs/ACTION-ITEMS.md) · [Architecture](docs/ARCHITECTURE-DIAGRAMS.md)
+
+## Recording scenario
+
+Open https://ledgerproof-one.vercel.app/?recording=1 to create a fresh Cedar Kitchen case. Add the default $3,000 emergency repair ($13,000 remains in week two), investigate receivables, inspect the returned-payment source and update its collection timing (week two becomes -$7,000). Inspect the duplicate ledger proposal and the two $149 Paddle charges. Check official vendor context without claiming fraud. Payment terms reuses the actual CRS P05 sandbox report, score 540. Prepare and approve a partial-collection recovery plan, inspect its unsent draft, and record the phone-call decision. A live investigation uses CREAO; the separate Run sample investigation button is explicitly simulated and instant.

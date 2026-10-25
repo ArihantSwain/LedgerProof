@@ -1,0 +1,3 @@
+Bill Number,Vendor Name,Invoice Date,Due Date,Amount,Description,Currency
+bill-1001,Payroll,2026-10-20,2026-10-30,4000.00,Payroll,USD
+bill-1002,Studio,2026-10-20,2026-11-06,1200.00,Studio rent,USD

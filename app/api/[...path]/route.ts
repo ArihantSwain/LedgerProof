@@ -1,5 +1,8 @@
 import { NextRequest,NextResponse } from 'next/server';
-import { randomUUID } from 'node:crypto';
+import { randomUUID,createHash,createHmac,timingSafeEqual } from 'node:crypto';
+import {convertFiles} from '@/lib/importer';
+import {enrichImport} from '@/lib/providers/importer-ai';
+import {importPayloadSchema} from '@/lib/contracts/import';
 import { z } from 'zod';
 import { createSession,readCase,applyCommand,saveOriginal,readOriginal,Access } from '@/lib/store';
 import { forecast } from '@/lib/finance';
@@ -27,8 +30,8 @@ const globalRate=globalThis as typeof globalThis & {lpRate?:Map<string,{n:number
 function limit(key:string,max=60){const map=globalRate.lpRate??=new Map();const now=Date.now();for(const [k,v] of map)if(v.until<now)map.delete(k);const v=map.get(key)??{n:0,until:now+60_000};v.n++;map.set(key,v);if(v.n>max)throw Error('Request limit reached; try again in a minute');}
 function access(req:NextRequest):Access{const raw=req.cookies.get('lp_session')?.value;if(!raw)throw Error('Session unavailable');const [caseId,token]=raw.split('.');return {caseId,token};}
 function response(data:unknown,status=200){return NextResponse.json(data,{status,headers:{'Cache-Control':'no-store','Referrer-Policy':'no-referrer'}});}
-function sessionResponse(a:Access){const r=response({caseId:a.caseId});r.cookies.set('lp_session',a.caseId+'.'+a.token,{httpOnly:true,sameSite:'strict',secure:process.env.VERCEL==='1'||(process.env.APP_ORIGIN?.startsWith('https:')??false),path:'/',maxAge:86400});return r;}
-async function body(req:NextRequest){const text=await req.text();if(text.length>60000)throw Error('Request body too large');return JSON.parse(text);}
+function sessionResponse(a:Access,data:unknown={caseId:a.caseId}){const r=response(data);r.cookies.set('lp_session',a.caseId+'.'+a.token,{httpOnly:true,sameSite:'strict',secure:process.env.VERCEL==='1'||(process.env.APP_ORIGIN?.startsWith('https:')??false),path:'/',maxAge:86400});return r;}
+async function body(req:NextRequest){const text=await req.text();if(text.length>(req.nextUrl.pathname==='/api/imports/commit'?800000:60000))throw Error('Request body too large');return JSON.parse(text);}
 function view(c:Case){
  const live=c.mode==='CONVEX'&&liveBackendConfigured();
  const capabilities={hostedInvestigation:live&&creaoConfigured(),accountingReview:live&&claudeConfigured(),creditReport:live&&crsConfigured(),wallet:live&&coinbaseConfigured(),quote:live,paidEvidence:live&&paidEvidenceConfigured()};
@@ -55,11 +58,27 @@ export async function GET(req:NextRequest){try{
  }catch(error){return response({error:humanMessage(error)},400);}}
 export async function POST(req:NextRequest){try{
  const origin=req.headers.get('origin');if(origin&&!appOrigins().has(origin))return response({error:'Origin rejected'},403);
- const length=Number(req.headers.get('content-length')??0);if(length>MAX_BYTES+10_000)throw Error('Request body too large');
+ const length=Number(req.headers.get('content-length')??0);if(length>(req.nextUrl.pathname.startsWith('/api/imports/')?3*1024*1024+100000:MAX_BYTES+10_000))throw Error('Request body too large');
  const p=req.nextUrl.pathname.slice(5).split('/').map(decodeURIComponent);
  if(p[0]==='demo'&&p[1]==='session'){limit('create',20);return sessionResponse(await createSession());}
  if(p[0]==='demo'&&p[1]==='join'){limit('join',30);const b=z.object({session:z.string().max(110)}).parse(await body(req));const [caseId,token]=b.session.split('.');const a={caseId,token};await readCase(a);return sessionResponse(a);}
+ if(p[0]==='imports'&&p[1]==='preview'){
+  let a:Access;try{a=access(req);await readCase(a);}catch{limit('import-create',20);a=await createSession();}
+  const c=await readCase(a);limit(a.caseId+':import',12);const form=await req.formData();const uploads=form.getAll('files').filter((file):file is File=>file instanceof File);
+  if(!uploads.length||uploads.length>10)throw Error('Choose between one and ten files.');
+  if(uploads.some(file=>!file.size||file.size>2*1024*1024)||uploads.reduce((sum,file)=>sum+file.size,0)>3*1024*1024)throw Error('Choose nonempty files up to 2 MB each and 3 MB total.');
+  const files=await Promise.all(uploads.map(async file=>({name:file.name,type:file.type,bytes:new Uint8Array(await file.arrayBuffer())})));
+  let preview=await convertFiles(files);preview=await enrichImport(c,preview,files);
+  const sources=await Promise.all(preview.sources.map(async source=>{const file=files.find(file=>createHash('sha256').update(file.bytes).digest('hex')===source.sha256);if(!file)throw Error('Choose a supported source file.');const storageRef=await saveOriginal(a,file.bytes,source.mime);const ext=source.filename.toLowerCase().split('.').pop()??'';const mime=({pdf:'application/pdf',csv:'text/csv',tsv:'text/tab-separated-values',txt:'text/plain',json:'application/json',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',xls:'application/vnd.ms-excel',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'} as Record<string,string>)[ext]??'application/octet-stream';const signed={...source,mime,text:source.text.slice(0,20000),storageRef};return {...signed,proof:createHmac('sha256',a.token).update(JSON.stringify(signed)).digest('hex')};}));
+  return sessionResponse(a,{...preview,sources});
+ }
  const a=access(req);limit(a.caseId+':write',40);let c=await readCase(a);
+ if(p[0]==='imports'&&p[1]==='commit'){
+  const input=importPayloadSchema.parse(await body(req));
+  for(const source of input.sources){const {proof,...signed}=source;const expected=createHmac('sha256',a.token).update(JSON.stringify(signed)).digest('hex');if(!proof||proof.length!==64||!timingSafeEqual(Buffer.from(proof,'hex'),Buffer.from(expected,'hex')))throw Error('Choose your files again to confirm their source records.');}
+  const requestKey=createHash('sha256').update(JSON.stringify({...input,expectedRevision:undefined})).digest('hex');
+  return response(view(await applyCommand(a,{...input,type:'import_workspace',expectedRevision:input.expectedRevision??c.revision,requestKey})));
+ }
  if(p[0]==='evidence'){
   if(p[1]==='wallet')return response(await prepareEvidenceWallet());
   if(p[1]==='quote'){const b=z.object({chargeId:z.string().max(100)}).parse(await body(req));const charge=c.evidencePurchases.charges.find(x=>x.id===b.chargeId);if(!charge)throw Error('Unknown investigation charge');return response(await probeExa(charge));}

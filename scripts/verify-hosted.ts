@@ -12,10 +12,10 @@ try{
  await page.goto(origin,{waitUntil:'networkidle'});
  await page.getByRole('button',{name:'Start finance demo'}).click();
  await expect(page.getByRole('heading',{name:'Cash forecast',exact:true})).toBeVisible();
- await expect(page.getByRole('navigation',{name:'Main navigation'}).getByRole('link')).toHaveCount(2);
+ await expect(page.getByRole('navigation',{name:'Main navigation'}).getByRole('link')).toHaveCount(3);
  await page.getByRole('navigation').getByRole('link',{name:'Accounting workbench'}).click();
  await expect(page.getByRole('heading',{name:'Accounting workbench',exact:true})).toBeVisible();
- checks.push('Only Cash forecast and Accounting workbench appear in navigation');
+ checks.push('Cash forecast, Accounting workbench and Import records appear in navigation');
  checks.push('Anonymous browser started the hosted demo without a Vercel account');
  await page.getByRole('button',{name:'Load sample settlement'}).click();
  const balanced=page.getByTestId('settlement-bank_oct27');

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { ConvexHttpClient } from 'convex/browser';
 import { makeFunctionReference } from 'convex/server';
 import { Case,Command,caseSchema } from './contracts';
-import { createFixture } from '../fixtures/agency';
+import { createRecordingFixture as createFixture } from '../fixtures/agency';
 import { transition } from './workflow';
 export type Access={caseId:string;token:string};
 const root=path.join(process.cwd(),'.data');
