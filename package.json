@@ -14,8 +14,6 @@
     "smoke:creao": "tsx scripts/smoke-creao.ts",
     "doctor": "node --import tsx scripts/doctor.ts",
     "evaluate": "node --import tsx scripts/evaluate.ts",
-    "docs:build": "python3 scripts/render-diagrams.py && node --import tsx scripts/build-briefing.ts",
-    "docs:export": "node --import tsx scripts/export-docs.ts",
     "fixtures:creao": "node --import tsx scripts/prepare-creao.ts",
     "setup:convex": "node --import tsx scripts/setup-convex.ts",
     "verify:claude": "node --import tsx scripts/verify-claude.ts",
@@ -25,9 +23,12 @@
     "verify:x402": "node --import tsx scripts/verify-x402-evidence.ts",
     "verify:crs": "node --import tsx scripts/verify-crs.ts",
     "verify:hosted": "node --import tsx scripts/verify-hosted.ts",
-    "examples:build": "tsx scripts/judge-examples.ts",
+    "examples:build": "tsx scripts/build-samples.ts && node scripts/prepare-samples.mjs",
     "examples:verify": "tsx --test tests/judge-examples.test.ts",
-    "demo": "node scripts/demo.mjs"
+    "demo": "node scripts/demo.mjs",
+    "prebuild": "node scripts/prepare-samples.mjs",
+    "predev": "node scripts/prepare-samples.mjs",
+    "predemo": "node scripts/prepare-samples.mjs"
   },
   "dependencies": {
     "@coinbase/cdp-cli": "^2.0.124",

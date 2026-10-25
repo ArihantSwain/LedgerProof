@@ -21,7 +21,7 @@ export function humanMessage(error:unknown):string{
  if(/Maximum 5|5 PDF pages/i.test(raw))return 'Choose a text-based PDF with five pages or fewer.';
  if(/1 MB|between 1 byte|supported file/i.test(raw))return 'Choose a nonempty credit-note PDF or one-receipt CSV smaller than 1 MB.';
  if(/Type: credit_note|Currency: USD/i.test(raw))return 'Choose a supported USD credit-note PDF. The sample pack includes files ready to upload.';
- if(/exactly one receipt|documented CSV header|bank CSV row/i.test(raw))return 'Use a one-receipt bank CSV here. Settlement CSVs belong in Import settlement CSV above.';
+ if(/exactly one receipt|documented CSV header|bank CSV row/i.test(raw))return 'Use a one-payment CSV here, or use Import records for multiple files.';
  if(/Expected columns|quoted|positive integer|duplicate source|40 KB|settlement activity requires/i.test(raw))return 'Check the settlement CSV format: id, kind, date, amountCents, reference. Amounts use whole cents. A sample CSV is available to download.';
  if(/immutable/i.test(raw))return 'This settlement has already been approved. Start a fresh demo to try another version of that batch.';
  if(/request cap|spending.*cap|credit.*cap/i.test(raw))return 'The demo allowance for new requests has been reached. Previously saved results are still available.';

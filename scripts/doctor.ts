@@ -17,8 +17,6 @@ const checks=[
  {name:'Convex backend secret',ok:(env.LEDGERPROOF_BACKEND_SECRET?.length??0)>=32,action:'Set a strong shared server/backend secret of at least 32 characters.'},
  {name:'Exact app origin',ok:!!env.APP_ORIGIN,action:'Set APP_ORIGIN to the real local or authorized hosted origin.'},
  {name:'Fixture credit PDF',ok:existsSync('public/fixtures/credit-note-INV-A.pdf'),action:'Run npm run fixtures.'},
- {name:'Architecture briefing',ok:existsSync('docs/briefing.html')&&existsSync('docs/LedgerProof-Briefing.pdf'),action:'Run npm run docs:build and npm run docs:export.'},
 ];
 for(const c of checks)console.log(`${c.ok?'READY':'ACTION'} | ${c.name}${c.ok?'':' | '+c.action}`);
 console.log('\nConfiguration inspection only. No secrets printed, no provider calls, no LIVE_VERIFIED claim.');
-console.log('Next: docs/ACTION-ITEMS.md. Live execution evidence must be captured separately.');

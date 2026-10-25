@@ -11,7 +11,7 @@ import {transition} from '../lib/workflow';
 import {localRehearsal} from '../lib/investigation';
 import {outstanding,forecast,validateEntry} from '../lib/finance';
 import {parseCloseCsv,reconcileClose} from '../lib/close';
-const root='public/examples/';
+const root='SAMPLES/';
 const fresh=()=>createFixture('judge-pack-verification',fixtureTime);
 async function parsed(sample:JudgeSample,c=fresh()){
  return parseUpload(new Uint8Array(await readFile(root+sample.path)),sample.path.split('/').at(-1)!,sample.path.endsWith('.pdf')?'application/pdf':'text/csv',c);
@@ -26,11 +26,11 @@ test('judge pack manifest matches every generated example and its checksum; arch
  for(const sample of judgeSamples){const entry=manifest.entries.find((e:{path:string})=>e.path===sample.path);assert.ok(entry,sample.path);const bytes=await readFile(root+sample.path);assert.equal(bytes.length,entry.bytes,sample.path);assert.equal(createHash('sha256').update(bytes).digest('hex'),entry.sha256,sample.path);}
  const zipped=spawnSync('python3',['-c',`from zipfile import ZipFile
 from pathlib import Path
-with ZipFile('public/examples/ledgerproof-judge-pack.zip') as z:
+with ZipFile('SAMPLES/samples.zip') as z:
  assert z.testzip() is None
- for p in Path('public/examples').rglob('*'):
+ for p in Path('SAMPLES').rglob('*'):
   if p.is_file() and p.suffix!='.zip':
-   assert z.read('ledgerproof-judge-pack/'+p.relative_to('public/examples').as_posix())==p.read_bytes()
+   assert z.read('SAMPLES/'+p.relative_to('SAMPLES').as_posix())==p.read_bytes()
 `],{encoding:'utf8'});assert.equal(zipped.status,0,zipped.stderr);
 });
 for(const use of ['credit-upload','receipt-upload'] as const)test(`all supported ${use} examples produce independently specified remaining balances and week-two cash only after approval`,async()=>{

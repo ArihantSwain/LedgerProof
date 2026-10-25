@@ -8,6 +8,7 @@ import {normalizeNativeCreao,getInvestigation} from '../lib/providers/creao';
 import {evidenceBundle} from '../lib/investigation';
 import {createFixture} from '../fixtures/agency';
 import {z} from 'zod';
+import {visibleProviderJobs} from '../lib/providers/jobs';
 import {sealProviderToken,openProviderToken} from '../lib/providers/session-vault';
 import {appOrigins} from '../lib/app-origin';
 test('provider token encryption rejects another credential, secret, expiry or tampered ciphertext; expired sessions are not used',()=>{
@@ -69,3 +70,5 @@ test('completed CREAO artifact envelopes are retrieved without treating artifact
  try{Object.assign(process.env,{LEDGERPROOF_OFFLINE_REHEARSAL:'false',CREAO_API_KEY:'test-only',CREAO_AGENT_ID:'test-agent',CREAO_CONTRACT_VERIFIED:'true',CREAO_API_FAMILY:'agent-v1',CREAO_API_BASE:'https://agent.creao.ai/api/v1'});const c=createFixture('artifact-check',Date.now());const id='test-run';const raw={bundle_version:'1',findings:[{category:'evidence_conflict',evidence_ids:['doc-inv-0'],affected_record_ids:['invoice-0'],title:'Check receipt',facts:'No confirmed receipt',discrepancy:'Collection uncertain',proposed_review_step:'Request evidence',review_status:'needs_human_review'}]};globalThis.fetch=async input=>{const url=new URL(String(input));if(url.pathname.endsWith('/artifacts/download'))return Response.json(url.searchParams.get('name')==='bundle.json'?evidenceBundle(c):raw);return Response.json({id,status:'completed',result:{artifacts:['bundle.json','ledgerproof_findings.json'].map(name=>({title:name,url:'https://agent.creao.ai/api/v1/runs/'+id+'/artifacts/download?name='+name}))}});};const result=await getInvestigation(id,c);assert.equal(result.status,'completed');assert.equal(result.result?.findings.length,1);
  }finally{globalThis.fetch=originalFetch;for(const key of keys)if(env[key]===undefined)delete process.env[key];else process.env[key]=env[key];}
 });
+
+test('reset hides earlier provider results while retaining the shared spending counters',()=>{const jobs=[{createdAt:10,result:{generation:1}},{createdAt:30,result:{generation:1}},{createdAt:30,result:{snapshot:{generation:2}}},{createdAt:30,result:{subject:{id:'P05'}}}];assert.deepEqual(visibleProviderJobs({generation:2,createdAt:20},jobs),jobs.slice(2));});

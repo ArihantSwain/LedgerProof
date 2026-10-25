@@ -80,7 +80,7 @@ export function ImportWorkspace({api,run,busy,view,onImported}:Props){
    setWorkingStep('preview');setFileMessage('');
    try{
     const names=['receivables.csv','receipts.csv','bills.csv'];
-    const files=await Promise.all(names.map(async name=>{const response=await fetch('/examples/import-ready/'+name);if(!response.ok)throw Error('The sample files could not be loaded. Download a template and upload it instead.');return new File([await response.blob()],name,{type:'text/csv'});}));
+    const files=await Promise.all(names.map(async name=>{const response=await fetch('/SAMPLES/import-ready/'+name);if(!response.ok)throw Error('The sample files could not be loaded. Download a template and upload it instead.');return new File([await response.blob()],name,{type:'text/csv'});}));
     const body=new FormData();files.forEach(file=>body.append('files',file));
     const result=await api('imports/preview',body);
     if(!Array.isArray(result?.rows)||!Array.isArray(result?.sources))throw Error('We could not read the sample files.');
@@ -102,15 +102,15 @@ export function ImportWorkspace({api,run,busy,view,onImported}:Props){
   });
  }
  return <div className="import-workspace">
-  <div className="import-intro"><p>Bring your customer invoices, payments, credits, bills and settlement records together. We convert common exports into reviewable rows before adding them to your books.</p><ol className="import-steps" aria-label="Import steps"><li className="active"><b>1</b> Upload your files</li><li className={preview?'active':''}><b>2</b> Check the conversion</li><li><b>3</b> Open your workspace</li></ol></div>
+  <div className="import-intro"><p>Upload your records. Check the amounts and dates. Start using your books.</p><ol className="import-steps" aria-label="Import steps"><li className="active"><b>1</b> Upload your files</li><li className={preview?'active':''}><b>2</b> Check the conversion</li><li><b>3</b> Open your workspace</li></ol></div>
   <section className="import-card" aria-labelledby="upload-files-heading"><div className="import-section-heading"><div><div className="eyebrow">STEP 1</div><h2 id="upload-files-heading">Upload your business records</h2></div><span className="import-meta">USD records</span></div>
    <div className={'import-dropzone'+(dragging?' dragging':'')} onDragOver={event=>{event.preventDefault();if(!busy)setDragging(true);}} onDragLeave={()=>setDragging(false)} onDrop={event=>{event.preventDefault();setDragging(false);if(!busy)void convert(Array.from(event.dataTransfer.files));}}>
     <span className="import-upload-icon" aria-hidden="true">↥</span><h3>Drop a set of files here</h3><p>CSV, TSV, Excel, PDF, Word, photos, JSON or text.<br/>Up to 10 files · 2 MB each · 3 MB total.</p>
     <button className="primary" disabled={busy} onClick={()=>picker.current?.click()}>{busy&&workingStep==='preview'?'Converting your files…':'Choose files to convert'}</button><input ref={picker} type="file" multiple accept=".csv,.tsv,.txt,.json,.xlsx,.xls,.pdf,.docx,.png,.jpg,.jpeg,.webp" aria-label="Upload business records" hidden disabled={busy} onChange={event=>{const files=Array.from(event.target.files??[]);event.currentTarget.value='';void convert(files);}}/>
    </div>
-   <p className="import-help">Upload invoices or an accounts-receivable export to establish what customers owe. Add payment receipts and credit notes to explain reductions. Scans and photos use AI extraction when available. Check the preview; every converted row stays editable.</p>
+   <p className="import-help">Invoices show what customers owe. Payments show what arrived. Bills show what you need to pay. You can edit the conversion before importing.</p>
    {fileMessage&&<p className="import-message" role="alert">{fileMessage}</p>}
-   <div className="import-template-row"><button disabled={busy} onClick={()=>void sample()}>Try sample business files</button><span>Or download a starting point:</span><a href="/examples/import-ready/receivables.csv" download>Receivables CSV ↓</a><a href="/examples/import-ready/receipts.csv" download>Payments CSV ↓</a><a href="/examples/import-ready/bills.csv" download>Bills CSV ↓</a></div>
+   <div className="import-template-row"><button disabled={busy} onClick={()=>void sample()}>Try sample business files</button><span>Download:</span><a href="/SAMPLES/import-ready/receivables.csv" download>Invoices CSV ↓</a><a href="/SAMPLES/import-ready/receipts.csv" download>Payments CSV ↓</a><a href="/SAMPLES/import-ready/bills.csv" download>Bills CSV ↓</a></div>
   </section>
   {preview&&<>
    <section className="import-card" aria-labelledby="review-conversion-heading"><div className="import-section-heading"><div><div className="eyebrow">STEP 2</div><h2 id="review-conversion-heading">Check the converted records</h2><p>{rows.length} {rows.length===1?'record':'records'} from {sources.length} {sources.length===1?'file':'files'}. Confirm amounts, dates and invoice references before importing.</p></div><span className="import-meta">Nothing imported yet</span></div>

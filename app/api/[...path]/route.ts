@@ -4,6 +4,7 @@ import {convertFiles} from '@/lib/importer';
 import {enrichImport} from '@/lib/providers/importer-ai';
 import {importPayloadSchema} from '@/lib/contracts/import';
 import { z } from 'zod';
+import {suggestActionsWithClaude,prepareSuggestedAction} from '@/lib/providers/suggested-actions';
 import { createSession,readCase,applyCommand,saveOriginal,readOriginal,Access } from '@/lib/store';
 import { forecast } from '@/lib/finance';
 import { documentPdf,parseUpload,MAX_BYTES } from '@/lib/documents';
@@ -15,7 +16,7 @@ import { operationsCommandSchema } from '@/lib/contracts/operations';
 import {reconcileClose,parseCloseCsv} from '@/lib/close';
 import {closeCommandSchema} from '@/lib/contracts/close';
 import {claudeConfigured,reviewWithClaude} from '@/lib/providers/claude';
-import {serviceHistory,liveBackendConfigured} from '@/lib/providers/jobs';
+import {caseServiceHistory as serviceHistory,liveBackendConfigured} from '@/lib/providers/jobs';
 import {humanMessage,hasReviewEvidence} from '@/lib/ui-readiness';
 import {transition} from '@/lib/workflow';
 import {crsConfigured,crsPersonas,runCrs} from '@/lib/providers/crs';
@@ -47,13 +48,13 @@ async function poll(a:Access,c:Case){
 export async function GET(req:NextRequest){try{
  const p=req.nextUrl.pathname.slice(5).split('/').map(decodeURIComponent);const a=access(req);let c=await readCase(a);limit(a.caseId+':read',180);
  if(p[0]==='state'||p[0]==='operations')return response(view(c));
- if(p[0]==='services')return response({providers:view(c).providers,capabilities:view(c).capabilities,paidEvidenceEnabled:view(c).capabilities.paidEvidence,crsPersonas,...await serviceHistory(c.id)});
+ if(p[0]==='services')return response({providers:view(c).providers,capabilities:view(c).capabilities,paidEvidenceEnabled:view(c).capabilities.paidEvidence,crsPersonas,...await serviceHistory(c)});
  if(p[0]==='commerce'&&p[1]==='report')return paidCloseReport(req,a,c);
  if(p[0]==='investigations') {c=await poll(a,c);return response(view(c));}
  if(p[0]==='cases'&&p[1]===c.id&&p[2]==='bundle')return response(evidenceBundle(c));
  if(p[0]==='share')return response({fragment:`session=${a.caseId}.${a.token}`});
  if(p[0]==='documents'&&p[1]){const d=c.documents.find(d=>d.id===p[1]);if(!d)throw Error('Document unavailable');const bytes=await readOriginal(a,d.id)??(d.mime==='application/pdf'?await documentPdf(d.text):new TextEncoder().encode(d.text));return new NextResponse(Buffer.from(bytes),{headers:{'Content-Type':d.mime,'Content-Disposition':`inline; filename="${d.filename}"`,'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'}});}
- if(p[0]==='reports')return new NextResponse(JSON.stringify({label:'Synthetic accounting investigation and decision support',mode:c.mode,business:c.business,forecast:forecast(c),evidenceProcurement:c.evidencePurchases,serviceEvidence:await serviceHistory(c.id),settlementClose:c.close,financeOperations:operationsSummary(c),recoveryPlans:c.operations.plans,actionDrafts:c.operations.drafts,decisionRoom:c.operations.comments,executionDisclosure:'All recovery plans are conditional scenarios. Approved drafts are not sent. No money moved or external books changed.',findings:c.findings,reviewEvents:c.events,providerRuns:c.runs.map(r=>({id:r.id,mode:r.mode,providerRunId:r.providerRunId,state:r.state})),limitations:'Provider status requires actual job evidence; credential configuration alone is not verification. Sponsor eligibility and production suitability are unverified. This is not a certified audit.'},null,2),{headers:{'Content-Type':'application/json','Content-Disposition':'attachment; filename="ledgerproof-report.json"','Cache-Control':'no-store'}});
+ if(p[0]==='reports')return new NextResponse(JSON.stringify({label:'Synthetic accounting investigation and decision support',mode:c.mode,business:c.business,forecast:forecast(c),evidenceProcurement:c.evidencePurchases,serviceEvidence:await serviceHistory(c),settlementClose:c.close,financeOperations:operationsSummary(c),recoveryPlans:c.operations.plans,actionDrafts:c.operations.drafts,decisionRoom:c.operations.comments,executionDisclosure:'All recovery plans are conditional scenarios. Approved drafts are not sent. No money moved or external books changed.',findings:c.findings,reviewEvents:c.events,providerRuns:c.runs.map(r=>({id:r.id,mode:r.mode,providerRunId:r.providerRunId,state:r.state})),limitations:'Provider status requires actual job evidence; credential configuration alone is not verification. Sponsor eligibility and production suitability are unverified. This is not a certified audit.'},null,2),{headers:{'Content-Type':'application/json','Content-Disposition':'attachment; filename="ledgerproof-report.json"','Cache-Control':'no-store'}});
  return response({error:'Route not found'},404);
  }catch(error){return response({error:humanMessage(error)},400);}}
 export async function POST(req:NextRequest){try{
@@ -82,17 +83,21 @@ export async function POST(req:NextRequest){try{
  if(p[0]==='evidence'){
   if(p[1]==='wallet')return response(await prepareEvidenceWallet());
   if(p[1]==='quote'){const b=z.object({chargeId:z.string().max(100)}).parse(await body(req));const charge=c.evidencePurchases.charges.find(x=>x.id===b.chargeId);if(!charge)throw Error('Unknown investigation charge');return response(await probeExa(charge));}
-  if(p[1]==='buy'){const b=z.object({chargeId:z.string().max(100),quoteFingerprint:z.string().length(64),reason:z.string().min(1).max(500)}).parse(await body(req));const job=await buyEvidence(a,c,b.chargeId,b.quoteFingerprint,b.reason);return response({job,...await serviceHistory(c.id)});}
-  if(p[1]==='reconcile'){const b=z.object({key:z.string().length(64)}).parse(await body(req));const job=await reconcileEvidence(a,b.key);return response({job,...await serviceHistory(c.id)});}
+  if(p[1]==='buy'){const b=z.object({chargeId:z.string().max(100),quoteFingerprint:z.string().length(64),reason:z.string().min(1).max(500)}).parse(await body(req));const job=await buyEvidence(a,c,b.chargeId,b.quoteFingerprint,b.reason);return response({job,...await serviceHistory(c)});}
+  if(p[1]==='reconcile'){const b=z.object({key:z.string().length(64)}).parse(await body(req));const job=await reconcileEvidence(a,b.key);return response({job,...await serviceHistory(c)});}
   return response(view(await applyCommand(a,evidenceCommandSchema.parse(await body(req)))));
  }
  if(p[0]==='close'){
   const raw=await body(req);const command=raw.type==='close_import_csv'?closeCommandSchema.parse({...raw,type:'close_import',records:parseCloseCsv(z.string().max(40000).parse(raw.csv))}):closeCommandSchema.parse(raw);
   return response(view(await applyCommand(a,command)));
  }
- if(p[0]==='services'&&p[1]==='claude'){if(!hasReviewEvidence(c))throw Error('Add settlement records, a credit note or a bank receipt before asking for an accounting review.');const {question}=z.object({question:z.string().min(1).max(800)}).parse(await body(req));const job=await reviewWithClaude(c,question);return response({job,...await serviceHistory(c.id)});}
- if(p[0]==='services'&&p[1]==='crs'){const {personaId}=z.object({personaId:z.string().max(10),syntheticOnly:z.literal(true)}).parse(await body(req));const job=await runCrs(c.id,personaId);return response({job,...await serviceHistory(c.id)});}
- if(p[0]==='commerce'&&p[1]==='buy'){z.object({testnetOnly:z.literal(true)}).parse(await body(req));const job=await buyClosePacket(a,c,req.nextUrl.origin);return response({job,...await serviceHistory(c.id)});}
+ if(p[0]==='services'&&p[1]==='actions'){
+  if(p[2]==='record'){const b=z.object({jobKey:z.string().length(64),actionId:z.string().min(1).max(60),contact:z.string().max(120)}).parse(await body(req));const history=await serviceHistory(c);const job=history.jobs.find((job:{key:string})=>job.key===b.jobKey);if(!job)throw Error('Choose a suggestion from this workspace.');const packet=prepareSuggestedAction(c,{...job,caseId:c.id},b.actionId,b.contact);const updated=await applyCommand(a,{type:'ops_comment',role:'owner',text:packet.text,requestKey:packet.requestKey});return response({...view(updated),reference:packet.reference});}
+  const job=await suggestActionsWithClaude(c);return response({job,...await serviceHistory(c)});
+ }
+ if(p[0]==='services'&&p[1]==='claude'){if(!hasReviewEvidence(c))throw Error('Add settlement records, a credit note or a bank receipt before asking for an accounting review.');const {question}=z.object({question:z.string().min(1).max(800)}).parse(await body(req));const job=await reviewWithClaude(c,question);return response({job,...await serviceHistory(c)});}
+ if(p[0]==='services'&&p[1]==='crs'){const {personaId}=z.object({personaId:z.string().max(10),syntheticOnly:z.literal(true)}).parse(await body(req));const job=await runCrs(c.id,personaId);return response({job,...await serviceHistory(c)});}
+ if(p[0]==='commerce'&&p[1]==='buy'){z.object({testnetOnly:z.literal(true)}).parse(await body(req));const job=await buyClosePacket(a,c,req.nextUrl.origin);return response({job,...await serviceHistory(c)});}
  if(p[0]==='commerce'&&p[1]==='faucet'){z.object({testnetOnly:z.literal(true)}).parse(await body(req));return response({job:await fundDemoBuyer()});}
  if(p[0]==='operations'){const command=operationsCommandSchema.parse(await body(req));return response(view(await applyCommand(a,command)));}
  if(p[0]==='demo'&&p[1]==='reset')return response(view(await applyCommand(a,{type:'reset'})));

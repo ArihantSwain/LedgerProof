@@ -11,7 +11,7 @@ export function importWorkspace(original:Case,cmd:ImportCommand,now:number):Case
  if(cmd.expectedRevision!==original.revision)throw Error('The records changed during conversion. Refresh and review before importing.');
  if(cmd.mode==='append'&&(cmd.openingCashCents!==original.business.openingCashCents||cmd.startDate!==original.business.startDate))throw Error('Choose the existing opening cash and forecast date when adding records, or replace the workspace.');
  const c:Case=structuredClone(original),replace=cmd.mode==='replace';
- if(replace){Object.assign(c,{generation:c.generation+1,invoices:[],receipts:[],credits:[],documents:[],obligations:[],entries:[],scenarios:[],findings:[],proposals:[],runs:[],events:[],decisions:{},operations:emptyOperations(),close:emptyClose(),evidencePurchases:emptyEvidence()});}
+ if(replace){Object.assign(c,{generation:c.generation+1,createdAt:now,invoices:[],receipts:[],credits:[],documents:[],obligations:[],entries:[],scenarios:[],findings:[],proposals:[],runs:[],events:[],decisions:{},operations:emptyOperations(),close:emptyClose(),evidencePurchases:emptyEvidence()});}
  else {c.findings=[];c.proposals=c.proposals.filter(p=>p.status!=='pending');c.operations={...c.operations,version:c.operations.version+1};}
  c.business={...c.business,id:replace?'imported-business':c.business.id,displayName:cmd.businessName,openingCashCents:cmd.openingCashCents,startDate:cmd.startDate};
  const sources=new Map(cmd.sources.map(s=>[s.id,s]));if(sources.size!==cmd.sources.length)throw Error('Each uploaded source needs a unique ID.');

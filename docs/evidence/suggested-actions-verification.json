@@ -1,0 +1,28 @@
+{
+  "verifiedAt": "2026-10-25T10:53:04.641Z",
+  "source": "Actual local production build with live Convex and Anthropic",
+  "checks": [
+    "Real Claude returned source-bound chargeback preparation and collection suggestions",
+    "Database serialization preserves current snapshot binding",
+    "Actual record endpoint persisted a draft with sample contact",
+    "Note survives page reload",
+    "No refund, bank submission, call or journal was executed",
+    "Search by fictional customer name displays real saved CRS sandbox score 540 without a new pull"
+  ],
+  "jobKey": "5af2f4c3fe772b1fef9148a3687ae352023c2e53d54450255de3dd21bf309d10",
+  "chargedMicros": 11950,
+  "claudeBudget": {
+    "callCap": 50,
+    "calls": 7,
+    "capMicros": 5000000,
+    "chargedMicros": 101056,
+    "reservedMicros": 0,
+    "scope": "This Convex deployment only; other API clients and provider billing are outside this counter."
+  },
+  "chargebackSources": [
+    "doc-duplicate-vendor",
+    "kitchen-subscription-1",
+    "kitchen-subscription-2"
+  ],
+  "caseGeneration": 1
+}

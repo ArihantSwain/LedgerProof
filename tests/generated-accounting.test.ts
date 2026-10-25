@@ -1,0 +1,31 @@
+process.env.LEDGERPROOF_OFFLINE_REHEARSAL='true';
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createFixture,createRecordingFixture} from '../fixtures/agency';
+import {forecast,outstanding,plusDays,validateEntry} from '../lib/finance';
+import {transition} from '../lib/workflow';
+import {localRehearsal} from '../lib/investigation';
+import {parseCloseCsv,reconcileClose} from '../lib/close';
+import {convertFiles} from '../lib/importer';
+import {actionSnapshot,actionSnapshotMatches} from '../lib/action-snapshot';
+const now=1792886400000;
+function number(seed:number,max:number){return ((Math.imul(seed+17,1664525)+1013904223)>>>0)%max;}
+for(let seed=0;seed<500;seed++){
+ test(`generated forecast ${seed}: dated cash conservation across all 13 weeks`,()=>{
+  const c=createFixture('forecast-'+seed,now);c.invoices=[{...c.invoices[0],amountCents:1+number(seed,50_000_000),expectedDate:plusDays(c.business.startDate,(seed%151)-30)}];c.receipts=[];c.credits=[];c.entries=[];c.obligations=[{...c.obligations[0],amountCents:1+number(seed+1,5_000_000),date:plusDays(c.business.startDate,(seed*7%121)-10)}];c.business.openingCashCents=number(seed+2,20_000_000);const original=JSON.stringify(c);const f=forecast(c);let cash=c.business.openingCashCents;
+  for(let week=0;week<13;week++){const start=week*7,end=start+7,collectionDay=(seed%151)-30,expenseDay=(seed*7%121)-10;const incoming=collectionDay<91&&Math.max(0,collectionDay)>=start&&Math.max(0,collectionDay)<end?c.invoices[0].amountCents:0;const outgoing=expenseDay>=start&&expenseDay<end?c.obligations[0].amountCents:0;assert.equal(f.weeks[week].openingCents,cash);cash+=incoming-outgoing;assert.equal(f.weeks[week].closingCents,cash);assert.ok(Number.isSafeInteger(cash));}assert.equal(JSON.stringify(c),original);
+ });
+ test(`generated correction ${seed}: source review, balanced posting and replay protection`,()=>{
+  let c=createFixture('credit-'+seed,now);const amountCents=1+number(seed,2_000_000);c=transition(c,{type:'upload_credit',document:{id:'credit-doc',filename:'credit.pdf',mime:'application/pdf',sha256:'generated-'+seed,text:'Issued credit',uploadedAt:now,kind:'credit_note'},credit:{id:'credit',invoiceId:'invoice-0',amountCents,date:'2026-10-26',evidenceId:'credit-doc',approved:false}},now);const originalEntries=c.entries.length;
+  c=transition(c,{type:'start_run',run:{id:'review',inputVersion:c.inputVersion,generation:c.generation,mode:'LOCAL_REHEARSAL',state:'queued',startedAt:now}},now);c=transition(c,{type:'apply_result',runId:'review',generation:c.generation,result:localRehearsal(c)},now);assert.equal(c.entries.length,originalEntries);assert.equal(outstanding(c,'invoice-0'),2_000_000);const proposal=c.proposals.find(p=>p.kind==='credit')!;const command={type:'decision' as const,proposalId:proposal.id,status:'approved' as const,reason:'Reviewed the original credit.',expectedLedgerVersion:c.ledgerVersion,requestKey:'generated-review-'+seed};c=transition(c,command,now);assert.equal(outstanding(c,'invoice-0'),2_000_000-amountCents);assert.equal(forecast(c).weeks[1].closingCents,1_600_000-amountCents);validateEntry(c.entries.at(-1)!);assert.equal(transition(c,command,now).entries.length,c.entries.length);
+ });
+ test(`generated settlement ${seed}: conserve processor cash and reject unexplained differences`,()=>{
+  let c=createFixture('settlement-'+seed,now);const fee=1+number(seed,50000),refund=1+number(seed+1,200000),gross=refund+fee+100+number(seed+2,10_000_000),net=gross-refund-fee,variance=seed%2;const csv=`id,kind,date,amountCents,reference\nbank,bank,2026-10-27,${net+variance},batch\nsale,charge,2026-10-27,${gross},batch\nrefund,refund,2026-10-27,${refund},batch\nfee,fee,2026-10-27,${fee},batch`;c=transition(c,{type:'close_import',records:parseCloseCsv(csv),expectedCloseVersion:1,requestKey:'generated-import-'+seed},now);const result=reconcileClose(c.close).banks[0];assert.equal(result.status,variance?'variance':'ready');const command={type:'close_approve' as const,bankId:'bank',batchId:'batch',reason:'Source amounts checked.',expectedCloseVersion:c.close.version,requestKey:'generated-close-'+seed};if(variance)assert.throws(()=>transition(c,command,now),/not uniquely/);else{c=transition(c,command,now);const journal=c.close.postings[0];assert.equal(journal.lines.reduce((sum,line)=>sum+line.debitCents-line.creditCents,0),0);assert.equal(transition(c,command,now).close.postings.length,1);}assert.equal(forecast(c).weeks[1].closingCents,1_600_000);
+ });
+ test(`generated import ${seed}: quoted customer names, dates and cent precision survive conversion`,async()=>{
+  const amount=1+number(seed,20_000_000),customer=`Store ${seed}, "Main Street"`,date=plusDays('2026-10-01',seed%90);const csv=`Invoice Number,Customer,Date,Due Date,Amount,Currency\nIMPORT-${seed},"${customer.replaceAll('"','""')}",${date},${plusDays(date,14)},${(amount/100).toFixed(2)},USD\n`;const data=await convertFiles([{name:'business.csv',type:'text/csv',bytes:new TextEncoder().encode(csv)}]);assert.equal(data.rows.length,1);assert.equal(data.rows[0].counterparty,customer);assert.equal(data.rows[0].amountCents,amount);assert.equal(data.rows[0].date,date);assert.equal(data.rows[0].dueDate,plusDays(date,14));assert.equal(data.rows[0].sourceId,data.sources[0].id);
+ });
+ test(`generated reset ${seed}: discard work, late results and stale action bindings`,()=>{
+  let c=createRecordingFixture('reset-'+seed,now);c=transition(c,{type:'ops_comment',role:'owner',text:'private-work-'+seed,requestKey:'generated-note-'+seed},now);const oldSnapshot=actionSnapshot(c),oldResult=localRehearsal(c);c=transition(c,{type:'start_run',run:{id:'old-run',inputVersion:c.inputVersion,generation:c.generation,mode:'CREAO',state:'running',startedAt:now}},now);const generation=c.generation;c=transition(c,{type:'reset'},now+seed+1);assert.equal(c.generation,generation+1);assert.equal(c.operations.comments.length,0);assert.equal(c.operations.shocks.length,0);assert.equal(c.proposals.length,0);assert.equal(c.runs.length,0);assert.equal(actionSnapshotMatches(oldSnapshot,c),false);assert.deepEqual(transition(c,{type:'apply_result',runId:'old-run',generation,result:oldResult},now+seed+2),c);assert.equal(forecast(c).weeks[1].closingCents,1_600_000);
+ });
+}

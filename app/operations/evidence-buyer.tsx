@@ -13,7 +13,7 @@ export function EvidenceBuyer({c,api,run,busy,onChange}:{c:Case;api:Api;run:(fn:
  useEffect(()=>{let active=true;void api('services').then(value=>{if(active)setHistory(value);}).catch(()=>{if(active)setMessage('Live checks are temporarily unavailable. You can still add and review local evidence.');});return()=>{active=false;};},[c.id]);
  useEffect(()=>{setQuote(undefined);setLocal(charge?.localEvidence??'');setMessage('');},[charge?.id]);
  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),10000);return()=>clearInterval(timer);},[]);
- const jobs=(history?.jobs??[]).filter((job:any)=>job.provider==='x402_evidence');const cached=jobs.find((job:any)=>job.state==='completed'&&job.result?.generation===c.generation&&job.result?.charge?.merchantId===charge?.merchantId);
+ const jobs=(history?.jobs??[]).filter((job:any)=>job.provider==='x402_evidence'&&job.result?.generation===c.generation);const cached=jobs.find((job:any)=>job.state==='completed'&&job.result?.generation===c.generation&&job.result?.charge?.merchantId===charge?.merchantId);
  const chargeAmount=amountInCents(amount,false,100000000),chargeReady=!!description.trim()&&chargeAmount!==null&&validDate(date)&&c.evidencePurchases.charges.length<30;
  const quoteReady=!!history?.capabilities?.quote&&!!need?.needsPurchase&&!cached;
  const budget=history?.evidenceBudget,budgetReady=!!budget&&budget.calls<10&&budget.chargedAtomic+budget.reservedAtomic+10000<=budget.capAtomic;

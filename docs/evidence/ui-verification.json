@@ -1,0 +1,31 @@
+{
+  "verifiedAt": "2026-10-25T11:02:14.531684+00:00",
+  "unitTests": {
+    "passed": 2581,
+    "generatedFinancialScenarios": 2500
+  },
+  "convexTests": {
+    "passed": 7
+  },
+  "browserTests": {
+    "passed": 24,
+    "separateEndUsers": 2
+  },
+  "productionBuild": "passed",
+  "checks": [
+    "Two independent users retain separate records",
+    "Shared notes synchronize between two users",
+    "Reset clears uploaded credit, investigations, proposals, shocks and notes for both shared users",
+    "Mobile reset restores the original cash forecast",
+    "Old polling responses cannot overwrite newer data",
+    "Transient errors clear on page navigation",
+    "Multi-file imports preserve originals and review editable rows",
+    "Hidden native file picker stays hidden",
+    "All sample archive entries and checksums match",
+    "Live Claude action draft and saved CRS name search verified separately"
+  ],
+  "sampleDataDirectory": "SAMPLES",
+  "sampleArchiveSha256": "2a626093df072c50733814bc5a7097d7d8edcb289389b4b7e9d5b5a5cebd30ac",
+  "paidEvidencePurchased": false,
+  "credentialsCommitted": false
+}

@@ -13,3 +13,6 @@ playwright-report/
 .mcp.json
 .cursor/mcp.json
 .vscode/mcp.json
+
+# Static sample assets are copied from SAMPLES before dev/build.
+/public/SAMPLES/
