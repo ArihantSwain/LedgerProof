@@ -9,7 +9,7 @@ import { createSession,readCase,applyCommand,saveOriginal,readOriginal,Access } 
 import { forecast } from '@/lib/finance';
 import { documentPdf,parseUpload,MAX_BYTES } from '@/lib/documents';
 import { localRehearsal,evidenceBundle } from '@/lib/investigation';
-import { creaoConfigured,startInvestigation,getInvestigation,ProviderResultError } from '@/lib/providers/creao';
+import { creaoConfigured,startInvestigation,getInvestigation,investigationDigest,ProviderResultError } from '@/lib/providers/creao';
 import { Case,Run } from '@/lib/contracts';
 import { operationsSummary } from '@/lib/operations';
 import { operationsCommandSchema } from '@/lib/contracts/operations';
@@ -113,7 +113,7 @@ export async function POST(req:NextRequest){try{
  if(p[0]==='investigations'||p[0]==='findings'){
   const b=z.object({mode:z.enum(['CREAO','LOCAL_REHEARSAL']).default('CREAO'),question:z.string().max(1000).optional(),injectTimeout:z.boolean().optional(),resumeRunId:z.string().optional()}).parse(await body(req));
   if(b.resumeRunId){const r=c.runs.find(r=>r.id===b.resumeRunId);if(!r)throw Error('Run unavailable');if(r.mode==='LOCAL_REHEARSAL'&&r.state==='retry_scheduled')c=await applyCommand(a,{type:'apply_result',runId:r.id,generation:r.generation,result:localRehearsal(c)});else c=await poll(a,c);return response(view(c));}
-  const run:Run={id:randomUUID(),inputVersion:c.inputVersion,generation:c.generation,mode:b.mode,sourceVersions:{ledgerVersion:c.ledgerVersion,operationsVersion:c.operations.version,closeVersion:c.close.version},state:b.mode==='CREAO'&&!view(c).capabilities.hostedInvestigation?'blocked':'queued',startedAt:Date.now(),challenge:b.question};
+  const run:Run={id:randomUUID(),inputVersion:c.inputVersion,generation:c.generation,mode:b.mode,sourceVersions:{ledgerVersion:c.ledgerVersion,operationsVersion:c.operations.version,closeVersion:c.close.version},inputDigest:investigationDigest(c,b.question),state:b.mode==='CREAO'&&!view(c).capabilities.hostedInvestigation?'blocked':'queued',startedAt:Date.now(),challenge:b.question};
   if(run.state==='blocked')run.error='CREAO hosted execution unavailable. Configure agent ID, API key, and verify the v2 contract. Local rehearsal is separate and does not satisfy the mandatory integration.';
   c=await applyCommand(a,{type:'start_run',run});
   if(run.state==='blocked')return response(view(c));
