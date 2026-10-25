@@ -1,7 +1,7 @@
 {
-  "verifiedAt": "2026-10-25T11:02:14.531684+00:00",
+  "verifiedAt": "2026-10-25T11:27:15.966841+00:00",
   "unitTests": {
-    "passed": 2581,
+    "passed": 2584,
     "generatedFinancialScenarios": 2500
   },
   "convexTests": {
@@ -22,7 +22,10 @@
     "Multi-file imports preserve originals and review editable rows",
     "Hidden native file picker stays hidden",
     "All sample archive entries and checksums match",
-    "Live Claude action draft and saved CRS name search verified separately"
+    "Live Claude action draft and saved CRS name search verified separately",
+    "Captured CREAO numeric-version and record-citation output passes source validation",
+    "Known provider run can be retrieved again without a new submission",
+    "Long findings, repeated source buttons and earlier runs are condensed"
   ],
   "sampleDataDirectory": "SAMPLES",
   "sampleArchiveSha256": "2a626093df072c50733814bc5a7097d7d8edcb289389b4b7e9d5b5a5cebd30ac",

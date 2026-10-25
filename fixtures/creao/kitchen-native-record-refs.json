@@ -1,0 +1,295 @@
+{
+  "bundle_version": 1,
+  "generated_at": "2026-10-26T00:00:00Z",
+  "counts": {
+    "by_category": {
+      "duplicate_invoice_posting": 1,
+      "partial_payment": 1,
+      "unmatched_receipt": 2,
+      "evidence_conflict": 3,
+      "missing_evidence": 1
+    }
+  },
+  "totals": {
+    "amount_flagged_usd": 80798.0,
+    "findings_total": 8,
+    "amount_components": [
+      {
+        "finding_id": "F-001",
+        "stated_amount_usd": 5000.0,
+        "basis": "duplicated stated invoice amount (500000 cents), counted once"
+      },
+      {
+        "finding_id": "F-002",
+        "stated_amount_usd": 3000.0,
+        "basis": "stated invoice amount INV-003; residual shown as arithmetic"
+      },
+      {
+        "finding_id": "F-003",
+        "stated_amount_usd": 500.0,
+        "basis": "stated bank receipt amount (50000 cents)"
+      },
+      {
+        "finding_id": "F-004",
+        "stated_amount_usd": 20000.0,
+        "basis": "stated invoice amount INV-A (2000000 cents)"
+      },
+      {
+        "finding_id": "F-006",
+        "stated_amount_usd": 52000.0,
+        "basis": "stated distribution amount (5200000 cents); opening 2000000 cents referenced but not added"
+      },
+      {
+        "finding_id": "F-007",
+        "stated_amount_usd": 298.0,
+        "basis": "sum of two stated charges (14900 + 14900 cents)"
+      }
+    ],
+    "note": "Sum of stated amounts at issue, with duplicated amounts counted once. This is arithmetic over stated figures, not a valuation, exposure estimate or probability."
+  },
+  "coverage": {
+    "record_counts": {
+      "invoices": 10,
+      "bank_receipts": 10,
+      "credit_notes": 0,
+      "ledger_entries": 22,
+      "evidence_documents": 13
+    },
+    "records_without_document_text": {
+      "count": 22,
+      "detail": "All 22 ledger entries are represented only by the aggregated doc-ledger CSV; no per-entry document exists. The 10 bank receipts are represented only by the doc-bank CSV; no per-receipt remittance or deposit slip exists. All 10 invoices do carry extracted document text (doc-inv-0 to doc-inv-9)."
+    },
+    "records_unable_to_assess": [
+      {
+        "record_ids": [
+          "receipt-unmatched"
+        ],
+        "reason": "posting status and clearing status cannot be established from the bundle"
+      },
+      {
+        "record_ids": [
+          "doc-returned-payment"
+        ],
+        "reason": "scenario note only; no bank return advice or customer confirmation supplied"
+      },
+      {
+        "record_ids": [
+          "doc-duplicate-vendor"
+        ],
+        "reason": "claim that both charges sit inside opening cash cannot be traced to any ledger entry"
+      },
+      {
+        "record_ids": [
+          "invoice-0"
+        ],
+        "reason": "no receipt or payment evidence in either direction"
+      }
+    ],
+    "checks_run": [
+      "A duplicate invoice postings",
+      "B unapplied issued credit notes",
+      "C unmatched receipts (both directions)",
+      "D partial payments",
+      "E evidence conflicts and missing evidence"
+    ],
+    "checks_with_no_findings": [
+      "B unapplied issued credit notes - creditNotes array is empty (0 records supplied), so no issued credit note exists in this bundle to apply or test; no reduction to receivables is proposed"
+    ]
+  },
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "category": "duplicate_invoice_posting",
+      "title": "INV-005 Fieldwork Co. posted to receivables twice from the same source document",
+      "parties": [
+        "Fieldwork Co."
+      ],
+      "amount_usd": 5000.0,
+      "currency": "USD",
+      "evidence_ids": [
+        "doc-inv-4",
+        "doc-ledger",
+        "receipt-4"
+      ],
+      "source_pages": [],
+      "facts": "doc-inv-4 states INV-005, Fieldwork Co., 500000 cents, issued 2026-10-01, due 2027-02-01. doc-ledger contains entry-invoice-4 (sourceReference doc-inv-4) debiting accounts_receivable 500000 / crediting service_revenue 500000, and a second entry, entry-duplicate (sourceReference also doc-inv-4, effectiveDate 2026-10-01), with an identical 500000 debit to accounts_receivable and 500000 credit to service_revenue. Both entries match on source reference, invoice number reference, party, amount, date and account pair. The 500000 receipt (receipt-4, doc-bank, 2026-10-20) is posted once, as entry-receipt-4. Total accounts_receivable debits in doc-ledger are 7900000 cents against 7400000 cents of invoices in the bundle (sum of stated invoice amounts); accounts_receivable balance per doc-ledger is 2700000 cents versus 2200000 cents expected from stated invoices less posted receipts (arithmetic: 7400000 - 5200000).",
+      "discrepancy": "The 500000-cent receivable for INV-005 is recorded twice, leaving accounts_receivable overstated by 500000 cents. Revenue is likewise credited twice. No field in the bundle distinguishes the second entry as a separate legitimate charge.",
+      "open_questions": [
+        "Was entry-duplicate created manually, or by a re-import of doc-inv-4?",
+        "Does a second, separate Fieldwork Co. invoice for 500000 cents exist that is simply missing from the bundle?"
+      ],
+      "review_status": "needs_human_review",
+      "proposed_review_step": "A human should trace entry-duplicate to its originating import or journal batch and confirm against the Fieldwork Co. document set before any correction is recorded."
+    },
+    {
+      "finding_id": "F-002",
+      "category": "partial_payment",
+      "title": "INV-003 Northline Partners only partly settled by posted receipts",
+      "parties": [
+        "Northline Partners"
+      ],
+      "amount_usd": 3000.0,
+      "currency": "USD",
+      "evidence_ids": [
+        "doc-inv-2",
+        "doc-bank",
+        "receipt-2",
+        "receipt-unmatched"
+      ],
+      "source_pages": [],
+      "facts": "doc-inv-2 states INV-003, Northline Partners, 300000 cents. doc-bank shows receipt-2 of 100000 cents (2026-10-20, posted; entry-receipt-2 credits accounts_receivable 100000) and receipt-unmatched of 50000 cents (2026-10-21, posted=false, no corresponding ledger entry). Posted receipts against INV-003 total 100000 cents. Residual on posted basis is 200000 cents (arithmetic: 300000 - 100000); residual if the unposted 50000 cents is counted is 150000 cents (arithmetic: 300000 - 100000 - 50000).",
+      "discrepancy": "The invoice is not fully settled by posted cash: 200000 cents of the stated 300000 cents remains unmatched to any posted receipt. The intended allocation of the separate 50000-cent receipt to INV-003 is unconfirmed.",
+      "open_questions": [
+        "Is the 50000-cent receipt-unmatched a partial payment of INV-003, a payment of another invoice, or a mis-keyed amount?",
+        "Is the remaining 200000 cents disputed, on a payment plan, or simply not yet paid?"
+      ],
+      "review_status": "needs_human_review",
+      "proposed_review_step": "A human should confirm the customer remittance advice for both the 100000-cent and 50000-cent receipts before deciding whether the residual is collectable."
+    },
+    {
+      "finding_id": "F-003",
+      "category": "unmatched_receipt",
+      "title": "Bank receipt of 50000 cents for INV-003 has no ledger posting",
+      "parties": [
+        "Northline Partners"
+      ],
+      "amount_usd": 500.0,
+      "currency": "USD",
+      "evidence_ids": [
+        "doc-bank",
+        "receipt-unmatched",
+        "doc-ledger",
+        "doc-inv-2"
+      ],
+      "source_pages": [],
+      "facts": "doc-bank lists externalId receipt-unmatched, invoiceNumber INV-003, postedDate 2026-10-21, amountCents 50000. In the bundle this record is posted=false and no entry-receipt-unmatched exists in doc-ledger; cash and accounts_receivable therefore do not reflect it. The invoiceNumber key resolves to invoice-2 (INV-003 Northline Partners, 300000 cents) in doc-inv-2. Cash per doc-ledger is 2000000 cents (7200000 debits less 5200000 credits), which equals the stated opening cash of 2000000 cents and excludes this 50000 cents.",
+      "discrepancy": "A cash receipt present in bank evidence is absent from the ledger: 50000 cents of cash and the related accounts_receivable credit are unposted. Matching failed on posting status, not on the invoice-number key.",
+      "open_questions": [
+        "Is receipt-unmatched a genuine cleared deposit or a pending/returned item?",
+        "Which invoice or customer credit should it be applied to, and does a remittance advice exist?"
+      ],
+      "review_status": "needs_human_review",
+      "proposed_review_step": "A human should pull the bank statement line behind receipt-unmatched and confirm clearing status before any entry is prepared."
+    },
+    {
+      "finding_id": "F-004",
+      "category": "unmatched_receipt",
+      "title": "INV-A (20000 USD) has no receipt anywhere in the bundle and is reported returned unpaid",
+      "parties": [
+        "Ricky Dalton (CRS sandbox customer)"
+      ],
+      "amount_usd": 20000.0,
+      "currency": "USD",
+      "evidence_ids": [
+        "doc-inv-0",
+        "doc-ledger",
+        "doc-bank",
+        "doc-returned-payment"
+      ],
+      "source_pages": [],
+      "facts": "doc-inv-0 states INV-A, Ricky Dalton, 2000000 cents, issued 2026-10-01, due 2026-11-01; doc-ledger contains entry-invoice-0 debiting accounts_receivable 2000000 cents. doc-bank contains no line referencing INV-A, and doc-ledger contains no receipt entry for invoice-0. doc-returned-payment (a fictional recorded scenario) states the customer payment was returned unpaid, that no receipt or cash posting exists, and that revised expected collection is 2026-11-09 subject to customer confirmation. The full 2000000 cents therefore remains in accounts_receivable per doc-ledger.",
+      "discrepancy": "The receivable is recorded but no cash evidence exists in either direction: there is no receipt for INV-A and no returned-payment advice (bank line, debit memo, or customer notice) in the bundle. The collection date in the invoice record and the scenario note disagree (see F-005).",
+      "open_questions": [
+        "Is there a bank return/chargeback advice for the returned payment, and what is its exact amount and date?",
+        "Has the customer confirmed the 2026-11-09 collection date in writing?",
+        "Can the receivable still be collected, or is it disputed?"
+      ],
+      "review_status": "needs_human_review",
+      "proposed_review_step": "A human should obtain the bank's return notice and a written customer confirmation before relying on either collection date; nothing in the bundle should be treated as cash."
+    },
+    {
+      "finding_id": "F-005",
+      "category": "evidence_conflict",
+      "title": "INV-A expected collection date conflicts: 2026-10-28 in the invoice record versus 2026-11-09 in the returned-payment note",
+      "parties": [
+        "Ricky Dalton (CRS sandbox customer)"
+      ],
+      "currency": "USD",
+      "evidence_ids": [
+        "doc-inv-0",
+        "doc-returned-payment"
+      ],
+      "source_pages": [],
+      "facts": "The bundle's invoice-0 record carries expectedDate 2026-10-28 while doc-inv-0 states only issue 2026-10-01 and due 2026-11-01. doc-returned-payment states the original forecast relied on INV-A arriving 2026-10-28 and that the revised expected collection is 2026-11-09, subject to customer confirmation. No document supplies customer confirmation of either date, and the note itself is labelled a fictional recording scenario.",
+      "discrepancy": "Two expected collection dates (2026-10-28 and 2026-11-09) refer to the same 2000000-cent receivable. The bundle does not establish which is current, and the revised date is explicitly unconfirmed. No amount is flagged separately for this finding because it concerns the same receivable already reported in F-004.",
+      "open_questions": [
+        "Which date should drive the forecast, and what evidence supports it?",
+        "Is the returned-payment note derived from a bank advice, a customer message, or an internal estimate?"
+      ],
+      "review_status": "needs_human_review",
+      "proposed_review_step": "A human should reconcile the two dates to primary evidence (bank advice plus customer written confirmation) and record which one the forecast uses."
+    },
+    {
+      "finding_id": "F-006",
+      "category": "missing_evidence",
+      "title": "52000 USD cash distribution and 20000 USD opening cash cite only the ledger itself",
+      "parties": [
+        "Cedar Kitchen"
+      ],
+      "amount_usd": 52000.0,
+      "currency": "USD",
+      "evidence_ids": [
+        "doc-ledger"
+      ],
+      "source_pages": [],
+      "facts": "doc-ledger contains historical-distribution (effectiveDate 2026-10-23) debiting opening_equity 5200000 cents and crediting cash 5200000 cents, with sourceReference doc-ledger. The opening entry likewise debits cash 2000000 cents with sourceReference doc-ledger. Both are self-referencing: no bank statement, distribution authorization, or owner-resolution document for either amount exists among the supplied evidence. The 5200000-cent distribution exactly equals the 5200000 cents of posted receipts in doc-ledger (200000 + 100000 + 400000 + 500000 + 600000 + 700000 + 800000 + 900000 + 1000000).",
+      "discrepancy": "A cash movement of 5200000 cents and the 2000000-cent opening balance are unsupported by any primary document in the bundle. Cash per doc-ledger (2000000 cents) cannot be verified against a bank statement, and the coincidence of the distribution amount with total receipts is unexplained.",
+      "open_questions": [
+        "Is there a bank statement or transfer confirmation for the 5200000-cent distribution?",
+        "Was the distribution authorized, and does it match the exact sum of receipts by coincidence or by design?",
+        "Does a bank statement confirm the 2000000-cent opening cash balance?"
+      ],
+      "review_status": "needs_human_review",
+      "proposed_review_step": "A human should obtain the bank statement covering 2026-10-01 to 2026-10-23 and the distribution authorization before treating the 2000000-cent cash figure as reliable."
+    },
+    {
+      "finding_id": "F-007",
+      "category": "evidence_conflict",
+      "title": "Two identical 149 USD KitchenOps charges with an unverified claim they are already in opening cash",
+      "parties": [
+        "PADDLE.NET KitchenOps"
+      ],
+      "amount_usd": 298.0,
+      "currency": "USD",
+      "evidence_ids": [
+        "doc-duplicate-vendor",
+        "doc-ledger"
+      ],
+      "source_pages": [],
+      "facts": "doc-duplicate-vendor lists kitchen-subscription-1 and kitchen-subscription-2, both dated 2026-10-24, both described 'PADDLE.NET KitchenOps subscription', both 14900 cents. The note states they may be duplicate billing or separate subscriptions, that no fraud conclusion is established, and that they are already within the opening cash snapshot and must not be deducted again. doc-ledger contains no entry referencing either transactionId, no software or subscription expense account, and no 14900 or 29800 cent amount anywhere.",
+      "discrepancy": "The note asserts both charges are already inside the opening cash snapshot, but doc-ledger shows no posting for them at all, so the assertion cannot be verified from the bundle and the expense appears unrecorded. Whether the two charges are duplicates is unresolved in the evidence. Amount shown is the sum of the two stated charges (arithmetic: 14900 + 14900).",
+      "open_questions": [
+        "Are these two charges one subscription billed twice or two distinct subscriptions?",
+        "If they are already inside the opening balance, where is that represented, and if not, are they missing from the ledger?",
+        "Do vendor invoices or the PADDLE.NET billing portal support two separate subscriptions?"
+      ],
+      "review_status": "needs_human_review",
+      "proposed_review_step": "A human should check the PADDLE.NET billing portal for two distinct subscription IDs and confirm with the bank statement whether both charges cleared, before deducting or reversing anything."
+    },
+    {
+      "finding_id": "F-008",
+      "category": "evidence_conflict",
+      "title": "Ledger effective dates (2026-10-01 to 2026-10-23) precede the stated business start date of 2026-10-26",
+      "parties": [
+        "Cedar Kitchen"
+      ],
+      "currency": "USD",
+      "evidence_ids": [
+        "doc-ledger",
+        "doc-inv-0",
+        "doc-returned-payment"
+      ],
+      "source_pages": [],
+      "facts": "The bundle's business record states startDate 2026-10-26 and openingCashCents 2000000. doc-ledger entries range from 2026-10-01 (opening, invoice postings) through 2026-10-20 (receipts), 2026-10-23 (historical-distribution), and doc-returned-payment refers to 2026-10-28 and 2026-11-09 events. doc-inv-0 and all nine other invoice documents are issued 2026-10-01. Every ledger date therefore falls before the stated start date. No amount is flagged separately for this finding because the amounts are already reported in F-001, F-004 and F-006.",
+      "discrepancy": "The reporting period implied by the business metadata (from 2026-10-26) does not contain any of the supplied ledger activity, and the opening balance date is 25 days earlier than the stated start. Either the start date is a re-open or migration date rather than a period start, or one of the two dates is wrong.",
+      "open_questions": [
+        "Is startDate 2026-10-26 the audit period start, an entity formation date, or a migration date?",
+        "Which period should the receivables audit be scoped to?"
+      ],
+      "review_status": "needs_human_review",
+      "proposed_review_step": "A human should confirm the intended audit period with the finance owner and restate the period boundary consistently before the report is used downstream."
+    }
+  ],
+  "blockers": [],
+  "disclaimer": "Findings only. The bundle was not modified, no ledger entry was posted, no correction was approved or applied, no customer or vendor was contacted, and no funds moved."
+}
