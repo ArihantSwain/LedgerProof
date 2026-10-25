@@ -1,0 +1,15 @@
+{
+  "verifiedAt": "2026-10-25T11:35:30.887Z",
+  "commit": "7989dd3",
+  "status": "CLEAN_CHECKOUT_VERIFIED",
+  "environmentFilePresent": false,
+  "checks": [
+    "npm ci installed exact lockfile",
+    "npm run demo prepared sample assets and started",
+    "Repair and sample investigation connected to the cash forecast",
+    "Unavailable live tools stayed disabled",
+    "Reset restored original cash",
+    "Sample CSV converted and ZIP downloaded"
+  ],
+  "unexpectedBrowserErrors": []
+}

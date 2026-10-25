@@ -1,0 +1,146 @@
+{
+  "verifiedAt": "2026-10-25T11:25:10.731Z",
+  "providerRunId": "26e27d25-ec77-4b57-9e35-39fb3d4c0ad1",
+  "requestDigestPersisted": true,
+  "findings": 8,
+  "result": {
+    "schemaVersion": "1",
+    "inputVersion": 1,
+    "findings": [
+      {
+        "type": "duplicate_invoice",
+        "affectedRecordIds": [
+          "receipt-4",
+          "entry-invoice-4",
+          "entry-duplicate",
+          "entry-receipt-4",
+          "invoice-4"
+        ],
+        "evidenceRefs": [
+          "doc-inv-4",
+          "doc-ledger",
+          "doc-bank"
+        ],
+        "explanation": "INV-005 Fieldwork Co. posted to receivables twice from the same source document\ndoc-inv-4 states INV-005, Fieldwork Co., 500000 cents, issued 2026-10-01, due 2027-02-01. doc-ledger contains entry-invoice-4 (sourceReference doc-inv-4) debiting accounts_receivable 500000 / crediting service_revenue 500000, and a second entry, entry-duplicate (sourceReference also doc-inv-4, effectiveDate 2026-10-01), with an identical 500000 debit to accounts_receivable and 500000 credit to service_revenue. Both entries match on source reference, invoice number reference, party, amount, date and account pair. The 500000 receipt (receipt-4, doc-bank, 2026-10-20) is posted once, as entry-receipt-4. Total accounts_receivable debits in doc-ledger are 7900000 cents against 7400000 cents of invoices in the bundle (sum of stated invoice amounts); accounts_receivable balance per doc-ledger is 2700000 cents versus 2200000 cents expected from stated invoices less posted receipts (arithmetic: 7400000 - 5200000).\nThe 500000-cent receivable for INV-005 is recorded twice, leaving accounts_receivable overstated by 500000 cents. Revenue is likewise credited twice. No field in the bundle distinguishes the second entry as a separate legitimate charge.\nA human should trace entry-duplicate to its originating import or journal batch and confirm against the Fieldwork Co. document set before any correction is recorded.",
+        "certaintyLabel": "possible",
+        "proposedAction": "review_duplicate",
+        "needsHumanReview": true
+      },
+      {
+        "type": "partial_payment",
+        "affectedRecordIds": [
+          "receipt-2",
+          "receipt-unmatched",
+          "entry-receipt-2",
+          "invoice-2"
+        ],
+        "evidenceRefs": [
+          "doc-inv-2",
+          "doc-bank"
+        ],
+        "explanation": "INV-003 Northline Partners only partly settled by posted receipts\ndoc-inv-2 states INV-003, Northline Partners, 300000 cents. doc-bank shows receipt-2 of 100000 cents (2026-10-20, posted; entry-receipt-2 credits accounts_receivable 100000) and receipt-unmatched of 50000 cents (2026-10-21, posted=false, no corresponding ledger entry). Posted receipts against INV-003 total 100000 cents. Residual on posted basis is 200000 cents (arithmetic: 300000 - 100000); residual if the unposted 50000 cents is counted is 150000 cents (arithmetic: 300000 - 100000 - 50000).\nThe invoice is not fully settled by posted cash: 200000 cents of the stated 300000 cents remains unmatched to any posted receipt. The intended allocation of the separate 50000-cent receipt to INV-003 is unconfirmed.\nA human should confirm the customer remittance advice for both the 100000-cent and 50000-cent receipts before deciding whether the residual is collectable.",
+        "certaintyLabel": "possible",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      },
+      {
+        "type": "unmatched_receipt",
+        "affectedRecordIds": [
+          "invoice-2",
+          "receipt-unmatched"
+        ],
+        "evidenceRefs": [
+          "doc-bank",
+          "doc-ledger",
+          "doc-inv-2"
+        ],
+        "explanation": "Bank receipt of 50000 cents for INV-003 has no ledger posting\ndoc-bank lists externalId receipt-unmatched, invoiceNumber INV-003, postedDate 2026-10-21, amountCents 50000. In the bundle this record is posted=false and no entry-receipt-unmatched exists in doc-ledger; cash and accounts_receivable therefore do not reflect it. The invoiceNumber key resolves to invoice-2 (INV-003 Northline Partners, 300000 cents) in doc-inv-2. Cash per doc-ledger is 2000000 cents (7200000 debits less 5200000 credits), which equals the stated opening cash of 2000000 cents and excludes this 50000 cents.\nA cash receipt present in bank evidence is absent from the ledger: 50000 cents of cash and the related accounts_receivable credit are unposted. Matching failed on posting status, not on the invoice-number key.\nA human should pull the bank statement line behind receipt-unmatched and confirm clearing status before any entry is prepared.",
+        "certaintyLabel": "possible",
+        "proposedAction": "review_receipt_match",
+        "needsHumanReview": true
+      },
+      {
+        "type": "unmatched_receipt",
+        "affectedRecordIds": [
+          "invoice-0",
+          "entry-invoice-0"
+        ],
+        "evidenceRefs": [
+          "doc-inv-0",
+          "doc-ledger",
+          "doc-bank",
+          "doc-returned-payment"
+        ],
+        "explanation": "INV-A (20000 USD) has no receipt anywhere in the bundle and is reported returned unpaid\ndoc-inv-0 states INV-A, Ricky Dalton, 2000000 cents, issued 2026-10-01, due 2026-11-01; doc-ledger contains entry-invoice-0 debiting accounts_receivable 2000000 cents. doc-bank contains no line referencing INV-A, and doc-ledger contains no receipt entry for invoice-0. doc-returned-payment (a fictional recorded scenario) states the customer payment was returned unpaid, that no receipt or cash posting exists, and that revised expected collection is 2026-11-09 subject to customer confirmation. The full 2000000 cents therefore remains in accounts_receivable per doc-ledger.\nThe receivable is recorded but no cash evidence exists in either direction: there is no receipt for INV-A and no returned-payment advice (bank line, debit memo, or customer notice) in the bundle. The collection date in the invoice record and the scenario note disagree (see F-005).\nA human should obtain the bank's return notice and a written customer confirmation before relying on either collection date; nothing in the bundle should be treated as cash.",
+        "certaintyLabel": "possible",
+        "proposedAction": "review_receipt_match",
+        "needsHumanReview": true
+      },
+      {
+        "type": "inconsistent_amount",
+        "affectedRecordIds": [
+          "invoice-0"
+        ],
+        "evidenceRefs": [
+          "doc-inv-0",
+          "doc-returned-payment"
+        ],
+        "explanation": "INV-A expected collection date conflicts: 2026-10-28 in the invoice record versus 2026-11-09 in the returned-payment note\nThe bundle's invoice-0 record carries expectedDate 2026-10-28 while doc-inv-0 states only issue 2026-10-01 and due 2026-11-01. doc-returned-payment states the original forecast relied on INV-A arriving 2026-10-28 and that the revised expected collection is 2026-11-09, subject to customer confirmation. No document supplies customer confirmation of either date, and the note itself is labelled a fictional recording scenario.\nTwo expected collection dates (2026-10-28 and 2026-11-09) refer to the same 2000000-cent receivable. The bundle does not establish which is current, and the revised date is explicitly unconfirmed. No amount is flagged separately for this finding because it concerns the same receivable already reported in F-004.\nA human should reconcile the two dates to primary evidence (bank advice plus customer written confirmation) and record which one the forecast uses.",
+        "certaintyLabel": "possible",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      },
+      {
+        "type": "insufficient_evidence",
+        "affectedRecordIds": [
+          "historical-distribution"
+        ],
+        "evidenceRefs": [
+          "doc-ledger"
+        ],
+        "explanation": "52000 USD cash distribution and 20000 USD opening cash cite only the ledger itself\ndoc-ledger contains historical-distribution (effectiveDate 2026-10-23) debiting opening_equity 5200000 cents and crediting cash 5200000 cents, with sourceReference doc-ledger. The opening entry likewise debits cash 2000000 cents with sourceReference doc-ledger. Both are self-referencing: no bank statement, distribution authorization, or owner-resolution document for either amount exists among the supplied evidence. The 5200000-cent distribution exactly equals the 5200000 cents of posted receipts in doc-ledger (200000 + 100000 + 400000 + 500000 + 600000 + 700000 + 800000 + 900000 + 1000000).\nA cash movement of 5200000 cents and the 2000000-cent opening balance are unsupported by any primary document in the bundle. Cash per doc-ledger (2000000 cents) cannot be verified against a bank statement, and the coincidence of the distribution amount with total receipts is unexplained.\nA human should obtain the bank statement covering 2026-10-01 to 2026-10-23 and the distribution authorization before treating the 2000000-cent cash figure as reliable.",
+        "certaintyLabel": "insufficient",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      },
+      {
+        "type": "inconsistent_amount",
+        "affectedRecordIds": [
+          "doc-duplicate-vendor",
+          "doc-ledger"
+        ],
+        "evidenceRefs": [
+          "doc-duplicate-vendor",
+          "doc-ledger"
+        ],
+        "explanation": "Two identical 149 USD KitchenOps charges with an unverified claim they are already in opening cash\ndoc-duplicate-vendor lists kitchen-subscription-1 and kitchen-subscription-2, both dated 2026-10-24, both described 'PADDLE.NET KitchenOps subscription', both 14900 cents. The note states they may be duplicate billing or separate subscriptions, that no fraud conclusion is established, and that they are already within the opening cash snapshot and must not be deducted again. doc-ledger contains no entry referencing either transactionId, no software or subscription expense account, and no 14900 or 29800 cent amount anywhere.\nThe note asserts both charges are already inside the opening cash snapshot, but doc-ledger shows no posting for them at all, so the assertion cannot be verified from the bundle and the expense appears unrecorded. Whether the two charges are duplicates is unresolved in the evidence. Amount shown is the sum of the two stated charges (arithmetic: 14900 + 14900).\nA human should check the PADDLE.NET billing portal for two distinct subscription IDs and confirm with the bank statement whether both charges cleared, before deducting or reversing anything.",
+        "certaintyLabel": "possible",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      },
+      {
+        "type": "inconsistent_amount",
+        "affectedRecordIds": [
+          "historical-distribution"
+        ],
+        "evidenceRefs": [
+          "doc-ledger",
+          "doc-inv-0",
+          "doc-returned-payment"
+        ],
+        "explanation": "Ledger effective dates (2026-10-01 to 2026-10-23) precede the stated business start date of 2026-10-26\nThe bundle's business record states startDate 2026-10-26 and openingCashCents 2000000. doc-ledger entries range from 2026-10-01 (opening, invoice postings) through 2026-10-20 (receipts), 2026-10-23 (historical-distribution), and doc-returned-payment refers to 2026-10-28 and 2026-11-09 events. doc-inv-0 and all nine other invoice documents are issued 2026-10-01. Every ledger date therefore falls before the stated start date. No amount is flagged separately for this finding because the amounts are already reported in F-001, F-004 and F-006.\nThe reporting period implied by the business metadata (from 2026-10-26) does not contain any of the supplied ledger activity, and the opening balance date is 25 days earlier than the stated start. Either the start date is a re-open or migration date rather than a period start, or one of the two dates is wrong.\nA human should confirm the intended audit period with the finance owner and restate the period boundary consistently before the report is used downstream.",
+        "certaintyLabel": "possible",
+        "proposedAction": "request_evidence",
+        "needsHumanReview": true
+      }
+    ],
+    "missingEvidence": [
+      "52000 USD cash distribution and 20000 USD opening cash cite only the ledger itself"
+    ],
+    "summary": "Found 8 items to review. Inspect the sources before approving a correction. No changes have been posted."
+  },
+  "status": "LIVE_SOURCE_VALIDATED",
+  "agentId": "bdd3a27c-ebcf-4c6a-87d6-243a03bcfeaa",
+  "shareLink": null,
+  "resubmitted": false
+}

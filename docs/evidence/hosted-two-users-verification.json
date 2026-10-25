@@ -1,0 +1,40 @@
+{
+  "verifiedAt": "2026-10-25T11:19:06.268Z",
+  "origin": "https://ledgerproof-one.vercel.app",
+  "commit": "7989dd3",
+  "checks": [
+    "Owner A started the default repair scenario and a real CREAO investigation.",
+    "Investigation controls are disabled while running; reset remains available.",
+    "User B uploaded actual files, approved a matched receipt and retained originals in a separate Convex case.",
+    "The same saved CREAO run now returns eight source-validated findings through the deployed UI; no new execution was submitted.",
+    "Hosted Claude generated source-bound suggestions; a demo chargeback draft persisted without a refund, call or bank submission.",
+    "Name search displays the verified CRS fictional customer report without another credit pull.",
+    "The deployed Exa endpoint returns a real unpaid x402 quote; purchase stays disabled without funding.",
+    "Two live users shared a case; reset removed its notes, findings, proposed entries and provider results while preserving the separate imported business.",
+    "Current and previous sample download links work."
+  ],
+  "creao": {
+    "id": "26e27d25-ec77-4b57-9e35-39fb3d4c0ad1",
+    "findings": 8,
+    "state": "needs_review",
+    "requestDigestPersisted": true,
+    "resubmitted": false
+  },
+  "claude": {
+    "key": "71e93af84fc0cbc041422679cb999cb379058735c096746ee0c07f4c9e5af400",
+    "chargedMicros": 16527,
+    "budget": {
+      "callCap": 50,
+      "calls": 8,
+      "capMicros": 5000000,
+      "chargedMicros": 117583,
+      "reservedMicros": 0,
+      "scope": "This Convex deployment only; other API clients and provider billing are outside this counter."
+    }
+  },
+  "unexpectedBrowserErrors": [],
+  "status": "LIVE_PRODUCTION_TWO_USERS_VERIFIED",
+  "recheckedAt": "2026-10-25T11:29:51.732Z",
+  "testedDeployment": "https://ledgerproof-cu8m5hdh3-ledger-proof1.vercel.app",
+  "paidEvidencePurchased": false
+}
