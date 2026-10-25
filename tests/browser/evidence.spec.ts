@@ -3,7 +3,7 @@ test('optional evidence explains each provider and local context prevents a purc
  await page.goto('/workbench');await page.getByRole('button',{name:'Start finance demo'}).click();
  await expect(page.getByRole('button',{name:'Add investigation charge'})).not.toBeVisible();
  await page.locator('#missing-context > summary').click();await expect(page.locator('#missing-context')).toContainText('Exa searches official vendor documentation');
- await page.getByRole('button',{name:'Add investigation charge'}).click();await expect(page.getByRole('heading',{name:'PADDLE.NET · KitchenOps subscription',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Add investigation charge'})).not.toBeVisible();await page.getByText('Add another charge',{exact:true}).click();await page.getByRole('button',{name:'Add investigation charge'}).click();await expect(page.getByRole('heading',{name:'PADDLE.NET · KitchenOps subscription',exact:true})).toBeVisible();
  await expect(page.getByRole('button',{name:'Get unpaid Exa quote'})).toBeDisabled();await expect(page.locator('#missing-context')).toContainText('Live vendor searches are unavailable');
  await page.getByLabel('Local billing evidence').fill('Vendor receipt is available locally. Review subscription and usage line items before paying for research.');await page.getByRole('button',{name:'Attach local evidence'}).click();
  await expect(page.getByRole('button',{name:'Get unpaid Exa quote'})).toBeDisabled();await expect(page.getByText('Local evidence is attached. Review it before buying additional context.',{exact:true})).toBeVisible();

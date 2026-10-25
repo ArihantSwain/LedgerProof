@@ -6,7 +6,7 @@ test('missing inputs, repeated imports and unavailable tools disable their actio
  await page.getByLabel('Unexpected expense · USD').fill('');await expect(page.getByRole('button',{name:'Model unexpected expense'})).toBeDisabled();
  await page.getByLabel('Delayed collection date').fill('2026-11-09');await page.getByRole('button',{name:'Model customer delay'}).click();await expect(page.getByRole('button',{name:'Model customer delay'})).toBeDisabled();
  await page.getByRole('navigation').getByRole('link',{name:'Accounting workbench'}).click();await page.locator('#accounting-review > summary').click();await expect(page.getByRole('button',{name:'Request accounting review'})).toBeDisabled();
- await page.locator('#missing-context > summary').click();await page.getByLabel('Investigation charge amount').fill('');await expect(page.getByRole('button',{name:'Add investigation charge'})).toBeDisabled();
+ await page.locator('#missing-context > summary').click();await page.getByText('Add another charge',{exact:true}).click();await page.getByLabel('Investigation charge amount').fill('');await expect(page.getByRole('button',{name:'Add investigation charge'})).toBeDisabled();
  await expect(page.locator('.error[role=alert]')).toHaveCount(0);
 });
 test('a temporary server response is readable and clears on navigation',async({page})=>{
